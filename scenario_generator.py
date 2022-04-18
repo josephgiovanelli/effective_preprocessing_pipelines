@@ -69,7 +69,7 @@ def get_filtered_datasets():
     df = df.loc[df['NumberOfMissingValues'] / (df['NumberOfInstances'] * df['NumberOfFeatures']) < 0.1]
     df = df.loc[df['NumberOfInstancesWithMissingValues'] / df['NumberOfInstances'] < 0.1]
     df = df.loc[df['NumberOfInstances'] * df['NumberOfFeatures'] < 5000000]
-    df.to_csv('extended_benchmark_suite.csv', index=False)
+    #df.to_csv('extended_benchmark_suite.csv', index=False)
     df = df['did']
     return df.values.flatten().tolist()
 
