@@ -46,8 +46,6 @@ for scenario in scenario_list:
         scenarios[scenario] = {'results': None, 'path': scenario}
     for result in result_list:
         base_result = result.split('.json')[0]
-        print(base_scenario)
-        print(base_result)
         if base_result.__eq__(base_scenario):
             scenarios[scenario]['results'] = result
             #date = base_result.split(base_scenario + '_')[-1].replace('_', ' ')
