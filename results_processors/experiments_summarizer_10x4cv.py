@@ -24,6 +24,8 @@ def main():
     save_results_10x4cv(create_directory(result_path, 'raw'), summaries)
 
     prob = 0.95
+    a = 0.1 if categories['first_second'] == 'FN' else (0.9 if categories['first_second'] == 'DF' else 0.5)
+    b = round(1 - a, 2)
     results = pd.DataFrame()
     results_train = pd.DataFrame()
     results_test = pd.DataFrame()
@@ -33,8 +35,8 @@ def main():
         train_frequencies = [summaries[batch]['train']['summary'][categories['first_second']], summaries[batch]['train']['summary'][categories['second_first']]]
         test_frequencies = [summaries[batch]['test']['summary'][categories['first_second']], summaries[batch]['test']['summary'][categories['second_first']]]
         critical, stat, statistic_test, alpha, p, p_value = chi2test(train_frequencies, test_frequencies, prob)
-        critical_train, stat_train, statistic_test_train, alpha_train, p_train, p_value_train = chi2test(train_frequencies, [total_train * 0.1, total_train * 0.9], prob)
-        critical_test, stat_test, statistic_test_test, alpha_test, p_test, p_value_test = chi2test(test_frequencies, [total_test * 0.1, total_test * 0.9], prob)
+        critical_train, stat_train, statistic_test_train, alpha_train, p_train, p_value_train = chi2test(train_frequencies, [total_train * a, total_train * b], prob)
+        critical_test, stat_test, statistic_test_test, alpha_test, p_test, p_value_test = chi2test(test_frequencies, [total_test * a, total_test * b], prob)
         results = results.append({'critical': critical, 'stat': stat, 'statistic_test': statistic_test, 'alpha': alpha, 'p': p, 'p_value': p_value}, ignore_index=True)
         results_train = results_train.append({'critical': critical_train, 'stat': stat_train, 'statistic_test': statistic_test_train, 'alpha': alpha_train, 'p': p_train, 'p_value': p_value_train}, ignore_index=True)
         results_test = results_test.append({'critical': critical_test, 'stat': stat_test, 'statistic_test': statistic_test_test, 'alpha': alpha_test, 'p': p_test, 'p_value': p_value_test}, ignore_index=True)
@@ -56,8 +58,8 @@ def main():
             train_frequencies = [summaries[batch]['train']['summary'][categories['first_second']], summaries[batch]['train']['summary'][categories['second_first']]]
             test_frequencies = [summaries[batch]['test']['summary'][categories['first_second']], summaries[batch]['test']['summary'][categories['second_first']]]
             critical, stat, statistic_test, alpha, p, p_value = chi2test(train_frequencies, test_frequencies, prob)
-            critical_train, stat_train, statistic_test_train, alpha_train, p_train, p_value_train = chi2test(train_frequencies, [total_train * 0.1, total_train * 0.9], prob)
-            critical_test, stat_test, statistic_test_test, alpha_test, p_test, p_value_test = chi2test(test_frequencies, [total_test * 0.1, total_test * 0.9], prob)
+            critical_train, stat_train, statistic_test_train, alpha_train, p_train, p_value_train = chi2test(train_frequencies, [total_train * a, total_train * b], prob)
+            critical_test, stat_test, statistic_test_test, alpha_test, p_test, p_value_test = chi2test(test_frequencies, [total_test * a, total_test * b], prob)
             batch_results = batch_results.append({'critical': critical, 'stat': stat, 'statistic_test': statistic_test, 'alpha': alpha, 'p': p, 'p_value': p_value}, ignore_index=True)
             batch_train_results = batch_train_results.append({'critical': critical_train, 'stat': stat_train, 'statistic_test': statistic_test_train, 'alpha': alpha_train, 'p': p_train, 'p_value': p_value_train}, ignore_index=True)
             batch_test_results = batch_test_results.append({'critical': critical_test, 'stat': stat_test, 'statistic_test': statistic_test_test, 'alpha': alpha_test, 'p': p_test, 'p_value': p_value_test}, ignore_index=True)

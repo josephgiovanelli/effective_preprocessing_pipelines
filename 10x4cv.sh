@@ -5,3 +5,4 @@ python results_processors/experiments_summarizer_10x4cv.py -p discretize feature
 python results_processors/experiments_summarizer_10x4cv.py -p features normalize -i results/pipeline_construction/features_normalize/ -o results/pipeline_construction/features_normalize/
 python results_processors/experiments_summarizer_10x4cv.py -p discretize rebalance -i results/pipeline_construction/discretize_rebalance/ -o results/pipeline_construction/discretize_rebalance/
 
+python results_processors/graphs_maker_10x4cv.py
