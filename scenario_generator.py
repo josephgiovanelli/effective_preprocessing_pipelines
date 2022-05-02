@@ -1,111 +1,100 @@
 import os
 import copy
 import re
+import argparse
+
 from collections import OrderedDict
 
 import pandas as pd
 
-from commons import large_comparison_classification_tasks, extended_benchmark_suite, benchmark_suite, algorithms
-from results_processors.utils import parse_args, create_directory
-
-
-SCENARIO_PATH = create_directory('./' ,'scenarios')
-SCENARIO_PATH = create_directory(SCENARIO_PATH ,'pipeline_construction')
-
-policies = ['split']
-
-
-policies_config = {
-    'iterative': {
-        'step_algorithm': 15,
-        'step_pipeline': 15,
-        'reset_trial': False
-    },
-    'split': {
-        'step_pipeline': 30
-    },
-    'adaptive': {
-        'initial_step_time': 15,
-        'reset_trial': False,
-        'reset_trials_after': 2
-    },
-    'joint': {}
-}
+from commons import large_comparison_classification_tasks, extended_benchmark_suite, preprocessing_impact_suite, benchmark_suite, algorithms
+from results_processors.utils import create_directory
 
 base = OrderedDict([
-    ('title', 'Random Forest on Wine with Iterative policy'),
-    ('setup', {
-        'policy': 'iterative',
-        'runtime': 400,
-        'algorithm': 'RandomForest',
-        'dataset': 'wine'
+    ("title", ""),
+    ("setup", {
+        "policy": "split",
     }),
-    ('control', {
-        'seed': 42
-    }),
-    ('policy', {})
+    ("control", {
+        "seed": 42
+    })
 ])
+
+def parse_args():
+
+    parser = argparse.ArgumentParser(
+        description="""
+            Automated Machine Learning Workflow creation and configuration
+            """
+    )
+
+    parser.add_argument(
+        "-exp",
+        "--experiment",
+        nargs="?",
+        type=str,
+        required=True,
+        help="type of the experiments",
+    )
+
+    args = parser.parse_args()
+
+    return args
 
 def __write_scenario(path, scenario):
     try:
-        print('   -> {}'.format(path))
-        with open(path, 'w') as f:
-            for k,v in scenario.items():
+        print("   -> {}".format(path))
+        with open(path, "w") as f:
+            for k, v in scenario.items():
                 if isinstance(v, str):
-                    f.write('{}: {}\n'.format(k, v))
+                    f.write("{}: {}\n".format(k, v))
                 else:
-                    f.write('{}:\n'.format(k))
-                    for i,j in v.items():
-                        f.write('  {}: {}\n'.format(i,j))
+                    f.write("{}:\n".format(k))
+                    for i, j in v.items():
+                        f.write("  {}: {}\n".format(i, j))
     except Exception as e:
         print(e)
 
 def get_filtered_datasets():
-    def diff(first, second):
-        second = set(second)
-        return [item for item in first if item not in second]
     df = pd.read_csv("results_processors/meta_features/simple-meta-features.csv")
-    df = df.loc[df['did'].isin(list(dict.fromkeys(benchmark_suite + extended_benchmark_suite + [10, 20, 26])))]
-    df = df.loc[df['NumberOfMissingValues'] / (df['NumberOfInstances'] * df['NumberOfFeatures']) < 0.1]
-    df = df.loc[df['NumberOfInstancesWithMissingValues'] / df['NumberOfInstances'] < 0.1]
-    df = df.loc[df['NumberOfInstances'] * df['NumberOfFeatures'] < 5000000]
-    #df.to_csv('extended_benchmark_suite.csv', index=False)
-    df = df['did']
+    df = df.loc[df["did"].isin(benchmark_suite)]
+    df = df.loc[
+        df["NumberOfMissingValues"] / (df["NumberOfInstances"] * df["NumberOfFeatures"])
+        < 0.1
+    ]
+    df = df.loc[
+        df["NumberOfInstancesWithMissingValues"] / df["NumberOfInstances"] < 0.1
+    ]
+    df = df.loc[df["NumberOfInstances"] * df["NumberOfFeatures"] < 5000000]
+    df = df["did"]
     return df.values.flatten().tolist()
 
-for id in get_filtered_datasets():
-    print('# DATASET: {}'.format(id))
-    for algorithm in algorithms:
-        print('## ALGORITHM: {}'.format(algorithm))
-        for policy in policies:
-            scenario = copy.deepcopy(base)
-            scenario['setup']['dataset'] = id
-            scenario['setup']['algorithm'] = algorithm
-            scenario['setup']['policy'] = policy
-            scenario['policy'] = copy.deepcopy(policies_config[policy])
-            a = re.sub(r"(\w)([A-Z])", r"\1 \2", algorithm)
-            b = ''.join([c for c in algorithm if c.isupper()]).lower()
-            scenario['title'] = '{} on dataset n {} with {} policy'.format(
-                a,
-                id,
-                policy.title()
-            )
-            '''
-            if policy == 'split':
-                runtime = scenario['setup']['runtime']
-                step = policies_config['split']['step_pipeline']
-                ranges = [i for i in range(0, runtime+step, step)]
-                for r in ranges:
-                    scenario['policy']['step_pipeline'] = r
-                    path = os.path.join('./scenarios', '{}_{}_{}_{}.yaml'.format(b, task_id, policy, r))
-                    __write_scenario(path, scenario)
-            else:
-                path = os.path.join('./scenarios', '{}_{}_{}.yaml'.format(b, task_id, policy))
-                __write_scenario(path, scenario)
-            '''
-            runtime = scenario['setup']['runtime']
-            step = policies_config['split']['step_pipeline']
-            scenario['policy']['step_pipeline'] = runtime
-            path = os.path.join(SCENARIO_PATH, '{}_{}.yaml'.format(b, id))
-            __write_scenario(path, scenario)
+args = parse_args()
 
+scenario_path = create_directory("./", "scenarios")
+scenario_path = create_directory(scenario_path, args.experiment)
+datasets = get_filtered_datasets() if args.experiment == "pipeline_construction" else preprocessing_impact_suite
+
+for dataset in datasets:
+    for algorithm in algorithms:
+        scenario = copy.deepcopy(base)
+        scenario["title"] = "{} on dataset n. {} with Split policy".format(
+            algorithm, dataset
+        )
+        runtime = 400 if args.experiment == "pipeline_construction" else 130
+        scenario["setup"]["runtime"] = runtime
+        scenario["setup"]["dataset"] = dataset
+        scenario["setup"]["algorithm"] = algorithm
+        scenario["policy"] = {"step_pipeline": runtime}
+
+        algorithm_acronym = "".join([c for c in algorithm if c.isupper()]).lower()
+        if args.experiment == "pipeline_construction":
+            path = os.path.join(scenario_path, "{}_{}.yaml".format(algorithm_acronym, dataset))
+            __write_scenario(path, scenario)
+        else:
+            for experiment_step in ["algorithm", "algorithm_pipeline"]:
+                step_pipeline = 0 if experiment_step == "algorithm" else 50
+                scenario["policy"]["step_pipeline"] = step_pipeline
+                path = create_directory(scenario_path, experiment_step)
+                path = os.path.join(path, "{}_{}.yaml".format(algorithm_acronym, dataset))
+                __write_scenario(path, scenario)
