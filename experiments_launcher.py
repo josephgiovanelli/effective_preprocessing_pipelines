@@ -16,14 +16,22 @@ import argparse
 from results_processors.utils import create_directory
 
 parser = argparse.ArgumentParser(description="Automated Machine Learning Workflow creation and configuration")
-parser.add_argument("-p", "--pipeline", nargs="+", type=str, required=True, help="step of the pipeline to execute")
+parser.add_argument("-p", "--pipeline", nargs="+", type=str, required=False, help="step of the pipeline to execute")
 parser.add_argument("-r", "--result_path", nargs="?", type=str, required=True, help="path where put the results")
+parser.add_argument("-exp", "--experiment", nargs="?", type=str, required=True, help="type of the experiments")
+parser.add_argument("-mode", "--mode", nargs="?", type=str, required=False, help="algorithm or algorithm_pipeline")
 args = parser.parse_args()
 
-SCENARIO_PATH = './scenarios/pipeline_construction'
-RESULT_PATH = './'
+
+scenario_path = create_directory("./", "scenarios")
+scenario_path = create_directory(scenario_path, args.experiment)
+if args.experiment == "preprocessing_impact":
+    scenario_path = create_directory(scenario_path, args.mode
+    )
+result_path = './'
 for directory in args.result_path.split("/"):
-    RESULT_PATH = create_directory(RESULT_PATH , str(directory))
+    result_path = create_directory(result_path , str(directory))
+result_path = create_directory(result_path , args.mode)
 GLOBAL_SEED = 42
 
 def yes_or_no(question):
@@ -35,8 +43,8 @@ def yes_or_no(question):
             return False
 
 # Gather list of scenarios
-scenario_list = [p for p in os.listdir(SCENARIO_PATH) if '.yaml' in p]
-result_list = [p for p in os.listdir(RESULT_PATH) if '.json' in p]
+scenario_list = [p for p in os.listdir(scenario_path) if '.yaml' in p]
+result_list = [p for p in os.listdir(result_path) if '.json' in p]
 scenarios = {}
 
 # Determine which one have no result files
@@ -54,7 +62,7 @@ for scenario in scenario_list:
 # Calculate total amount of time
 total_runtime = 0
 for path, scenario in iteritems(scenarios):
-    with open(os.path.join(SCENARIO_PATH, path), 'r') as f:
+    with open(os.path.join(scenario_path, path), 'r') as f:
         details = None
         try:
             details = yaml.safe_load(f)
@@ -121,13 +129,25 @@ with tqdm(total=total_runtime) as pbar:
         base_scenario = info['path'].split('.yaml')[0]
         output = base_scenario.split('_')[0]
         pbar.set_description("Running scenario {}\n\r".format(info['path']))
-        cmd = 'python ./main.py -s {} -c control.seed={} -p {} -r {}'.format(
-            os.path.join(SCENARIO_PATH, info['path']),
+
+        if args.experiment == "pipeline_construction":
+            pipeline = args.pipeline
+        else:
+            if base_scenario.startswith("knn"):
+                pipeline = ['impute', 'encode', 'normalize', 'rebalance', 'features']
+            elif base_scenario.startswith("nb"):
+                pipeline = ['impute', 'encode', 'normalize', 'features', 'rebalance']
+            else:
+                pipeline = ['impute', 'encode', 'normalize', 'rebalance', 'features']
+
+        cmd = 'python ./main.py -s {} -c control.seed={} -p {} -r {} -exp {}'.format(
+            os.path.join(scenario_path, info['path']),
             GLOBAL_SEED,
-            reduce(lambda x, y: x + " " + y, args.pipeline),
-            RESULT_PATH)
-        with open(os.path.join(RESULT_PATH, '{}_stdout.txt'.format(base_scenario)), "a") as log_out:
-            with open(os.path.join(RESULT_PATH, '{}_stderr.txt'.format(base_scenario)), "a") as log_err:
+            reduce(lambda x, y: x + " " + y, pipeline),
+            result_path,
+            args.experiment)
+        with open(os.path.join(result_path, '{}_stdout.txt'.format(base_scenario)), "a") as log_out:
+            with open(os.path.join(result_path, '{}_stderr.txt'.format(base_scenario)), "a") as log_err:
                 max_time = 1000
                 try:
                     process = subprocess.Popen(cmd, shell=True, stdout=log_out, stderr=log_err)

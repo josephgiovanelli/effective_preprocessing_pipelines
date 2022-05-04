@@ -30,7 +30,7 @@ def load_dataset(id):
 def main(args):
     scenario = scenarios.load(args.scenario)
     scenario = cli.apply_scenario_customization(scenario, args.customize)
-    config = scenarios.to_config(scenario)
+    config = scenarios.to_config(scenario, args.experiment)
     print('SCENARIO:\n {}'.format(json.dumps(scenario, indent=4, sort_keys=True)))
 
     X, y = load_dataset(scenario['setup']['dataset'])

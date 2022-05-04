@@ -18,7 +18,7 @@ decode = False
 
 def get_filtered_datasets():
     df = pd.read_csv("../simple-meta-features.csv")
-    df = df.loc[df['did'].isin(extended_benchmark_suite)]
+    df = df.loc[df['did'].isin(list(dict.fromkeys(benchmark_suite + extended_benchmark_suite + [10, 20, 26])))]
     df = df.loc[df['NumberOfMissingValues'] / (df['NumberOfInstances'] * df['NumberOfFeatures']) < 0.1]
     df = df.loc[df['NumberOfInstancesWithMissingValues'] / df['NumberOfInstances'] < 0.1]
     df = df.loc[df['NumberOfInstances'] * df['NumberOfFeatures'] < 5000000]

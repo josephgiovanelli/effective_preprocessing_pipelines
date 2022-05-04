@@ -16,6 +16,8 @@ benchmark_suite = [3, 6, 11, 12, 14, 15, 16, 18, 22, 23, 28, 29, 31, 32, 37, 44,
 extended_benchmark_suite = [41145, 41156, 41157, 4541, 41158, 42742, 40498, 42734, 41162, 42733, 42732, 1596, 40981, 40685, 
                         4135, 41142, 41161, 41159, 41163, 41164, 41138, 41143, 41146, 41150, 40900, 41165, 41166, 41168, 41169, 
                         41147, 1111, 1169, 41167, 41144, 1515, 1457, 181]
+preprocessing_impact_suite = [1461]
+
 
 
 def create_possible_categories(pipeline):
@@ -41,9 +43,10 @@ def create_possible_categories(pipeline):
             'not_exec': not_exec,
             'not_exec_once': not_exec_once}
 
-def get_filtered_datasets():
+def get_filtered_datasets(experiment="pipeline_construction"):
     df = pd.read_csv('results_processors/meta_features/simple-meta-features.csv')
-    df = df.loc[df['did'].isin(list(dict.fromkeys(benchmark_suite + extended_benchmark_suite + [10, 20, 26])))]
+    dataset_suit = list(dict.fromkeys(benchmark_suite + extended_benchmark_suite + [10, 20, 26])) if experiment == "pipeline_construction" else preprocessing_impact_suite
+    df = df.loc[df['did'].isin(dataset_suit)]
     df = df.loc[df['NumberOfMissingValues'] / (df['NumberOfInstances'] * df['NumberOfFeatures']) < 0.1]
     df = df.loc[df['NumberOfInstancesWithMissingValues'] / df['NumberOfInstances'] < 0.1]
     df = df.loc[df['NumberOfInstances'] * df['NumberOfFeatures'] < 5000000]
