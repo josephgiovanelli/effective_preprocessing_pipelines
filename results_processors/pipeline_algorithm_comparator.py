@@ -2,9 +2,9 @@ from __future__ import print_function
 
 import argparse
 
-from results_processors.results_extraction_utils import create_possible_categories, get_filtered_datasets, load_results, \
+from results_extraction_utils import create_possible_categories, get_filtered_datasets, load_results, \
     rich_simple_results, load_algorithm_results, merge_results, save_comparison, save_summary
-from results_processors.utils import create_directory
+from utils import create_directory
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Automated Machine Learning Workflow creation and configuration")

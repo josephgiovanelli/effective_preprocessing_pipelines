@@ -4,11 +4,11 @@ import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
 
-from results_processors.results_cooking_utils import get_results, save_train_meta_learner, modify_class, \
+from results_cooking_utils import get_results, save_train_meta_learner, modify_class, \
     join_result_with_extracted_meta_features, encode_data, create_correlation_matrix, save_correlation_matrix
-from results_processors.results_extraction_utils import create_possible_categories, get_filtered_datasets, \
+from results_extraction_utils import create_possible_categories, get_filtered_datasets, \
     extract_results
-from results_processors.utils import parse_args, create_directory
+from utils import parse_args, create_directory
 
 
 def main():
