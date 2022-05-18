@@ -10,13 +10,14 @@ import openml
 
 from sklearn.model_selection import train_test_split
 
-def load_dataset(id):
+def load_dataset(id, experiment):
     dataset = openml.datasets.get_dataset(id)
     X, y, categorical_indicator, _ = dataset.get_data(
         dataset_format='array',
         target=dataset.default_target_attribute
     )
-    X = SimpleImputer(strategy="constant").fit_transform(X)
+    if experiment != 'evaluation1':
+        X = SimpleImputer(strategy="constant").fit_transform(X)
     print(dataset.name)
     print(X, y)
     PrototypeSingleton.getInstance().setPipeline(args.pipeline)
@@ -33,7 +34,7 @@ def main(args):
     config = scenarios.to_config(scenario, args.experiment)
     print('SCENARIO:\n {}'.format(json.dumps(scenario, indent=4, sort_keys=True)))
 
-    X, y = load_dataset(scenario['setup']['dataset'])
+    X, y = load_dataset(scenario['setup']['dataset'], args.experiment)
 
     X_train, X_test, y_train, y_test = train_test_split(
         X,
@@ -46,8 +47,8 @@ def main(args):
     policy = policies.initiate(scenario['setup']['policy'], config)
     policy.run(X, y)
 
-    serializer.serialize_results(scenario, policy, args.result_path)
 
+    serializer.serialize_results(scenario, policy, args.result_path, args.pipeline)
 
 if __name__ == "__main__":
     args = cli.parse_args()

@@ -1,7 +1,9 @@
 #!/bin/bash
 
-./pipeline_construction.sh
+#./pipeline_construction.sh
 
-./10x4cv.sh
+#./10x4cv.sh
 
-./preprocessing_impact.sh
+#./preprocessing_impact.sh
+
+./evaluation.sh

@@ -1,5 +1,5 @@
 import os
-import signal
+import json
 from functools import reduce
 
 import yaml
@@ -13,6 +13,8 @@ from tqdm import tqdm
 
 import argparse
 
+from auto_pipeline_builder import framework_table_pipelines
+from experiment.utils import scenarios as scenarios_util
 from results_processors.utils import create_directory
 
 parser = argparse.ArgumentParser(description="Automated Machine Learning Workflow creation and configuration")
@@ -26,26 +28,21 @@ args = parser.parse_args()
 scenario_path = create_directory("./", "scenarios")
 scenario_path = create_directory(scenario_path, args.experiment)
 if args.experiment == "preprocessing_impact":
-    scenario_path = create_directory(scenario_path, args.mode
-    )
+    scenario_path = create_directory(scenario_path, args.mode)
+
 result_path = './'
 for directory in args.result_path.split("/"):
     result_path = create_directory(result_path , str(directory))
-result_path = create_directory(result_path , args.mode)
+if args.mode:
+    result_path = create_directory(result_path , args.mode)
 GLOBAL_SEED = 42
 
-def yes_or_no(question):
-    while True:
-        reply = str(input(question+' (y/n): ')).lower().strip()
-        if reply[0] == 'y':
-            return True
-        if reply[0] == 'n':
-            return False
-
+print('Gather list of scenarios')
 # Gather list of scenarios
 scenario_list = [p for p in os.listdir(scenario_path) if '.yaml' in p]
 result_list = [p for p in os.listdir(result_path) if '.json' in p]
 scenarios = {}
+print('Done.')
 
 # Determine which one have no result files
 for scenario in scenario_list:
@@ -74,6 +71,8 @@ for path, scenario in iteritems(scenarios):
                 runtime = details['setup']['runtime']
                 scenario['status'] = 'Ok'
                 scenario['runtime'] = runtime
+                if args.experiment == "evaluation1":
+                    scenario['runtime'] *= 24
                 if scenario['results'] is None:
                     total_runtime += runtime
             except:
@@ -130,30 +129,86 @@ with tqdm(total=total_runtime) as pbar:
         output = base_scenario.split('_')[0]
         pbar.set_description("Running scenario {}\n\r".format(info['path']))
 
-        if args.experiment == "pipeline_construction":
-            pipeline = args.pipeline
-        else:
-            if base_scenario.startswith("knn"):
-                pipeline = ['impute', 'encode', 'normalize', 'rebalance', 'features']
-            elif base_scenario.startswith("nb"):
-                pipeline = ['impute', 'encode', 'normalize', 'features', 'rebalance']
-            else:
-                pipeline = ['impute', 'encode', 'normalize', 'rebalance', 'features']
+        if args.experiment == "pipeline_construction" or args.experiment == "preprocessing_impact":
 
-        cmd = 'python ./main.py -s {} -c control.seed={} -p {} -r {} -exp {}'.format(
-            os.path.join(scenario_path, info['path']),
-            GLOBAL_SEED,
-            reduce(lambda x, y: x + " " + y, pipeline),
-            result_path,
-            args.experiment)
-        with open(os.path.join(result_path, '{}_stdout.txt'.format(base_scenario)), "a") as log_out:
-            with open(os.path.join(result_path, '{}_stderr.txt'.format(base_scenario)), "a") as log_err:
-                max_time = 1000
+            if args.experiment == "pipeline_construction":
+                pipeline = args.pipeline
+            else:
+                if base_scenario.startswith("knn"):
+                    pipeline = ['impute', 'encode', 'normalize', 'rebalance', 'features']
+                elif base_scenario.startswith("nb"):
+                    pipeline = ['impute', 'encode', 'normalize', 'features', 'rebalance']
+                else:
+                    pipeline = ['impute', 'encode', 'normalize', 'rebalance', 'features']
+
+            cmd = 'python ./main.py -s {} -c control.seed={} -p {} -r {} -exp {}'.format(
+                os.path.join(scenario_path, info['path']),
+                GLOBAL_SEED,
+                reduce(lambda x, y: x + " " + y, pipeline),
+                result_path,
+                args.experiment)
+            with open(os.path.join(result_path, '{}_stdout.txt'.format(base_scenario)), "a") as log_out:
+                with open(os.path.join(result_path, '{}_stderr.txt'.format(base_scenario)), "a") as log_err:
+                    max_time = 1000
+                    try:
+                        process = subprocess.Popen(cmd, shell=True, stdout=log_out, stderr=log_err)
+                        process.wait(timeout = max_time)
+                    except:
+                        kill(process.pid)
+                        print("\n\n"+ base_scenario + " does not finish in " + str(max_time) + "\n\n" )
+        else:
+            current_scenario = scenarios_util.load(os.path.join(scenario_path, info['path']))
+            config = scenarios_util.to_config(current_scenario, args.experiment)
+            pipelines = framework_table_pipelines()
+
+            data_to_write = {}
+            data_to_write['pipelines'] = []
+            results = []
+
+            for i in range(0, len(pipelines)):
+                pipeline = pipelines[i]
+                cmd = 'python ./main.py -s {} -c control.seed={} -p {} -r {} -f {} -exp {}'.format(
+                    os.path.join(scenario_path, info['path']),
+                    GLOBAL_SEED,
+                    pipeline,
+                    result_path,
+                    len(pipelines),
+                    args.experiment)
+                with open(os.path.join(result_path, '{}_stdout.txt'.format(base_scenario + "_" + str(i))),
+                        "a") as log_out:
+                    with open(os.path.join(result_path, '{}_stderr.txt'.format(base_scenario + "_" + str(i))),
+                            "a") as log_err:
+                        max_time = 1000
+                        try:
+                            process = subprocess.Popen(cmd, shell=True, stdout=log_out, stderr=log_err)
+                            process.wait(timeout=max_time)
+                        except Exception as e:
+                            print(e)
+                            kill(process.pid)
+                            print("\n\n" + base_scenario + " does not finish in " + str(max_time) + "\n\n")
+
                 try:
-                    process = subprocess.Popen(cmd, shell=True, stdout=log_out, stderr=log_err)
-                    process.wait(timeout = max_time)
-                except:
-                    kill(process.pid)
-                    print("\n\n"+ base_scenario + " does not finish in " + str(max_time) + "\n\n" )
+                    os.rename(os.path.join(result_path, '{}.json'.format(base_scenario)),
+                            os.path.join(result_path, '{}.json'.format(base_scenario + "_" + str(i))))
+                    with open(os.path.join(result_path, '{}.json'.format(base_scenario + "_" + str(i)))) as json_file:
+                        data = json.load(json_file)
+                        accuracy = data['context']['best_config']['score'] // 0.0001 / 100
+                        results.append(accuracy)
+                except Exception as e:
+                    print(e)
+                    accuracy = 0
+
+                data_to_write['pipelines'].append({
+                    'index': str(i),
+                    'pipeline': pipeline,
+                    'accuracy': accuracy
+                })
+                print(results)
+
+            try:
+                with open(os.path.join(result_path, '{}.json'.format(base_scenario)), 'w') as outfile:
+                    json.dump(data_to_write, outfile)
+            except:
+                print("I didn't manage to write")
 
         pbar.update(info['runtime'])

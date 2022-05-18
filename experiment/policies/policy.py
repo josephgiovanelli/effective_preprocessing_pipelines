@@ -6,8 +6,8 @@ import json
 class Policy(object):
     def __init__(self, config):
         self.PIPELINE_SPACE = PrototypeSingleton.getInstance().getDomainSpace()
-        self.compute_baseline = True
         self.config = config
+        self.compute_baseline = False if self.config["experiment"] == "evaluation1" else True
         self.context = {
             'iteration': 0,
             'history_hash': [],

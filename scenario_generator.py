@@ -68,7 +68,11 @@ args = parse_args()
 
 scenario_path = create_directory("./", "scenarios")
 scenario_path = create_directory(scenario_path, args.experiment)
-datasets = get_filtered_datasets() if args.experiment == "pipeline_construction" else preprocessing_impact_suite
+
+if args.experiment == "pipeline_construction" or args.experiment == "evaluation1":
+    datasets = get_filtered_datasets() 
+else:
+    datasets = preprocessing_impact_suite
 
 for dataset in datasets:
     for algorithm in algorithms:
@@ -76,14 +80,19 @@ for dataset in datasets:
         scenario["title"] = "{} on dataset n. {} with Split policy".format(
             algorithm, dataset
         )
-        runtime = 400 if args.experiment == "pipeline_construction" else 130
+        if args.experiment == "pipeline_construction" or args.experiment == "evaluation1":
+            runtime = 400 
+        else:
+            runtime = 130
         scenario["setup"]["runtime"] = runtime
         scenario["setup"]["dataset"] = dataset
         scenario["setup"]["algorithm"] = algorithm
         scenario["policy"] = {"step_pipeline": runtime}
 
         algorithm_acronym = "".join([c for c in algorithm if c.isupper()]).lower()
-        if args.experiment == "pipeline_construction":
+        if args.experiment == "pipeline_construction" or args.experiment == "evaluation1":
+            if args.experiment == "evaluation1":
+                scenario["policy"]["step_pipeline"] = 200
             path = os.path.join(scenario_path, "{}_{}.yaml".format(algorithm_acronym, dataset))
             __write_scenario(path, scenario)
         else:
