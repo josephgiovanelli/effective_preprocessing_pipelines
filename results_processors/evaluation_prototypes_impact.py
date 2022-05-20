@@ -20,7 +20,7 @@ def parse_args():
 
 def main():
     # configure environment
-    input_pipelines, input_auto, result_path = "results/evaluation1", "results/evaluation3/preprocessing_algorithm", "results"
+    input_pipelines, input_auto, result_path = "results/evaluation1", "results/evaluation2_3/pipeline_algorithm", "results"
     result_path = create_directory(create_directory(result_path, "summary"), "evaluation2")
     filtered_data_sets = ['_'.join(i) for i in list(itertools.product(["knn", "nb", "rf"], [str(integer) for integer in get_filtered_datasets()]))]
     #print(filtered_data_sets)
@@ -32,7 +32,7 @@ def main():
     for algorithm in results_auto.keys():
         for dataset in results_auto[algorithm].keys():
             if results_auto[algorithm][dataset][1] == 0:
-                evaluation_3 = pd.read_csv("results/summary/evaluation3/" + algorithm + ".csv")
+                evaluation_3 = pd.read_csv("results/summary/evaluation2_3/" + algorithm + ".csv")
                 evaluation_3 = evaluation_3.set_index(['dataset'])
                 results_auto[algorithm][dataset] = (results_auto[algorithm][dataset][0], evaluation_3.loc[int(dataset)]["baseline"])
     #print(results_auto)

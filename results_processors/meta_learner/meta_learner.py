@@ -32,8 +32,8 @@ def save_data_frame(result_path, data_frame, index):
     data_frame.to_csv(result_path, index=index)
 
 validations = ['cross-validation', 'leave-one-out']
-input_path = '../../results/pipeline/features_rebalance/meta_learner/training_set/'
-output_path = '../../results/pipeline/features_rebalance/meta_learner/results/'
+input_path = 'results/pipeline/features_rebalance/meta_learner/training_set/'
+output_path = 'results/pipeline/features_rebalance/meta_learner/results/'
 data_sets = ['three_classes/ts_rf', 'three_classes/ts_all', 'two_classes/ts_rf', 'two_classes/ts_all',]
 
 for data_set in data_sets:

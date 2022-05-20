@@ -6,7 +6,7 @@ from sklearn.impute import SimpleImputer
 
 from results_cooking_utils import get_results, save_train_meta_learner, modify_class, \
     join_result_with_extracted_meta_features, encode_data, create_correlation_matrix, save_correlation_matrix
-from results_extraction_utils import create_possible_categories, get_filtered_datasets, \
+from results_processors.evaluation2_results_extraction_utils import create_possible_categories, get_filtered_datasets, \
     extract_results
 from utils import parse_args, create_directory
 

@@ -1,6 +1,7 @@
 import os
 import json
 from functools import reduce
+import shutil
 
 import yaml
 from six import iteritems
@@ -13,7 +14,7 @@ from tqdm import tqdm
 
 import argparse
 
-from auto_pipeline_builder import framework_table_pipelines
+from auto_pipeline_builder import framework_table_pipelines, pseudo_exhaustive_pipelines
 from experiment.utils import scenarios as scenarios_util
 from results_processors.utils import create_directory
 
@@ -27,7 +28,7 @@ args = parser.parse_args()
 
 scenario_path = create_directory("./", "scenarios")
 scenario_path = create_directory(scenario_path, args.experiment)
-if args.experiment == "preprocessing_impact":
+if args.mode:
     scenario_path = create_directory(scenario_path, args.mode)
 
 result_path = './'
@@ -73,6 +74,8 @@ for path, scenario in iteritems(scenarios):
                 scenario['runtime'] = runtime
                 if args.experiment == "evaluation1":
                     scenario['runtime'] *= 24
+                if args.experiment == "evaluation2_3" and args.mode == "pipeline_algorithm":
+                    scenario['runtime'] *= 3
                 if scenario['results'] is None:
                     total_runtime += runtime
             except:
@@ -156,9 +159,9 @@ with tqdm(total=total_runtime) as pbar:
                     except:
                         kill(process.pid)
                         print("\n\n"+ base_scenario + " does not finish in " + str(max_time) + "\n\n" )
-        else:
+        elif args.experiment == "evaluation1":
             current_scenario = scenarios_util.load(os.path.join(scenario_path, info['path']))
-            config = scenarios_util.to_config(current_scenario, args.experiment)
+            config = scenarios_util.to_config(current_scenario, args)
             pipelines = framework_table_pipelines()
 
             data_to_write = {}
@@ -210,5 +213,109 @@ with tqdm(total=total_runtime) as pbar:
                     json.dump(data_to_write, outfile)
             except:
                 print("I didn't manage to write")
+        elif args.experiment == "evaluation2_3":
+            current_scenario = scenarios_util.load(os.path.join(scenario_path, info['path']))
+            config = scenarios_util.to_config(current_scenario, args)
 
+            if args.mode == "pipeline_algorithm":
+                pipelines = pseudo_exhaustive_pipelines()
+                results = []
+
+                for i in range(0, len(pipelines)):
+                    pipeline = pipelines[i]
+                    cmd = 'python ./main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}'.format(
+                        os.path.join(scenario_path, info['path']),
+                        GLOBAL_SEED,
+                        pipeline,
+                        result_path,
+                        "pipeline_algorithm",
+                        len(pipelines),
+                        args.experiment)
+                    with open(os.path.join(result_path, '{}_stdout.txt'.format(base_scenario + "_" + str(i))), "a") as log_out:
+                        with open(os.path.join(result_path, '{}_stderr.txt'.format(base_scenario + "_" + str(i))), "a") as log_err:
+                            max_time = 1000
+                            try:
+                                process = subprocess.Popen(cmd, shell=True, stdout=log_out, stderr=log_err)
+                                process.wait(timeout=max_time)
+                            except:
+                                kill(process.pid)
+                                print("\n\n" + base_scenario + " does not finish in " + str(max_time) + "\n\n")
+
+                    try:
+                        os.rename(os.path.join(result_path, '{}.json'.format(base_scenario)),
+                                os.path.join(result_path,'{}.json'.format(base_scenario + "_" + str(i))))
+
+                        with open(
+                                os.path.join(result_path, '{}.json'.format(base_scenario + "_" + str(i)))) as json_file:
+                            data = json.load(json_file)
+                            accuracy = data['context']['best_config']['score'] // 0.0001 / 100
+                            results.append(accuracy)
+                    except:
+                        accuracy = 0
+                        results.append(accuracy)
+                    print(results)
+
+                try:
+                    max_i = 0
+                    for i in range(1, len(pipelines)):
+                        if results[i] > results[max_i]:
+                            max_i = i
+
+                    src_dir = os.path.join(result_path, '{}.json'.format(base_scenario + "_" + str(max_i)))
+                    dst_dir = os.path.join(result_path, '{}.json'.format(base_scenario + "_best_pipeline"))
+                    shutil.copy(src_dir, dst_dir)
+                except:
+                    with open(os.path.join(result_path,'{}.txt'.format(base_scenario + "_best_pipeline")), "a") as log_out:
+                        log_out.write("trying to get the best pipeline: no available result")
+
+
+                try:
+                    with open(os.path.join(result_path, '{}.json'.format(base_scenario + "_best_pipeline"))) as json_file:
+                        data = json.load(json_file)
+                        pipeline = data['pipeline']
+                    print(pipeline)
+                    cmd = 'python ./main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}'.format(
+                        os.path.join(scenario_path, info['path']),
+                        GLOBAL_SEED,
+                        ' '.join(pipeline),
+                        result_path,
+                        "algorithm",
+                        len(pipelines),
+                        args.experiment)
+                    with open(os.path.join(result_path, '{}_stdout.txt'.format(base_scenario)), "a") as log_out:
+                        with open(os.path.join(result_path, '{}_stderr.txt'.format(base_scenario)), "a") as log_err:
+                            max_time = 1000
+                            try:
+                                process = subprocess.Popen(cmd, shell=True, stdout=log_out, stderr=log_err)
+                                process.wait(timeout=max_time)
+                            except:
+                                kill(process.pid)
+                                print("\n\n" + base_scenario + " does not finish in " + str(max_time) + "\n\n")
+                                log_out.write("\n\n" + base_scenario + " does not finish in " + str(max_time) + "\n\n")
+                                log_err.write("\n\n" + base_scenario + " does not finish in " + str(max_time) + "\n\n")
+                except:
+                    with open(os.path.join(result_path, '{}.txt'.format(base_scenario)), "a") as log_out:
+                        log_out.write("\ntrying to run best pipeline and algorithm: could not find a pipeline")
+            elif args.mode == "algorithm":
+                cmd = 'python ./main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}'.format(
+                    os.path.join(scenario_path, info['path']),
+                    GLOBAL_SEED,
+                    'impute encode',
+                    result_path,
+                    "algorithm",
+                    0,
+                    args.experiment)
+                with open(os.path.join(result_path, '{}_stdout.txt'.format(base_scenario)), "a") as log_out:
+                    with open(os.path.join(result_path, '{}_stderr.txt'.format(base_scenario)), "a") as log_err:
+                        max_time = 1000
+                        try:
+                            process = subprocess.Popen(cmd, shell=True, stdout=log_out, stderr=log_err)
+                            process.wait(timeout=max_time)
+                        except:
+                            kill(process.pid)
+                            print("\n\n" + base_scenario + " does not finish in " + str(max_time) + "\n\n")
+            else:
+                raise Exception('unvalid mode option')
+        else:
+            raise Exception('unvalid experiment option')
         pbar.update(info['runtime'])

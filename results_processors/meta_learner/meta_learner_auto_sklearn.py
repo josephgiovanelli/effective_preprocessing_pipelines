@@ -27,7 +27,7 @@ def encode_data(data):
 
     return encoded
 
-data = pd.read_csv('../../results/pipeline/features_rebalance/meta_learner/ts_all.csv')
+data = pd.read_csv('results/pipeline/features_rebalance/meta_learner/ts_all.csv')
 
 columns = data.columns
 data = SimpleImputer(strategy="constant", fill_value=0.0).fit_transform(data)

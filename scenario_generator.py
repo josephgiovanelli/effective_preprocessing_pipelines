@@ -69,9 +69,9 @@ args = parse_args()
 scenario_path = create_directory("./", "scenarios")
 scenario_path = create_directory(scenario_path, args.experiment)
 
-if args.experiment == "pipeline_construction" or args.experiment == "evaluation1":
+if args.experiment == "pipeline_construction" or args.experiment == "evaluation1" or args.experiment == "evaluation2_3":
     datasets = get_filtered_datasets() 
-else:
+elif args.experiment == "preprocessing_impact":
     datasets = preprocessing_impact_suite
 
 for dataset in datasets:
@@ -80,9 +80,9 @@ for dataset in datasets:
         scenario["title"] = "{} on dataset n. {} with Split policy".format(
             algorithm, dataset
         )
-        if args.experiment == "pipeline_construction" or args.experiment == "evaluation1":
+        if args.experiment == "pipeline_construction" or args.experiment == "evaluation1" or args.experiment == "evaluation2_3":
             runtime = 400 
-        else:
+        elif args.experiment == "preprocessing_impact":
             runtime = 130
         scenario["setup"]["runtime"] = runtime
         scenario["setup"]["dataset"] = dataset
@@ -95,10 +95,17 @@ for dataset in datasets:
                 scenario["policy"]["step_pipeline"] = 200
             path = os.path.join(scenario_path, "{}_{}.yaml".format(algorithm_acronym, dataset))
             __write_scenario(path, scenario)
-        else:
-            for experiment_step in ["algorithm", "algorithm_pipeline"]:
-                step_pipeline = 0 if experiment_step == "algorithm" else 50
+        elif args.experiment == "preprocessing_impact" or args.experiment == "evaluation2_3":
+            experiment_steps = ['algorithm']
+            if args.experiment == "evaluation2_3":
+                experiment_steps.append("pipeline_algorithm")
+            else:
+                experiment_steps.append("algorithm_pipeline")
+            for experiment_step in experiment_steps:
+                step_pipeline = 0 if experiment_step == "algorithm" else (50 if args.experiment == "preprocessing_impact" else 200)
                 scenario["policy"]["step_pipeline"] = step_pipeline
+                if args.experiment == "evaluation2_3" and experiment_step == "pipeline_algorithm":
+                    scenario["setup"]["runtime"] = 200
                 path = create_directory(scenario_path, experiment_step)
                 path = os.path.join(path, "{}_{}.yaml".format(algorithm_acronym, dataset))
                 __write_scenario(path, scenario)

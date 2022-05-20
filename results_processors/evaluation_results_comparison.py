@@ -17,7 +17,7 @@ def parse_args():
 
 def main():
     # configure environment
-    input_pipelines, input_auto, result_path = "results/evaluation1", "results/evaluation3/preprocessing_algorithm", "results"
+    input_pipelines, input_auto, result_path = "results/evaluation1", "results/evaluation2_3/pipeline_algorithm", "results"
     result_path = create_directory(create_directory(result_path, "summary"), "evaluation2")
     filtered_data_sets = ['_'.join(i) for i in list(itertools.product(["knn", "nb", "rf"], [str(integer) for integer in get_filtered_datasets()]))]
     #print(filtered_data_sets)

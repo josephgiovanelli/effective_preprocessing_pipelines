@@ -7,7 +7,10 @@ class Policy(object):
     def __init__(self, config):
         self.PIPELINE_SPACE = PrototypeSingleton.getInstance().getDomainSpace()
         self.config = config
-        self.compute_baseline = False if self.config["experiment"] == "evaluation1" else True
+        if self.config["experiment"] == "evaluation1" or (self.config["experiment"] == "evaluation2_3" and self.config["mode"] == "algorithm"):
+            self.compute_baseline = False
+        else:
+            self.compute_baseline = True
         self.context = {
             'iteration': 0,
             'history_hash': [],

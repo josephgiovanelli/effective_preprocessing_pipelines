@@ -5,18 +5,18 @@ from experiment.utils import scenarios, serializer, cli, datasets
 from experiment import policies
 
 import json
-
+import os
 import openml
 
 from sklearn.model_selection import train_test_split
 
-def load_dataset(id, experiment):
+def load_dataset(id, args):
     dataset = openml.datasets.get_dataset(id)
     X, y, categorical_indicator, _ = dataset.get_data(
         dataset_format='array',
         target=dataset.default_target_attribute
     )
-    if experiment != 'evaluation1':
+    if args.experiment == 'pipeline_construction' or (args.experiment == 'evaluation2_3' and args.mode == "algorithm"):
         X = SimpleImputer(strategy="constant").fit_transform(X)
     print(dataset.name)
     print(X, y)
@@ -31,22 +31,25 @@ def load_dataset(id, experiment):
 def main(args):
     scenario = scenarios.load(args.scenario)
     scenario = cli.apply_scenario_customization(scenario, args.customize)
-    config = scenarios.to_config(scenario, args.experiment)
+    config = scenarios.to_config(scenario, args)
+    
+    if args.experiment == 'evaluation2_3':
+        if args.mode == "pipeline_algorithm":
+            config['time'] /= args.num_pipelines
+            config['step_pipeline'] /= args.num_pipelines
+        else:
+            if args.num_pipelines == 0:
+                config['time'] = 400
+            else:
+                config['time'] = 240
+                config['step_pipeline'] = 40
+
     print('SCENARIO:\n {}'.format(json.dumps(scenario, indent=4, sort_keys=True)))
 
-    X, y = load_dataset(scenario['setup']['dataset'], args.experiment)
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
-        test_size=0.4,
-        stratify=y,
-        random_state=scenario['control']['seed']
-    )
+    X, y = load_dataset(scenario['setup']['dataset'], args)
 
     policy = policies.initiate(scenario['setup']['policy'], config)
     policy.run(X, y)
-
 
     serializer.serialize_results(scenario, policy, args.result_path, args.pipeline)
 
