@@ -1,28 +1,39 @@
 from __future__ import print_function
 
-from results_cooking_utils import create_num_equal_elements_matrix, save_num_equal_elements_matrix, \
-    create_correlation_matrix, save_correlation_matrix, chi2test, chi2tests, save_chi2tests, \
-    join_result_with_simple_meta_features, \
-    get_results, modify_class
+from results_cooking_utils import chi2test
 from results_extraction_utils import create_possible_categories, get_filtered_datasets, extract_results_10x4cv, save_results_10x4cv
 from utils import parse_args, create_directory
 import pandas as pd
 import numpy as np
 import os
+import argparse
+
+parser = argparse.ArgumentParser(description="Automated Machine Learning Workflow creation and configuration")
+parser.add_argument("-exp", "--experiment", nargs="?", type=str, required=True, help="type of the experiments")
+parser.add_argument("-mode", "--mode", nargs="?", type=str, required=False, help="algorithm or algorithm_pipeline")
+parser.add_argument("-toy", "--toy-example", nargs="?", type=bool, required=False, default=False, help="wether it is a toy example or not")
+args = parser.parse_args()
+
 
 def main():
     # configure environment
-    input_path, result_path, pipeline = parse_args()
-    categories = create_possible_categories(pipeline)
-    result_path = create_directory(result_path, 'summary')
+    pipeline = args.mode.split('_')
+    path = "results"
+    if args.toy_example:
+        path = os.path.join(path, "toy")
+    input_path = os.path.join(path, "pipeline_construction", args.mode)
+    result_path = create_directory(input_path, 'summary')
     result_path = create_directory(result_path, '10x4cv')
-    filtered_data_sets = get_filtered_datasets()
-    folds, repeat = 4, 10
+    categories = create_possible_categories(pipeline)
+    filtered_data_sets = get_filtered_datasets(experiment=args.experiment, toy=args.toy_example)
+    folds = 3 if args.toy_example else 4
+    repeat = 10
 
     summaries = extract_results_10x4cv(input_path, filtered_data_sets, pipeline, categories, folds, repeat)
 
     save_results_10x4cv(create_directory(result_path, 'raw'), summaries)
 
+    #if (not args.toy_example) or (args.toy_example and args.mode == 'features_rebalance' and args.mode == 'discretize_rebalance'):
     prob = 0.95
     a = 0.1 if categories['first_second'] == 'FN' else (0.9 if categories['first_second'] == 'DF' else 0.5)
     b = round(1 - a, 2)

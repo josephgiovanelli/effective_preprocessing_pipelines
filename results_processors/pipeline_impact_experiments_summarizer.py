@@ -1,6 +1,6 @@
 from __future__ import print_function
-
-from preprocessing_impact_utils import perform_algorithm_pipeline_analysis, save_analysis, load_results
+import os
+from pipeline_impact_utils import perform_algorithm_pipeline_analysis, save_analysis, load_results
 from results_cooking_utils import create_num_equal_elements_matrix, save_num_equal_elements_matrix, \
     create_correlation_matrix, save_correlation_matrix, chi2tests, save_chi2tests, join_result_with_simple_meta_features, \
     get_results, modify_class
@@ -12,25 +12,35 @@ import argparse
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Automated Machine Learning Workflow creation and configuration")
-    parser.add_argument("-ip", "--input_pipeline", nargs="?", type=str, required=True, help="path of first input")
-    parser.add_argument("-ia", "--input_algorithm", nargs="?", type=str, required=True, help="path of second input")
-    parser.add_argument("-o", "--output", nargs="?", type=str, required=True, help="path where put the results")
-    args = parser.parse_args()
-    return args.input_pipeline, args.input_algorithm, args.output
-
+    parser.add_argument("-exp", "--experiment", nargs="?", type=str, required=True, help="type of the experiments")
+    parser.add_argument("-toy", "--toy-example", nargs="?", type=bool, required=False, default=False, help="wether it is a toy example or not")
+    return parser.parse_args()
+    
 def main():
-    input_pipeline, input_algorithm, result_path = parse_args()
-    result_path = create_directory(result_path, 'summary')
-    filtered_data_sets = [1461]
+    args = parse_args()
+    
+    path = "results"
+    result_path = "plots"
+    if args.toy_example:
+        path = os.path.join(path, "toy")
+        result_path = create_directory(result_path, 'toy')
+    input_path = os.path.join(path, "pipeline_impact")
+    result_path = create_directory(result_path, 'pipeline_impact')
+    input_pipeline = os.path.join(input_path, "algorithm_pipeline")
+    print(input_pipeline, result_path)
+    filtered_data_sets = get_filtered_datasets(experiment=args.experiment, toy=args.toy_example)
+    print(filtered_data_sets)
 
     pipeline_algorithm_results = load_results(input_pipeline, filtered_data_sets)
+    print(pipeline_algorithm_results)
     #algorithm_results = load_results(input_algorithm, filtered_data_sets)
 
-    pipeline_algorithm_analysis = perform_algorithm_pipeline_analysis(pipeline_algorithm_results)
+    pipeline_algorithm_analysis = perform_algorithm_pipeline_analysis(pipeline_algorithm_results, args.toy_example)
+    print(pipeline_algorithm_analysis)
     #algorithm_analysis = perform_algorithm_analysis(algorithm_results)
 
     result_path = create_directory(result_path, 'algorithm_pipeline')
-    save_analysis(pipeline_algorithm_analysis, result_path)
+    save_analysis(pipeline_algorithm_analysis, result_path, args.toy_example)
     #save_analysis(algorithm_analysis, create_directory(result_path, 'algorithm'))
     
     # print(pipeline_algorithm_analysis)

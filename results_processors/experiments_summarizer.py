@@ -1,5 +1,10 @@
 from __future__ import print_function
 
+import os
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
+from posixpath import split
 from results_cooking_utils import create_num_equal_elements_matrix, save_num_equal_elements_matrix, \
     create_correlation_matrix, save_correlation_matrix, chi2tests, save_chi2tests, \
     join_result_with_simple_meta_features, \
@@ -11,10 +16,16 @@ from utils import parse_args, create_directory
 
 def main():
     # configure environment
-    input_path, result_path, pipeline = parse_args()
+    # -p features rebalance -i results/pipeline_construction/features_rebalance/ -o results/pipeline_construction/features_rebalance/
+    args = parse_args()
+    pipeline = args.mode.split('_')
+    path = "results"
+    if args.toy_example:
+        path = os.path.join(path, "toy")
+    input_path = os.path.join(path, "pipeline_construction", args.mode)
+    result_path = create_directory(input_path, 'summary')
     categories = create_possible_categories(pipeline)
-    result_path = create_directory(result_path, 'summary')
-    filtered_data_sets = get_filtered_datasets()
+    filtered_data_sets = get_filtered_datasets(experiment=args.experiment, toy=args.toy_example)
 
     simple_results, grouped_by_algorithm_results, grouped_by_data_set_result, summary = extract_results(input_path,
                                                                                                         filtered_data_sets,

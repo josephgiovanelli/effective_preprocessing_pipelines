@@ -1,14 +1,30 @@
+import os
+import argparse
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+from utils import create_directory
+
+parser = argparse.ArgumentParser(description="Automated Machine Learning Workflow creation and configuration")
+parser.add_argument("-toy", "--toy-example", nargs="?", type=bool, required=False, default=False, help="wether it is a toy example or not")
+args = parser.parse_args()
 
 def main():
+    input_path = "results"
+    result_path = "plots"
+    if args.toy_example:
+        input_path = os.path.join(input_path, "toy")
+        result_path = os.path.join(result_path, "toy")
+    input_path = os.path.join(input_path, "pipeline_construction")
+    result_path = create_directory(result_path, "pipeline_construction")
+
     data = {}
-    data[0] = {'title': r'$T_1$ = Feat. Eng., $T_2$ = Normalize', 'data': pd.read_csv('results/pipeline_construction/features_normalize/summary/algorithms_summary/summary.csv').reindex([1, 0, 2, 3])}
-    data[1] = {'title': r'$T_1$ = Discretize, $T_2$ = Feat. Eng.', 'data': pd.read_csv('results/pipeline_construction/discretize_features/summary/algorithms_summary/summary.csv').reindex([1, 0, 2, 3])}
-    data[2] = {'title': r'$T_1$ = Feat. Eng., $T_2$ = Rebalance', 'data': pd.read_csv('results/pipeline_construction/features_rebalance/summary/algorithms_summary/summary.csv').reindex([1, 0, 2, 3])}
-    data[3] = {'title': r'$T_1$ = Discretize, $T_2$ = Rebalance', 'data': pd.read_csv('results/pipeline_construction/discretize_rebalance/summary/algorithms_summary/summary.csv').reindex([1, 0, 2, 3])}
+    data[0] = {'title': r'$T_1$ = Feat. Eng., $T_2$ = Normalize', 'data': pd.read_csv(os.path.join(input_path, 'features_normalize', 'summary', 'algorithms_summary', 'summary.csv')).reindex([1, 0, 2, 3])}
+    data[1] = {'title': r'$T_1$ = Discretize, $T_2$ = Feat. Eng.', 'data': pd.read_csv(os.path.join(input_path, 'discretize_features', 'summary', 'algorithms_summary', 'summary.csv')).reindex([1, 0, 2, 3])}
+    data[2] = {'title': r'$T_1$ = Feat. Eng., $T_2$ = Rebalance', 'data': pd.read_csv(os.path.join(input_path, 'features_rebalance', 'summary', 'algorithms_summary', 'summary.csv')).reindex([1, 0, 2, 3])}
+    data[3] = {'title': r'$T_1$ = Discretize, $T_2$ = Rebalance', 'data': pd.read_csv(os.path.join(input_path, 'discretize_rebalance', 'summary', 'algorithms_summary', 'summary.csv')).reindex([1, 0, 2, 3])}
     labels = [r'$T_1$', r'$T_2$', r'$T_1 \to T_2$', r'$T_2 \to T_1$', 'Baseline']
     colors = ['gold', 'mediumspringgreen', 'royalblue', 'sienna', 'mediumpurple', 'salmon']
     patterns = ["/", "\\", "o", "-", "x", ".", "O", "+", "*", "|"]
@@ -28,14 +44,11 @@ def main():
     fig, axs = plt.subplots(2, 2)
     n_groups = 3
 
-    print(data[0]['data'].drop(columns=['inconsistent', 'not_exec', 'not_exec_once']))
-
     for i in range(0, 2):
         for j in range(0, 2):
             #fig2, ax = axs[i, j].subplots()
             data[i * 2 + j]['data'].columns = list(range(0, len(data[i * 2 + j]['data'].columns)))
             data[i * 2 + j]['data'] = data[i * 2 + j]['data'].drop(columns=[3, 6])
-            print(data[i * 2 + j]['data'])
             index = np.arange(n_groups)
             bar_width = 0.4
 
@@ -54,7 +67,7 @@ def main():
     text = fig.text(-0.2, 1.05, "", transform=axs[1,1].transAxes)
     fig.set_size_inches(20, 10, forward=True)
     fig.tight_layout(h_pad=3.0, w_pad=4.0)
-    fig.savefig('results/pipeline_construction/experiments_results.pdf', bbox_extra_artists=(lgd,text), bbox_inches='tight')
+    fig.savefig(os.path.join(result_path, 'experiments_results.pdf'), bbox_extra_artists=(lgd,text), bbox_inches='tight')
 
     SMALL_SIZE = 8
     MEDIUM_SIZE = 17
@@ -98,6 +111,6 @@ def main():
     text = fig.text(-0.2, 1.05, "", transform=axs[3].transAxes)
     fig.set_size_inches(20, 5, forward=True)
     fig.tight_layout(w_pad=4.0)
-    fig.savefig('results/pipeline_construction/experiments_validity.pdf', bbox_extra_artists=(lgd,text), bbox_inches='tight')
+    fig.savefig(os.path.join(result_path, 'experiments_validity.pdf'), bbox_extra_artists=(lgd,text), bbox_inches='tight')
 
 main()

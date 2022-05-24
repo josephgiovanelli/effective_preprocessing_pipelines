@@ -25,6 +25,7 @@ def to_config(scenario, args):
         "algorithm": scenario["setup"]["algorithm"],
         "experiment": args.experiment,
         "mode": args.mode,
+        "toy": args.toy_example,
     }
     if scenario["policy"] is not None:
         config.update(scenario["policy"])

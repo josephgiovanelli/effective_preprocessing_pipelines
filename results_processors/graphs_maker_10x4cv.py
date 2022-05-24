@@ -1,12 +1,22 @@
 import os
+import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+parser = argparse.ArgumentParser(description="Automated Machine Learning Workflow creation and configuration")
+parser.add_argument("-toy", "--toy-example", nargs="?", type=bool, required=False, default=False, help="wether it is a toy example or not")
+args = parser.parse_args()
 
 def main():
     cv_file_name = 'summary_with_mean_.csv'
-    pipeline_construction_path = os.path.join('results', 'pipeline_construction')
+    pipeline_construction_path = 'results'
+    plot_path = 'plots'
+    if args.toy_example:
+        pipeline_construction_path = os.path.join(pipeline_construction_path, "toy")
+        plot_path = os.path.join(plot_path, "toy")
+    pipeline_construction_path = os.path.join(pipeline_construction_path, 'pipeline_construction')
+    plot_path = os.path.join(plot_path, 'pipeline_construction')
 
     fn_path = os.path.join(pipeline_construction_path, 'features_normalize')
     fn_cv_path = os.path.join(fn_path, 'summary', '10x4cv')
@@ -41,7 +51,7 @@ def main():
     ax.set_ylim([0, 1])
     fig.tight_layout()
     fig.set_size_inches(12, 6, forward=True)
-    fig.savefig(os.path.join(pipeline_construction_path, '10_times_4_folds_cv.pdf'))
+    fig.savefig(os.path.join(plot_path, '10_times_4_folds_cv.pdf'))
 
 
 main()

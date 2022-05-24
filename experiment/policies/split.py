@@ -17,7 +17,7 @@ class Split(Policy):
         trials_pipelines = Trials()
         trials_algo = Trials()
 
-        if self.config["experiment"] == "preprocessing_impact":
+        if self.config["experiment"] == "pipeline_impact":
             if self.config['time'] - self.config['step_pipeline'] > 0:
                 current_algo_configuration = self._optimize_algorithm(X, y, current_pipeline_configuration, trials_algo)
             if self.config['step_pipeline'] > 0:
@@ -28,6 +28,23 @@ class Split(Policy):
             if self.config['time'] - self.config['step_pipeline'] > 0:
                 self._optimize_algorithm(X, y, current_pipeline_configuration, trials_algo)
 
+    def _get_budget(self, phase):
+    
+        if phase == 'algorithm':
+            budget = self.config['time'] - self.config['step_pipeline']
+        else:
+            budget = self.config['step_pipeline']
+
+        if self.config["experiment"] == "pipeline_impact" or self.config['toy']:
+            max_evals = budget
+            max_time = 80000
+        else:
+            max_evals = None
+            max_time = budget
+        
+        return max_evals, max_time
+            
+
     def _optimize_algorithm(self, X, y, current_pipeline_configuration, trials_algo):
         print('## Algorithm')
         obj_algo = functools.partial(objective_algo,
@@ -37,11 +54,12 @@ class Split(Policy):
                 y=y,
                 context=self.context,
                 config=self.config)
+        max_evals, max_time = self._get_budget('algorithm')
         fmin(fn=obj_algo,
             space=ALGORITHM_SPACE.get_domain_space(self.config['algorithm']),
             algo=tpe.suggest,
-            max_evals=75 if self.config["experiment"] == "preprocessing_impact" else None,
-            max_time=80000 if self.config["experiment"] == "preprocessing_impact" else (self.config['time'] - self.config['step_pipeline']),
+            max_evals=max_evals,
+            max_time=max_time,
             trials=trials_algo,
             show_progressbar=False,
             verbose=0
@@ -61,12 +79,13 @@ class Split(Policy):
                 y=y,
                 context=self.context,
                 config=self.config)
+        max_evals, max_time = self._get_budget('pipeline')
         fmin(
             fn=obj_pl, 
             space=self.PIPELINE_SPACE,
             algo=tpe.suggest, 
-            max_evals=75 if self.config["experiment"] == "preprocessing_impact" else None,
-            max_time=80000 if self.config["experiment"] == "preprocessing_impact" else self.config['step_pipeline'],
+            max_evals=max_evals,
+            max_time=max_time,
             trials=trials_pipelines,
             show_progressbar=False,
             verbose=0

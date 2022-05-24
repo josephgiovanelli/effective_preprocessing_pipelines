@@ -1,9 +1,8 @@
 #!/bin/bash
+TOY_EXAMPLE=True
 
-#./pipeline_construction.sh
+./scripts/pipeline_construction.sh $TOY_EXAMPLE
 
-#./10x4cv.sh
+./scripts/pipeline_impact.sh $TOY_EXAMPLE
 
-#./preprocessing_impact.sh
-
-./evaluation.sh
+./scripts/evaluation.sh $TOY_EXAMPLE

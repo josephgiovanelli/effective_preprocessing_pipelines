@@ -44,7 +44,7 @@ def find_pipeline_iterations(history):
         else:
             return iteration['iteration']
 
-def perform_algorithm_pipeline_analysis(results):
+def perform_algorithm_pipeline_analysis(results, toy):
     pipelines_iterations, algorithm_iterations = [], []
 
     for result in results:
@@ -56,6 +56,7 @@ def perform_algorithm_pipeline_analysis(results):
     # print(min(pipelines_iterations), min(algorithm_iterations))
 
     scores = {}
+    half_iteration = 5 if toy else 50
     for result in results:
         acronym = result.split('_')[0]
         if not(acronym in scores):
@@ -63,23 +64,24 @@ def perform_algorithm_pipeline_analysis(results):
         scores[acronym][result] = []
         scores[acronym][result].append((0, results[result]['baseline_score']))
         max_score = results[result]['baseline_score']
-        for i in range(1, 51):
+        for i in range(1, half_iteration+1):
             if i <= results[result]['algorithm_iterations']:
                 scores[acronym][result].append((i,results[result]['history'][i - 1]['max_history_score'] // 0.0001 / 100))
                 max_score = results[result]['history'][i - 1]['max_history_score'] // 0.0001 / 100
             else:
                 scores[acronym][result].append((i, max_score))
-        for i in range(1, 51):
-            scores[acronym][result].append((50 + i, results[result]['history'][results[result]['algorithm_iterations'] + i - 1]['max_history_score'] // 0.0001 / 100))
+        for i in range(1, half_iteration+1):
+            scores[acronym][result].append((half_iteration + i, results[result]['history'][results[result]['algorithm_iterations'] + i - 1]['max_history_score'] // 0.0001 / 100))
 
-    return perform_analysis(results, scores)
+    return perform_analysis(results, scores, toy)
 
-def perform_analysis(results, scores):
+def perform_analysis(results, scores, toy):
     scores_to_kpi = {}
     outcome = {}
 
+    max_iteration = 10 if toy else 100
     for result in results:
-        for i in range(0, 101):
+        for i in range(0, max_iteration+1):
             acronym = result.split('_')[0]
             if not (acronym in scores_to_kpi):
                 scores_to_kpi[acronym] = []
@@ -90,26 +92,28 @@ def perform_analysis(results, scores):
                 scores_to_kpi[acronym].append([])
                 scores_to_kpi[acronym][i].append(scores[acronym][result][i][1]  / results[result]['baseline_score'])
 
-    for i in range(1, 101):
+    for i in range(1, max_iteration+1):
         for key in outcome.keys():
             outcome[key].append(mean(scores_to_kpi[key][i]))
             #outcome[key].append(mean(scores_to_kpi[key][i]) // 0.01 / 100)
 
     return outcome
 
-def save_analysis(analysis, result_path):
+def save_analysis(analysis, result_path, toy):
+
+    max_iteration = 10 if toy else 100
 
     with open(os.path.join(result_path, 'result_with_impact.csv'), 'w') as out:
         out.write(','.join(analysis.keys()) + '\n')
 
     with open(os.path.join(result_path, 'result_with_impact.csv'), 'a') as out:
-        for i in range(0, 100):
+        for i in range(0, max_iteration):
             row = []
             for key in analysis.keys():
                 row.append(str(analysis[key][i]))
             out.write(','.join(row) + '\n')
 
-    x = np.linspace(0, 100, 100)
+    x = np.linspace(0, max_iteration, max_iteration)
 
     SMALL_SIZE = 14
     MEDIUM_SIZE = 16
@@ -130,12 +134,12 @@ def save_analysis(analysis, result_path):
     plt.ylabel('Ratio of predictive accuracy change')
     #plt.title("Optimization on bank-marketing data-set")
     plt.legend()
-    plt.xlim(0, 100)
+    plt.xlim(0, max_iteration)
     plt.ylim(0.8, 1.5)
-    plt.axvline(x=50, color='#aaaaaa', linestyle='--')
+    plt.axvline(x=max_iteration/2, color='#aaaaaa', linestyle='--')
     plt.grid(False)
     plt.tick_params(axis ='both', which ='both', length = 5, color='#aaaaaa')
-    plt.xticks(np.linspace(0, 100, 11))
+    plt.xticks(np.linspace(0, max_iteration, int(max_iteration/10 + max_iteration/100)))
     fig = plt.gcf()
     fig.set_size_inches(12, 6, forward=True)
     fig.savefig(os.path.join(result_path, 'pre-processing-impact.pdf'))

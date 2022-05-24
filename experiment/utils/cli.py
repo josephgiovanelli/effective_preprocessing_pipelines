@@ -27,8 +27,11 @@ Automated Machine Learning Workflow creation and configuration
     parser.add_argument("-m", "--mode", nargs="?", type=str, required=False,
                         help="algorithm or pipeline_algorithm")
 
-    parser.add_argument("-np", "--num_pipelines", nargs="?", type=int, required=True,
+    parser.add_argument("-np", "--num_pipelines", nargs="?", type=int, required=False,
                         help="number of pipelines to split the budget")
+
+    parser.add_argument("-toy", "--toy_example", nargs="?", type=bool, required=False,
+                        help="wether to use the toy example or not")
 
     parser.add_argument('-c','--customize', nargs='+', help='Customize scenario by overwriting specific variables', required=False)
 

@@ -18,25 +18,42 @@ from auto_pipeline_builder import framework_table_pipelines, pseudo_exhaustive_p
 from experiment.utils import scenarios as scenarios_util
 from results_processors.utils import create_directory
 
+GLOBAL_SEED = 42
+
 parser = argparse.ArgumentParser(description="Automated Machine Learning Workflow creation and configuration")
 parser.add_argument("-p", "--pipeline", nargs="+", type=str, required=False, help="step of the pipeline to execute")
-parser.add_argument("-r", "--result_path", nargs="?", type=str, required=True, help="path where put the results")
 parser.add_argument("-exp", "--experiment", nargs="?", type=str, required=True, help="type of the experiments")
 parser.add_argument("-mode", "--mode", nargs="?", type=str, required=False, help="algorithm or algorithm_pipeline")
+parser.add_argument("-toy", "--toy-example", nargs="?", type=bool, required=False, default=False, help="wether it is a toy example or not")
 args = parser.parse_args()
 
 
 scenario_path = create_directory("./", "scenarios")
-scenario_path = create_directory(scenario_path, args.experiment)
-if args.mode:
-    scenario_path = create_directory(scenario_path, args.mode)
+result_path = create_directory("./", "results")
 
-result_path = './'
-for directory in args.result_path.split("/"):
-    result_path = create_directory(result_path , str(directory))
+if args.toy_example == True:
+    scenario_path = create_directory(scenario_path, "toy")
+    result_path = create_directory(result_path, "toy")
+else:
+    scenario_path = create_directory(scenario_path, "paper")
+    result_path = create_directory(result_path, "paper")
+
+scenario_path = create_directory(scenario_path, args.experiment)
+result_path = create_directory(result_path, args.experiment)
+
 if args.mode:
-    result_path = create_directory(result_path , args.mode)
-GLOBAL_SEED = 42
+    if args.mode not in ["algorithm", "pipeline_algorithm", "algorithm_pipeline"]:
+        pipeline = args.mode.split("_")
+        if pipeline[0] <= pipeline[1]:
+            result_path = create_directory(result_path, args.mode)
+            result_path = create_directory(result_path, 'conf1')
+        else:
+            result_path = create_directory(result_path, '_'.join(sorted(pipeline)))
+            result_path = create_directory(result_path, 'conf2')
+    else:
+        scenario_path = create_directory(scenario_path, args.mode)
+        result_path = create_directory(result_path, args.mode)
+
 
 print('Gather list of scenarios')
 # Gather list of scenarios
@@ -54,8 +71,6 @@ for scenario in scenario_list:
         base_result = result.split('.json')[0]
         if base_result.__eq__(base_scenario):
             scenarios[scenario]['results'] = result
-            #date = base_result.split(base_scenario + '_')[-1].replace('_', ' ')
-            #scenarios[scenario]['results_date'] = date
 
 # Calculate total amount of time
 total_runtime = 0
@@ -132,10 +147,10 @@ with tqdm(total=total_runtime) as pbar:
         output = base_scenario.split('_')[0]
         pbar.set_description("Running scenario {}\n\r".format(info['path']))
 
-        if args.experiment == "pipeline_construction" or args.experiment == "preprocessing_impact":
+        if args.experiment == "pipeline_construction" or args.experiment == "pipeline_impact":
 
             if args.experiment == "pipeline_construction":
-                pipeline = args.pipeline
+                pipeline = args.mode.split("_")
             else:
                 if base_scenario.startswith("knn"):
                     pipeline = ['impute', 'encode', 'normalize', 'rebalance', 'features']
