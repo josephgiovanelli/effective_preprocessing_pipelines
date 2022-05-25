@@ -23,14 +23,14 @@ def diff(first, second):
 
 def main():
     # configure environment
-    input_path = "results"
-    result_path = "plots"
+
+    results_path = "results"
     if args.toy_example:
-        input_path = os.path.join(input_path, "toy")
-        result_path = os.path.join(result_path, "toy")
-    input_path = os.path.join(input_path, "evaluation2_3")
-    result_path = create_directory(result_path, "evaluation2_3")
-    input_auto = os.path.join(input_path, "pipeline_algorithm")
+        results_path = os.path.join(results_path, "toy")
+    evaluation2_3_results_path = os.path.join(results_path, "evaluation2_3")
+    evaluation2_3_pipeline_algorithm_results_path = os.path.join(evaluation2_3_results_path, "pipeline_algorithm")
+    evaluation3_summary_results_path = os.path.join(evaluation2_3_results_path, "summary", "evaluation3")
+    results_path = create_directory(results_path, "extension")
 
     algorithms = ["knn", "nb", "rf"]
 
@@ -44,7 +44,7 @@ def main():
     baseline_results = {}
     ## Results Loading
     for algorithm in algorithms:
-        baseline_results[algorithm] = pd.read_csv(os.path.join(result_path, algorithm + '.csv'))
+        baseline_results[algorithm] = pd.read_csv(os.path.join(evaluation3_summary_results_path, algorithm + '.csv'))
         baseline_results[algorithm].rename(columns={"dataset": "ID"}, inplace=True)
 
     results_map = {}
@@ -54,13 +54,13 @@ def main():
         df = pd.read_csv(os.path.join("results", "summary", "evaluation2_3", algorithm + ".csv"))
         ids = list(df["dataset"])
 
-        files = [f for f in listdir(input_auto) if isfile(join(input_auto, f))]
+        files = [f for f in listdir(evaluation2_3_pipeline_algorithm_results_path) if isfile(join(evaluation2_3_pipeline_algorithm_results_path, f))]
         results = [f[:-5] for f in files if f[-4:] == 'json']
 
         for dataset in ids:
             acronym = algorithm + "_" + str(dataset)
             if acronym in results:
-                with open(os.path.join(input_auto, acronym + '.json')) as json_file:
+                with open(os.path.join(evaluation2_3_pipeline_algorithm_results_path, acronym + '.json')) as json_file:
                     data = json.load(json_file)
                     pipeline = data['context']['best_config']['pipeline']
 
@@ -114,9 +114,6 @@ def main():
     for algorithm in algorithms:
         results_map[algorithm] = pd.merge(results_map[algorithm], meta_features, on="ID")
 
-    ## Data Saving
-    meta_learning_input_path = create_directory(result_path, "operator_meta_learning")
-    meta_learning_input_path = create_directory(meta_learning_input_path, "input")
     #for algorithm in algorithms:
     #    results_map[algorithm].to_csv(os.path.join(meta_learning_input_path, algorithm + '_raw.csv'), index=False)
 
@@ -141,6 +138,6 @@ def main():
 
     ## Data Saving
     #union.to_csv(os.path.join(meta_learning_input_path, 'union' + '.csv'), index=False)
-    manual_fs_union.to_csv(os.path.join(meta_learning_input_path, 'data' + '.csv'), index=False)
+    manual_fs_union.to_csv(os.path.join(results_path, 'data' + '.csv'), index=False)
     
 main()
