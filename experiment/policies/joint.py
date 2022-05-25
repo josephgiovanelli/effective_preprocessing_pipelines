@@ -1,6 +1,6 @@
 from experiment.policies.policy import Policy
 from experiment.algorithm import space as ALGORITHM_SPACE
-from experiment.objective import objective_joint
+from experiment.policies.objective import objective_joint
 
 import functools
 

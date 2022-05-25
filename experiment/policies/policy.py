@@ -1,4 +1,4 @@
-from experiment.objective import get_baseline_score
+from experiment.policies.objective import get_baseline_score
 from experiment.pipeline.PrototypeSingleton import PrototypeSingleton
 
 import json
@@ -7,10 +7,7 @@ class Policy(object):
     def __init__(self, config):
         self.PIPELINE_SPACE = PrototypeSingleton.getInstance().getDomainSpace()
         self.config = config
-        if self.config["experiment"] == "evaluation1" or (self.config["experiment"] == "evaluation2_3" and self.config["mode"] == "algorithm"):
-            self.compute_baseline = False
-        else:
-            self.compute_baseline = True
+        self.compute_baseline = True
         self.context = {
             'iteration': 0,
             'history_hash': [],
