@@ -1,22 +1,24 @@
 #!/bin/bash
+params=()
+[[ $1 == true ]] && params+=(-toy)
 
 # EVALUATION 1
-# python experiment/scenario_generator.py -exp evaluation1 -toy $1
-# python experiment/experiments_launcher.py -exp evaluation1 -toy $1
-# python experiment/results_processors/evaluation_results_extraction.py -toy $1
+# python experiment/scenario_generator.py -exp evaluation1 "${params[@]}"
+# python experiment/experiments_launcher.py -exp evaluation1 "${params[@]}"
+# python experiment/results_processors/evaluation_results_extraction.py "${params[@]}"
 
 # EVALUATION 2_3
-# python experiment/scenario_generator.py -exp evaluation2_3 -toy $1
-# python experiment/experiments_launcher.py -exp evaluation2_3 -mode algorithm -toy $1
-# python experiment/experiments_launcher.py -exp evaluation2_3 -mode pipeline_algorithm -toy $1
+# python experiment/scenario_generator.py -exp evaluation2_3 "${params[@]}"
+# python experiment/experiments_launcher.py -exp evaluation2_3 -mode algorithm "${params[@]}"
+# python experiment/experiments_launcher.py -exp evaluation2_3 -mode pipeline_algorithm "${params[@]}"
 
-# python experiment/results_processors/evaluation_results_comparison.py -toy $1
-# python experiment/results_processors/results_comparator.py -toy $1
+# python experiment/results_processors/evaluation_results_comparison.py "${params[@]}"
+# python experiment/results_processors/results_comparator.py "${params[@]}"
 
-# python experiment/results_processors/pp_pipeline_study.py -toy $1
-# python experiment/results_processors/pp_pipeline_study2.py -toy $1
+# python experiment/results_processors/pp_pipeline_study.py "${params[@]}"
+# python experiment/results_processors/pp_pipeline_study2.py "${params[@]}"
 
-# python experiment/results_processors/evaluation_prototypes_impact.py -toy $1
+# python experiment/results_processors/evaluation_prototypes_impact.py "${params[@]}"
 
-# python experiment/results_processors/meta_learning_input_preparation.py -toy $1
+# python experiment/results_processors/meta_learning_input_preparation.py "${params[@]}"
 

@@ -1,8 +1,9 @@
-from experiment.utils import scenarios
 
 import argparse
 from functools import reduce
 import operator
+
+from .scenarios import load
 
 def parse_args():
 
@@ -40,7 +41,7 @@ Automated Machine Learning Workflow creation and configuration
     parsed_customs = []
 
     if customs is not None:
-        scenario = scenarios.load(args.scenario)
+        scenario = load(args.scenario)
         for field in customs:
             value = field.split('=')[-1]
             path =  field.split('=')[0].split('.')

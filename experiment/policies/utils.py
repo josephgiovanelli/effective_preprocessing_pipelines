@@ -1,7 +1,7 @@
-from experiment.policies.iterative import Iterative
-from experiment.policies.split import Split
-from experiment.policies.adaptive import Adaptive
-from experiment.policies.joint import Joint
+from .iterative import Iterative
+from .split import Split
+from .adaptive import Adaptive
+from .joint import Joint
 
 def initiate(name, config):
     policies = {

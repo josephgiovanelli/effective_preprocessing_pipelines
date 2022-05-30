@@ -5,7 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
 
-from experiment.algorithm.utils import generate_domain_space
+from .utils import generate_domain_space
 
 algorithms = {
     'RandomForest': RandomForestClassifier,

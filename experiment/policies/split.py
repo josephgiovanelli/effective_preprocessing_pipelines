@@ -1,7 +1,7 @@
-from experiment.pipeline.PrototypeSingleton import PrototypeSingleton
-from experiment.policies.policy import Policy
-from experiment.algorithm import space as ALGORITHM_SPACE
-from experiment.policies.objective import objective_pipeline, objective_algo
+from pipeline.PrototypeSingleton import PrototypeSingleton
+from .policy import Policy
+from algorithm import space as ALGORITHM_SPACE
+from .objective import objective_pipeline, objective_algo
 
 import functools
 

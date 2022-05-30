@@ -8,8 +8,8 @@ from hyperopt import STATUS_OK, STATUS_FAIL
 import numpy as np
 from sklearn.model_selection import train_test_split, cross_validate
 
-from experiment.algorithm import space as ALGORITHM_SPACE
-from experiment.pipeline.prototype import pipeline_conf_to_full_pipeline, get_baseline
+from algorithm import space as ALGORITHM_SPACE
+from pipeline.prototype import pipeline_conf_to_full_pipeline, get_baseline
 
 
 def objective(pipeline_config, algo_config, algorithm, X, y, context, config, step):

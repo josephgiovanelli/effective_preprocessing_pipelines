@@ -15,7 +15,7 @@ from sklearn.decomposition import PCA
 from sklearn.feature_selection import SelectKBest
 from sklearn.pipeline import FeatureUnion
 
-from experiment.pipeline.PrototypeSingleton import PrototypeSingleton
+from .PrototypeSingleton import PrototypeSingleton
 
 
 def get_baseline():

@@ -24,13 +24,14 @@ parser = argparse.ArgumentParser(description="Automated Machine Learning Workflo
 parser.add_argument("-p", "--pipeline", nargs="+", type=str, required=False, help="step of the pipeline to execute")
 parser.add_argument("-exp", "--experiment", nargs="?", type=str, required=True, help="type of the experiments")
 parser.add_argument("-mode", "--mode", nargs="?", type=str, required=False, help="algorithm or algorithm_pipeline")
-parser.add_argument("-toy", "--toy-example", nargs="?", type=bool, required=False, default=False, help="wether it is a toy example or not")
+parser.add_argument("-toy", "--toy_example", action='store_true', default=False, help="wether it is a toy example or not")
 args = parser.parse_args()
 
 
 scenario_path = create_directory("./", "scenarios")
 result_path = create_directory("./", "results")
 
+print(f"{args}")
 if args.toy_example == True:
     scenario_path = create_directory(scenario_path, "toy")
     result_path = create_directory(result_path, "toy")
@@ -173,7 +174,7 @@ with tqdm(total=total_runtime) as pbar:
                 else:
                     pipeline = ['impute', 'encode', 'normalize', 'rebalance', 'features']
 
-            cmd = 'python ./main.py -s {} -c control.seed={} -p {} -r {} -exp {}'.format(
+            cmd = 'python experiment/main.py -s {} -c control.seed={} -p {} -r {} -exp {}'.format(
                 os.path.join(scenario_path, info['path']),
                 GLOBAL_SEED,
                 reduce(lambda x, y: x + " " + y, pipeline),
@@ -195,7 +196,7 @@ with tqdm(total=total_runtime) as pbar:
 
             for i in range(0, len(pipelines)):
                 pipeline = pipelines[i]
-                cmd = 'python ./main.py -s {} -c control.seed={} -p {} -r {} -np {} -exp {}'.format(
+                cmd = 'python experiment/main.py -s {} -c control.seed={} -p {} -r {} -np {} -exp {}'.format(
                     os.path.join(scenario_path, info['path']),
                     GLOBAL_SEED,
                     pipeline,
@@ -239,7 +240,7 @@ with tqdm(total=total_runtime) as pbar:
 
                 for i in range(0, len(pipelines)):
                     pipeline = pipelines[i]
-                    cmd = 'python ./main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}'.format(
+                    cmd = 'python experiment/main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}'.format(
                         os.path.join(scenario_path, info['path']),
                         GLOBAL_SEED,
                         pipeline,
@@ -283,7 +284,7 @@ with tqdm(total=total_runtime) as pbar:
                         data = json.load(json_file)
                         pipeline = data['pipeline']
                     print(pipeline)
-                    cmd = 'python ./main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}'.format(
+                    cmd = 'python experiment/main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}'.format(
                         os.path.join(scenario_path, info['path']),
                         GLOBAL_SEED,
                         ' '.join(pipeline),
@@ -300,7 +301,7 @@ with tqdm(total=total_runtime) as pbar:
                     with open(os.path.join(result_path, '{}.txt'.format(base_scenario)), "a") as log_out:
                         log_out.write("\ntrying to run best pipeline and algorithm: could not find a pipeline")
             elif args.mode == "algorithm":
-                cmd = 'python ./main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}'.format(
+                cmd = 'python experiment/main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}'.format(
                     os.path.join(scenario_path, info['path']),
                     GLOBAL_SEED,
                     'impute encode',

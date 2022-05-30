@@ -1,5 +1,5 @@
-from experiment.policies.objective import get_baseline_score
-from experiment.pipeline.PrototypeSingleton import PrototypeSingleton
+from .objective import get_baseline_score
+from pipeline.PrototypeSingleton import PrototypeSingleton
 
 import json
 

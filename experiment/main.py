@@ -45,12 +45,12 @@ def main(args):
 
     print('SCENARIO:\n {}'.format(json.dumps(scenario, indent=4, sort_keys=True)))
 
-    X, y = load_dataset(scenario['setup']['dataset'], args)
-
-    policy = initiate(scenario['setup']['policy'], config)
-    policy.run(X, y)
-
-    serializer.serialize_results(scenario, policy, args.result_path, args.pipeline)
+    try:
+        X, y = load_dataset(scenario['setup']['dataset'], args)
+        policy = initiate(scenario['setup']['policy'], config)
+        policy.run(X, y)
+    finally:
+        serializer.serialize_results(scenario, policy, args.result_path, args.pipeline)
 
 if __name__ == "__main__":
     args = cli.parse_args()

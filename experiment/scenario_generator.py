@@ -39,7 +39,7 @@ def parse_args():
 
     parser.add_argument(
         "-toy",
-        "--toy-example",
+        "--toy_example",
         nargs="?",
         type=bool,
         required=False,
@@ -81,13 +81,14 @@ def get_filtered_datasets(toy):
 
 args = parse_args()
 
-scenario_path = create_directory("./", "scenarios")
+scenario_path = "scenarios"
 if args.toy_example == True:
     scenario_path = create_directory(scenario_path, "toy")
 else:
     scenario_path = create_directory(scenario_path, "paper")
 scenario_path = create_directory(scenario_path, args.experiment)
 
+datasets = []
 if args.experiment == "pipeline_construction" or args.experiment == "evaluation1" or args.experiment == "evaluation2_3":
     datasets = get_filtered_datasets(args.toy_example)
 elif args.experiment == "pipeline_impact":
