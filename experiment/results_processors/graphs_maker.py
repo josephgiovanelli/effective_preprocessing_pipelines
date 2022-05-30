@@ -8,7 +8,7 @@ import numpy as np
 from utils import create_directory
 
 parser = argparse.ArgumentParser(description="Automated Machine Learning Workflow creation and configuration")
-parser.add_argument("-toy", "--toy-example", nargs="?", type=bool, required=False, default=False, help="wether it is a toy example or not")
+parser.add_argument("-toy", "--toy_example", action='store_true', default=False, help="wether it is a toy example or not")
 args = parser.parse_args()
 
 def main():
@@ -67,50 +67,50 @@ def main():
     text = fig.text(-0.2, 1.05, "", transform=axs[1,1].transAxes)
     fig.set_size_inches(20, 10, forward=True)
     fig.tight_layout(h_pad=3.0, w_pad=4.0)
-    fig.savefig(os.path.join(result_path, 'experiments_results.pdf'), bbox_extra_artists=(lgd,text), bbox_inches='tight')
+    fig.savefig(os.path.join(result_path, 'Figure4.pdf'), bbox_extra_artists=(lgd,text), bbox_inches='tight')
 
-    SMALL_SIZE = 8
-    MEDIUM_SIZE = 17
-    BIGGER_SIZE = 21
+    # SMALL_SIZE = 8
+    # MEDIUM_SIZE = 17
+    # BIGGER_SIZE = 21
 
-    plt.rc('font', size=SMALL_SIZE)  # controls default text sizes
-    plt.rc('axes', titlesize=MEDIUM_SIZE)  # fontsize of the axes title
-    plt.rc('axes', labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
-    plt.rc('xtick', labelsize=MEDIUM_SIZE)  # fontsize of the tick labels
-    plt.rc('ytick', labelsize=MEDIUM_SIZE)  # fontsize of the tick labels
-    plt.rc('legend', fontsize=BIGGER_SIZE)  # legend fontsize
-    plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+    # plt.rc('font', size=SMALL_SIZE)  # controls default text sizes
+    # plt.rc('axes', titlesize=MEDIUM_SIZE)  # fontsize of the axes title
+    # plt.rc('axes', labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
+    # plt.rc('xtick', labelsize=MEDIUM_SIZE)  # fontsize of the tick labels
+    # plt.rc('ytick', labelsize=MEDIUM_SIZE)  # fontsize of the tick labels
+    # plt.rc('legend', fontsize=BIGGER_SIZE)  # legend fontsize
+    # plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
-    fig, axs = plt.subplots(1, 4)
-    n_groups = 3
+    # fig, axs = plt.subplots(1, 4)
+    # n_groups = 3
 
-    for i in range(0, 4):
-        # fig2, ax = axs[i, j].subplots()
-        index = np.arange(n_groups)
-        bar_width = 0.5
+    # for i in range(0, 4):
+    #     # fig2, ax = axs[i, j].subplots()
+    #     index = np.arange(n_groups)
+    #     bar_width = 0.5
 
-        valid = data[i]['data'].iloc[:-1, 0:8]
-        valid["sum"] = valid.sum(axis=1)
-        invalid = data[i]['data'].iloc[:-1, 8:11]
-        invalid["sum"] = invalid.sum(axis=1)
+    #     valid = data[i]['data'].iloc[:-1, 0:8]
+    #     valid["sum"] = valid.sum(axis=1)
+    #     invalid = data[i]['data'].iloc[:-1, 8:11]
+    #     invalid["sum"] = invalid.sum(axis=1)
 
-        axs[i].bar(index * bar_width * 3, valid["sum"], label='valid', color = 'g')
-        axs[i].bar(index * bar_width * 3, invalid["sum"], bottom=valid["sum"], label='invalid', color = 'r')
+    #     axs[i].bar(index * bar_width * 3, valid["sum"], label='valid', color = 'g')
+    #     axs[i].bar(index * bar_width * 3, invalid["sum"], bottom=valid["sum"], label='invalid', color = 'r')
 
-        #axs[i].bar((index * bar_width * 5) + (bar_width * (k - 1)), data[i]['data'].iloc[:-1, k], bar_width, label=labels[k - 1])
+    #     #axs[i].bar((index * bar_width * 5) + (bar_width * (k - 1)), data[i]['data'].iloc[:-1, k], bar_width, label=labels[k - 1])
 
-        axs[i].set(ylabel='Number of datasets')
-        axs[i].set_title(data[i]['title'])
-        axs[i].set_ylim([0, 60])
-        plt.setp(axs, xticks=(index * bar_width * 3), xticklabels=['NB', 'KNN', 'RF'])
+    #     axs[i].set(ylabel='Number of datasets')
+    #     axs[i].set_title(data[i]['title'])
+    #     axs[i].set_ylim([0, 60])
+    #     plt.setp(axs, xticks=(index * bar_width * 3), xticklabels=['NB', 'KNN', 'RF'])
 
-    handles, labels = plt.gca().get_legend_handles_labels()
-    by_label = dict(zip(labels, handles))
-    #fig.legend(by_label.values(), by_label.keys(), loc='upper center', ncol=2)
-    lgd = fig.legend(by_label.values(), by_label.keys(), loc='lower center', ncol=2, bbox_to_anchor=(0.5, 1.0))
-    text = fig.text(-0.2, 1.05, "", transform=axs[3].transAxes)
-    fig.set_size_inches(20, 5, forward=True)
-    fig.tight_layout(w_pad=4.0)
-    fig.savefig(os.path.join(result_path, 'experiments_validity.pdf'), bbox_extra_artists=(lgd,text), bbox_inches='tight')
+    # handles, labels = plt.gca().get_legend_handles_labels()
+    # by_label = dict(zip(labels, handles))
+    # #fig.legend(by_label.values(), by_label.keys(), loc='upper center', ncol=2)
+    # lgd = fig.legend(by_label.values(), by_label.keys(), loc='lower center', ncol=2, bbox_to_anchor=(0.5, 1.0))
+    # text = fig.text(-0.2, 1.05, "", transform=axs[3].transAxes)
+    # fig.set_size_inches(20, 5, forward=True)
+    # fig.tight_layout(w_pad=4.0)
+    # fig.savefig(os.path.join(result_path, 'experiments_validity.pdf'), bbox_extra_artists=(lgd,text), bbox_inches='tight')
 
 main()

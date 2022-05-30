@@ -17,6 +17,7 @@ import argparse
 from auto_pipeline_builder import framework_table_pipelines, pseudo_exhaustive_pipelines
 from utils import scenarios as scenarios_util
 from results_processors.utils import create_directory
+from utils import serializer
 
 GLOBAL_SEED = 42
 
@@ -142,7 +143,7 @@ def kill(proc_pid):
         proc.kill()
     process.kill()
 
-def run_cmd(cmd, stdout_path, stderr_path):
+def run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path):
     open(stdout_path, "w")
     open(stderr_path, "w")
     with open(stdout_path, "a") as log_out:
@@ -150,17 +151,22 @@ def run_cmd(cmd, stdout_path, stderr_path):
             max_time = 1000
             try:
                 process = subprocess.Popen(cmd, shell=True, stdout=log_out, stderr=log_err)
+                raise Exception("My Exception")
                 process.wait(timeout = max_time)
-            except:
+            except Exception as e:
                 print(e)
                 kill(process.pid)
                 print("\n\n"+ base_scenario + " does not finish in " + str(max_time) + "\n\n" )
+                serializer.serialize_results(scenario=current_scenario, result_path=result_path)
 
 with tqdm(total=total_runtime) as pbar:
     for info in to_run.values():
         base_scenario = info['path'].split('.yaml')[0]
         output = base_scenario.split('_')[0]
         pbar.set_description("Running scenario {}\n\r".format(info['path']))
+
+        current_scenario_path = os.path.join(scenario_path, info['path']) 
+        current_scenario = scenarios_util.load(current_scenario_path)
 
         if args.experiment == "pipeline_construction" or args.experiment == "pipeline_impact":
 
@@ -175,7 +181,7 @@ with tqdm(total=total_runtime) as pbar:
                     pipeline = ['impute', 'encode', 'normalize', 'rebalance', 'features']
 
             cmd = 'python experiment/main.py -s {} -c control.seed={} -p {} -r {} -exp {}'.format(
-                os.path.join(scenario_path, info['path']),
+                current_scenario_path,
                 GLOBAL_SEED,
                 reduce(lambda x, y: x + " " + y, pipeline),
                 result_path,
@@ -183,11 +189,9 @@ with tqdm(total=total_runtime) as pbar:
             
             stdout_path = os.path.join(result_path, '{}_stdout.txt'.format(base_scenario))
             stderr_path = os.path.join(result_path, '{}_stderr.txt'.format(base_scenario))
-            run_cmd(cmd, stdout_path, stderr_path)
+            run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path)
             
         elif args.experiment == "evaluation1":
-            current_scenario = scenarios_util.load(os.path.join(scenario_path, info['path']))
-            config = scenarios_util.to_config(current_scenario, args)
             pipelines = framework_table_pipelines()
 
             data_to_write = {}
@@ -197,7 +201,7 @@ with tqdm(total=total_runtime) as pbar:
             for i in range(0, len(pipelines)):
                 pipeline = pipelines[i]
                 cmd = 'python experiment/main.py -s {} -c control.seed={} -p {} -r {} -np {} -exp {}'.format(
-                    os.path.join(scenario_path, info['path']),
+                    current_scenario_path,
                     GLOBAL_SEED,
                     pipeline,
                     result_path,
@@ -206,7 +210,7 @@ with tqdm(total=total_runtime) as pbar:
 
                 stdout_path = os.path.join(result_path, '{}_{}_stdout.txt'.format(base_scenario, str(i)))
                 stderr_path = os.path.join(result_path, '{}_{}_stderr.txt'.format(base_scenario, str(i)))
-                run_cmd(cmd, stdout_path, stderr_path)
+                run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path)
 
                 try:
                     os.rename(os.path.join(result_path, '{}.json'.format(base_scenario)),
@@ -231,7 +235,7 @@ with tqdm(total=total_runtime) as pbar:
             except:
                 print("I didn't manage to write")
         elif args.experiment == "evaluation2_3":
-            current_scenario = scenarios_util.load(os.path.join(scenario_path, info['path']))
+            current_scenario = scenarios_util.load(current_scenario_path)
             config = scenarios_util.to_config(current_scenario, args)
 
             if args.mode == "pipeline_algorithm":
@@ -241,7 +245,7 @@ with tqdm(total=total_runtime) as pbar:
                 for i in range(0, len(pipelines)):
                     pipeline = pipelines[i]
                     cmd = 'python experiment/main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}'.format(
-                        os.path.join(scenario_path, info['path']),
+                        current_scenario_path,
                         GLOBAL_SEED,
                         pipeline,
                         result_path,
@@ -251,7 +255,7 @@ with tqdm(total=total_runtime) as pbar:
 
                     stdout_path = os.path.join(result_path, '{}_{}_stdout.txt'.format(base_scenario, str(i)))
                     stderr_path = os.path.join(result_path, '{}_{}_stderr.txt'.format(base_scenario, str(i)))
-                    run_cmd(cmd, stdout_path, stderr_path)
+                    run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path)
 
                     try:
                         os.rename(os.path.join(result_path, '{}.json'.format(base_scenario)),
@@ -285,7 +289,7 @@ with tqdm(total=total_runtime) as pbar:
                         pipeline = data['pipeline']
                     print(pipeline)
                     cmd = 'python experiment/main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}'.format(
-                        os.path.join(scenario_path, info['path']),
+                        current_scenario_path,
                         GLOBAL_SEED,
                         ' '.join(pipeline),
                         result_path,
@@ -295,14 +299,14 @@ with tqdm(total=total_runtime) as pbar:
 
                     stdout_path = os.path.join(result_path, '{}_stdout.txt'.format(base_scenario))
                     stderr_path = os.path.join(result_path, '{}_stderr.txt'.format(base_scenario))
-                    run_cmd(cmd, stdout_path, stderr_path)
+                    run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path)
 
                 except:
                     with open(os.path.join(result_path, '{}.txt'.format(base_scenario)), "a") as log_out:
                         log_out.write("\ntrying to run best pipeline and algorithm: could not find a pipeline")
             elif args.mode == "algorithm":
                 cmd = 'python experiment/main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}'.format(
-                    os.path.join(scenario_path, info['path']),
+                    current_scenario_path,
                     GLOBAL_SEED,
                     'impute encode',
                     result_path,
@@ -312,7 +316,7 @@ with tqdm(total=total_runtime) as pbar:
 
                 stdout_path = os.path.join(result_path, '{}_stdout.txt'.format(base_scenario))
                 stderr_path = os.path.join(result_path, '{}_stderr.txt'.format(base_scenario))
-                run_cmd(cmd, stdout_path, stderr_path)
+                run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path)
 
             else:
                 raise Exception('unvalid mode option')

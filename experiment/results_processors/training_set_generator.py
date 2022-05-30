@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import argparse
 import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
@@ -10,12 +11,16 @@ from results_processors.evaluation2_results_extraction_utils import create_possi
     extract_results
 from utils import parse_args, create_directory
 
+parser = argparse.ArgumentParser(description="Automated Machine Learning Workflow creation and configuration")
+parser.add_argument("-toy", "--toy_example", action='store_true', default=False, help="wether it is a toy example or not")
+args = parser.parse_args()
+
 
 def main():
     input_path, result_path, pipeline = parse_args()
     categories = create_possible_categories(pipeline)
     result_path = create_directory(result_path, 'meta_learner')
-    filtered_data_sets = get_filtered_datasets()
+    filtered_data_sets = get_filtered_datasets(args.toy_example)
 
     _, _, grouped_by_data_set_result, _ = extract_results(input_path, filtered_data_sets, pipeline, categories)
     data = get_results(grouped_by_data_set_result)

@@ -21,12 +21,17 @@ extended_benchmark_suite = [41145, 41156, 41157, 4541, 41158, 42742, 40498, 4273
                         4135, 41142, 41161, 41159, 41163, 41164, 41138, 41143, 41146, 41150, 40900, 41165, 41166, 41168, 41169, 
                         41147, 1111, 1169, 41167, 41144, 1515, 1457, 181]
 
-def get_filtered_datasets():
-    df = pd.read_csv('meta_features/simple-meta-features.csv')
-    df = df.loc[df['did'].isin(benchmark_suite + extended_benchmark_suite + [10, 20, 26] + [15, 29, 1053, 1590])]
+def get_filtered_datasets(toy):
+    df = pd.read_csv("meta_features/simple-meta-features.csv")
+    df = df.loc[df['did'].isin(list(dict.fromkeys(benchmark_suite + extended_benchmark_suite + [10, 20, 26])))]
     df = df.loc[df['NumberOfMissingValues'] / (df['NumberOfInstances'] * df['NumberOfFeatures']) < 0.1]
     df = df.loc[df['NumberOfInstancesWithMissingValues'] / df['NumberOfInstances'] < 0.1]
     df = df.loc[df['NumberOfInstances'] * df['NumberOfFeatures'] < 5000000]
+    if toy:
+        df = df.loc[df['NumberOfInstances'] <= 2000]
+        df = df.loc[df['NumberOfFeatures'] <= 10]
+        df = df.sort_values(by=['NumberOfInstances', 'NumberOfFeatures'])
+        df = df[:10]
     df = df['did']
     return df.values.flatten().tolist()
 
@@ -180,7 +185,7 @@ def save_summary(summary_map, results_path, plots_path):
     plt.legend()
     fig = plt.gcf()
     fig.set_size_inches(12, 6)
-    fig.savefig(os.path.join(plots_path, 'evaluation1.pdf'))
+    fig.savefig(os.path.join(plots_path, 'Figure12.pdf'))
 
     plt.clf()
 
@@ -232,6 +237,6 @@ def save_comparison(results_pipelines, results_auto, result_path, plot_path):
     plt.tight_layout(pad=0.2)
     fig = plt.gcf()
     fig.set_size_inches(10, 5)
-    fig.savefig(os.path.join(plot_path, 'evaluation2.pdf'))
+    fig.savefig(os.path.join(plot_path, 'Figure13.pdf'))
 
     plt.clf()

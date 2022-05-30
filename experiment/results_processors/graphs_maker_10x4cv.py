@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 parser = argparse.ArgumentParser(description="Automated Machine Learning Workflow creation and configuration")
-parser.add_argument("-toy", "--toy-example", nargs="?", type=bool, required=False, default=False, help="wether it is a toy example or not")
+parser.add_argument("-toy", "--toy_example", action='store_true', default=False, help="wether it is a toy example or not")
 args = parser.parse_args()
 
 def main():
@@ -51,7 +51,7 @@ def main():
     ax.set_ylim([0, 1])
     fig.tight_layout()
     fig.set_size_inches(12, 6, forward=True)
-    fig.savefig(os.path.join(plot_path, '10_times_4_folds_cv.pdf'))
+    fig.savefig(os.path.join(plot_path, 'Figure5.pdf'))
 
 
 main()

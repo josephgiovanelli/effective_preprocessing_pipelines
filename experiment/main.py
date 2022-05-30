@@ -7,6 +7,7 @@ from policies import initiate
 import json
 import os
 import openml
+import signal
 
 
 def load_dataset(id, args):
@@ -20,18 +21,22 @@ def load_dataset(id, args):
     print(dataset.name)
     print(X, y)
     PrototypeSingleton.getInstance().setPipeline(args.pipeline)
-    num_features = [i for i, x in enumerate(categorical_indicator) if x == False]
-    cat_features = [i for i, x in enumerate(categorical_indicator) if x == True]
-    print("numeriche: " + str(len(num_features)) + " categoriche: " + str(len(cat_features)))
+    num_features = [i for i, x in enumerate(
+        categorical_indicator) if x == False]
+    cat_features = [i for i, x in enumerate(
+        categorical_indicator) if x == True]
+    print("numeriche: " + str(len(num_features)) +
+          " categoriche: " + str(len(cat_features)))
     PrototypeSingleton.getInstance().setFeatures(num_features, cat_features)
     PrototypeSingleton.getInstance().set_X_y(X, y)
     return X, y
+
 
 def main(args):
     scenario = scenarios.load(args.scenario)
     scenario = cli.apply_scenario_customization(scenario, args.customize)
     config = scenarios.to_config(scenario, args)
-    
+
     if args.experiment == 'evaluation2_3':
         if args.mode == "pipeline_algorithm":
             config['time'] /= args.num_pipelines
@@ -50,7 +55,9 @@ def main(args):
         policy = initiate(scenario['setup']['policy'], config)
         policy.run(X, y)
     finally:
-        serializer.serialize_results(scenario, policy, args.result_path, args.pipeline)
+        serializer.serialize_results(
+            scenario=scenario, result_path=args.result_path, policy=policy, pipeline=args.pipeline)
+
 
 if __name__ == "__main__":
     args = cli.parse_args()

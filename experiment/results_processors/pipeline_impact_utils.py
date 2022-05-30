@@ -142,4 +142,4 @@ def save_analysis(analysis, result_path, toy):
     plt.xticks(np.linspace(0, max_iteration, int(max_iteration/10 + max_iteration/100)))
     fig = plt.gcf()
     fig.set_size_inches(12, 6, forward=True)
-    fig.savefig(os.path.join(result_path, 'pre-processing-impact.pdf'))
+    fig.savefig(os.path.join(result_path, 'Figure2.pdf'))

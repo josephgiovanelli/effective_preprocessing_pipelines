@@ -11,7 +11,7 @@ import argparse
 parser = argparse.ArgumentParser(description="Automated Machine Learning Workflow creation and configuration")
 parser.add_argument("-exp", "--experiment", nargs="?", type=str, required=True, help="type of the experiments")
 parser.add_argument("-mode", "--mode", nargs="?", type=str, required=False, help="algorithm or algorithm_pipeline")
-parser.add_argument("-toy", "--toy-example", nargs="?", type=bool, required=False, default=False, help="wether it is a toy example or not")
+parser.add_argument("-toy", "--toy_example", action='store_true', default=False, help="wether it is a toy example or not")
 args = parser.parse_args()
 
 

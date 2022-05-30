@@ -16,7 +16,7 @@ params=()
 # python experiment/experiments_launcher.py -exp pipeline_construction -mode normalize_features "${params[@]}"
 # python experiment/results_processors/experiments_summarizer.py  -exp pipeline_construction -mode features_normalize  "${params[@]}"
 
-python experiment/experiments_launcher.py -exp pipeline_construction -mode discretize_rebalance "${params[@]}"
+# python experiment/experiments_launcher.py -exp pipeline_construction -mode discretize_rebalance "${params[@]}"
 # python experiment/experiments_launcher.py -exp pipeline_construction -mode rebalance_discretize "${params[@]}"
 # python experiment/results_processors/experiments_summarizer.py -exp pipeline_construction -mode discretize_rebalance "${params[@]}"
 
