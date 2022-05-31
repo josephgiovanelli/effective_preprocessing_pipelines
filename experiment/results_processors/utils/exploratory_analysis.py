@@ -18,14 +18,14 @@ def diff(first, second):
     return [item for item in first if item not in second]
 
 
-def transformation_analysis(input_auto, new_results_path, plots_path):
+def transformation_analysis(evaluation2_3_results_path, new_results_path, plots_path):
     # configure environment
+    input_auto = os.path.join(evaluation2_3_results_path, "pipeline_algorithm")
     discretize_count, normalize_count = {}, {}
     results_map = pd.DataFrame()
     for algorithm in ["nb", "knn", "rf"]:
         discretize_count[algorithm], normalize_count[algorithm] = 0, 0
-        df = pd.read_csv(os.path.join("results", "summary",
-                         "evaluation2_3", algorithm + ".csv"))
+        df = pd.read_csv(os.path.join(evaluation2_3_results_path, "summary", "evaluation3", algorithm + ".csv"))
         #df = df[(df["pa_percentage"] == 0.5)]
         ids = list(df["dataset"])
 
@@ -150,13 +150,13 @@ def transformation_analysis(input_auto, new_results_path, plots_path):
                 bbox_extra_artists=(lgd, text), bbox_inches='tight')
 
 
-def physical_pipelines_analysis(input_auto, new_results_path, plots_path):
+def physical_pipelines_analysis(evaluation2_3_results_path, new_results_path, plots_path):
     # configure environment
+    input_auto = os.path.join(evaluation2_3_results_path, "pipeline_algorithm")
     results_map = pd.DataFrame()
     for algorithm in ["knn", "nb", "rf"]:
 
-        df = pd.read_csv(os.path.join("results", "summary",
-                         "evaluation2_3", algorithm + ".csv"))
+        df = pd.read_csv(os.path.join(evaluation2_3_results_path, "summary", "evaluation3", algorithm + ".csv"))
         ids = list(df["dataset"])
 
         files = [f for f in listdir(input_auto) if isfile(join(input_auto, f))]
@@ -278,18 +278,14 @@ def physical_pipelines_analysis(input_auto, new_results_path, plots_path):
                 bbox_extra_artists=(lgd, text), bbox_inches='tight')
 
 
-def prototypes_impact_analysis(evaluation1_results_path, evaluation2_3_pipeline_algorithm_results_path, evaluation2_3_results_path, plots_path, toy):
-    # configure environment
-
+def prototypes_impact_analysis(evaluation1_results_path, evaluation2_3_results_path, plots_path, toy):
     filtered_data_sets = ['_'.join(i) for i in list(itertools.product(
         ["knn", "nb", "rf"], [str(integer) for integer in get_filtered_datasets(toy)]))]
-    # print(filtered_data_sets)
 
-    results_pipelines = load_results_pipelines(
-        evaluation1_results_path, filtered_data_sets)
-    # print(results_pipelines)
-    results_auto = load_results_auto(
-        evaluation2_3_pipeline_algorithm_results_path, filtered_data_sets)
+    results_pipelines = load_results_pipelines(evaluation1_results_path, filtered_data_sets)
+    
+    evaluation2_3_pipeline_algorithm_results_path = os.path.join(evaluation2_3_results_path, "pipeline_algorithm")
+    results_auto = load_results_auto(evaluation2_3_pipeline_algorithm_results_path, filtered_data_sets)
     # print(results_auto)
     for algorithm in results_auto.keys():
         for dataset in results_auto[algorithm].keys():
@@ -329,8 +325,8 @@ def prototypes_impact_analysis(evaluation1_results_path, evaluation2_3_pipeline_
     fig.savefig(os.path.join(plots_path, "Figure7.pdf"))
 
 def get_paths(toy):
-    results_path = "results"
-    plots_path = "plots"
+    results_path = "raw_results"
+    plots_path = "artifacts"
     if toy:
         results_path = os.path.join(results_path, "toy")
         plots_path = os.path.join(plots_path, "toy")
@@ -338,9 +334,7 @@ def get_paths(toy):
         results_path = os.path.join(results_path, "paper")
         plots_path = os.path.join(plots_path, "paper")
     evaluation2_3_results_path = os.path.join(results_path, "evaluation2_3")
-    evaluation2_3_pipeline_algorithm_results_path = os.path.join(
-        evaluation2_3_results_path, "pipeline_algorithm")
     evaluation1_results_path = os.path.join(results_path, "evaluation1")
-    plots_path = create_directory(plots_path, "extension")
-    new_results_path = create_directory(results_path, "extension")
-    return evaluation1_results_path, evaluation2_3_pipeline_algorithm_results_path, evaluation2_3_results_path, plots_path, new_results_path
+    plots_path = create_directory(plots_path, "exploratory_analysis")
+    new_results_path = create_directory(results_path, "exploratory_analysis")
+    return evaluation1_results_path, evaluation2_3_results_path, plots_path, new_results_path

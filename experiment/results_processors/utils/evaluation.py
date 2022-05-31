@@ -438,8 +438,8 @@ def plot_evaluation2_comparison(comparison, result_path):
 
 def evaluation1(toy):
     # configure environment
-    results_path = "results"
-    plots_path = "plots"
+    results_path = "raw_results"
+    plots_path = "artifacts"
     if toy:
         results_path = os.path.join(results_path, "toy")
         plots_path = os.path.join(plots_path, "toy")
@@ -467,8 +467,8 @@ def evaluation1(toy):
 
 def evaluation2(toy):
     # configure environment
-    results_path = "results"
-    plots_path = "plots"
+    results_path = "raw_results"
+    plots_path = "artifacts"
     if toy:
         results_path = os.path.join(results_path, "toy")
         plots_path = os.path.join(plots_path, "toy")
@@ -501,8 +501,8 @@ def evaluation2(toy):
 
 def evaluation3(toy):
     # configure environment
-    results_path = "results"
-    plots_path = "plots"
+    results_path = "raw_results"
+    plots_path = "artifacts"
     if toy:
         results_path = os.path.join(results_path, "toy")
         plots_path = os.path.join(plots_path, "toy")

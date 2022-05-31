@@ -12,9 +12,7 @@ import datetime
 from prettytable import PrettyTable
 from tqdm import tqdm
 
-import argparse
-
-from auto_pipeline_builder import framework_table_pipelines, pseudo_exhaustive_pipelines
+from utils.auto_pipeline_builder import framework_table_pipelines, pseudo_exhaustive_pipelines
 from utils import scenarios as scenarios_util
 from results_processors.utils.common import *
 from utils import serializer
@@ -23,7 +21,7 @@ GLOBAL_SEED = 42
 
 args = parse_args()
 scenario_path = create_directory("./", "scenarios")
-result_path = create_directory("./", "results")
+result_path = create_directory("./", "raw_results")
 
 print(f"{args}")
 if args.toy_example == True:
@@ -61,11 +59,11 @@ print('Done.')
 for scenario in scenario_list:
     base_scenario = scenario.split('.yaml')[0]
     if scenario not in scenarios:
-        scenarios[scenario] = {'results': None, 'path': scenario}
+        scenarios[scenario] = {'raw_results': None, 'path': scenario}
     for result in result_list:
         base_result = result.split('.json')[0]
         if base_result.__eq__(base_scenario):
-            scenarios[scenario]['results'] = result
+            scenarios[scenario]['raw_results'] = result
 
 # Calculate total amount of time
 total_runtime = 0
@@ -86,7 +84,7 @@ for path, scenario in iteritems(scenarios):
                     scenario['runtime'] *= 24
                 if args.experiment == "evaluation2_3" and args.mode == "pipeline_algorithm":
                     scenario['runtime'] *= 2
-                if scenario['results'] is None:
+                if scenario['raw_results'] is None:
                     total_runtime += runtime
             except:
                 scenario['status'] = 'No runtime info'
@@ -98,14 +96,14 @@ t_invalid.align["PATH"] = "l"
 for v in invalid_scenarios.values():
     t_invalid.add_row([v['path'], v['status']])
 
-scenario_with_results = {k:v for k,v in iteritems(scenarios) if v['status'] == 'Ok' and v['results'] is not None}
+scenario_with_results = {k:v for k,v in iteritems(scenarios) if v['status'] == 'Ok' and v['raw_results'] is not None}
 t_with_results = PrettyTable(['PATH', 'RUNTIME',  'STATUS', 'RESULTS'])
 t_with_results.align["PATH"] = "l"
 t_with_results.align["RESULTS"] = "l"
 for v in scenario_with_results.values():
-    t_with_results.add_row([v['path'], str(v['runtime']) + 's', v['status'], v['results']])
+    t_with_results.add_row([v['path'], str(v['runtime']) + 's', v['status'], v['raw_results']])
 
-to_run = {k:v for k,v in iteritems(scenarios) if v['status'] == 'Ok' and v['results'] is None}
+to_run = {k:v for k,v in iteritems(scenarios) if v['status'] == 'Ok' and v['raw_results'] is None}
 t_to_run = PrettyTable(['PATH', 'RUNTIME', 'STATUS'])
 t_to_run.align["PATH"] = "l"
 for v in to_run.values():

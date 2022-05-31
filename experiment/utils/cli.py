@@ -20,7 +20,7 @@ Automated Machine Learning Workflow creation and configuration
                         help="step of the pipeline to execute")
 
     parser.add_argument("-r", "--result_path", nargs="?", type=str, required=True,
-                        help="path where put the results")
+                        help="path where put the raw results")
                                             
     parser.add_argument("-exp", "--experiment", nargs="?", type=str, required=True, 
                         help="type of the experiments")

@@ -116,15 +116,15 @@ def save_analysis(analysis, result_path, toy):
 
     max_iteration = 10 if toy else 100
 
-    with open(os.path.join(result_path, 'result_with_impact.csv'), 'w') as out:
-        out.write(','.join(analysis.keys()) + '\n')
+    # with open(os.path.join(result_path, 'result_with_impact.csv'), 'w') as out:
+    #     out.write(','.join(analysis.keys()) + '\n')
 
-    with open(os.path.join(result_path, 'result_with_impact.csv'), 'a') as out:
-        for i in range(0, max_iteration):
-            row = []
-            for key in analysis.keys():
-                row.append(str(analysis[key][i]))
-            out.write(','.join(row) + '\n')
+    # with open(os.path.join(result_path, 'result_with_impact.csv'), 'a') as out:
+    #     for i in range(0, max_iteration):
+    #         row = []
+    #         for key in analysis.keys():
+    #             row.append(str(analysis[key][i]))
+    #         out.write(','.join(row) + '\n')
 
     x = np.linspace(0, max_iteration, max_iteration)
 
@@ -162,8 +162,8 @@ def save_analysis(analysis, result_path, toy):
 
 def pipeline_impact(toy):
 
-    path = "results"
-    result_path = "plots"
+    path = "raw_results"
+    result_path = "artifacts"
     if toy:
         path = os.path.join(path, "toy")
         result_path = create_directory(result_path, 'toy')

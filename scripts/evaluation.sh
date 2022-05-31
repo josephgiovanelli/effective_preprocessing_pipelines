@@ -15,10 +15,4 @@ python experiment/experiments_launcher.py -exp evaluation2_3 -mode algorithm "${
 python experiment/experiments_launcher.py -exp evaluation2_3 -mode pipeline_algorithm "${params[@]}"
 
 # PLOTTING
-## Exploratory Analysis
-python experiment/results_processors/exploratory_analysis.py "${params[@]}"
-## Evaluation
 python experiment/results_processors/evaluation.py "${params[@]}"
-## Meta learning
-# python experiment/results_processors/meta_learning_input_preparation.py "${params[@]}"
-

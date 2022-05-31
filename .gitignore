@@ -126,8 +126,10 @@ dmypy.json
 
 #added by joseph giovanelli
 .scenarios
-.results
+.raw_results
+.artifacts
 .models
 scenarios/
-results/
+raw_results/
 models/
+artifacts/

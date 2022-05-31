@@ -920,11 +920,8 @@ def save_chi2tests(result_path, tests):
             saver(value, os.path.join(result_path, key + '.csv'))
 
 def experiments_summarizer(pipeline, toy):
-    # configure environment
-    # -p features rebalance -i results/pipeline_construction/features_rebalance/ -o results/pipeline_construction/features_rebalance/
-    #args = parse_args()
     warnings.simplefilter(action='ignore', category=FutureWarning)
-    path = "results"
+    path = "raw_results"
     if toy:
         path = os.path.join(path, "toy")
     input_path = os.path.join(path, "pipeline_construction", '_'.join(pipeline))
@@ -973,7 +970,7 @@ def experiments_summarizer(pipeline, toy):
 
 def experiments_summarizer_10x4cv(pipeline, toy):
     # configure environment
-    path = "results"
+    path = "raw_results"
     if toy:
         path = os.path.join(path, "toy")
     input_path = os.path.join(path, "pipeline_construction", '_'.join(pipeline))
@@ -1070,8 +1067,8 @@ def experiments_summarizer_10x4cv(pipeline, toy):
         result_path, 'summary_test_with_mean_.csv'), index=False)
 
 def graph_maker(toy):
-    input_path = "results"
-    result_path = "plots"
+    input_path = "raw_results"
+    result_path = "artifacts"
     if toy:
         input_path = os.path.join(input_path, "toy")
         result_path = os.path.join(result_path, "toy")
@@ -1129,8 +1126,8 @@ def graph_maker(toy):
 
 def graph_maker_10x4cv(toy):
     cv_file_name = 'summary_with_mean_.csv'
-    pipeline_construction_path = 'results'
-    plot_path = 'plots'
+    pipeline_construction_path = 'raw_results'
+    plot_path = 'artifacts'
     if toy:
         pipeline_construction_path = os.path.join(pipeline_construction_path, "toy")
         plot_path = os.path.join(plot_path, "toy")
