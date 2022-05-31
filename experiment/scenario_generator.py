@@ -8,7 +8,7 @@ from collections import OrderedDict
 import pandas as pd
 
 from commons import large_comparison_classification_tasks, extended_benchmark_suite, pipeline_impact_suite, benchmark_suite, algorithms
-from results_processors.utils import create_directory
+from results_processors.utils.common import create_directory
 
 base = OrderedDict([
     ("title", ""),

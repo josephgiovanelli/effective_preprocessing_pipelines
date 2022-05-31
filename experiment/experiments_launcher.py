@@ -16,7 +16,7 @@ import argparse
 
 from auto_pipeline_builder import framework_table_pipelines, pseudo_exhaustive_pipelines
 from utils import scenarios as scenarios_util
-from results_processors.utils import create_directory
+from results_processors.utils.common import create_directory
 from utils import serializer
 
 GLOBAL_SEED = 42

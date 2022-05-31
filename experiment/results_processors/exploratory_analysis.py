@@ -11,8 +11,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-from utils import create_directory
-from evaluation_utils import get_filtered_datasets, load_results_pipelines, load_results_auto
+from utils.common import create_directory
+from utils.evaluation import get_filtered_datasets, load_results_pipelines, load_results_auto
 
 parser = argparse.ArgumentParser(
     description="Automated Machine Learning Workflow creation and configuration")
