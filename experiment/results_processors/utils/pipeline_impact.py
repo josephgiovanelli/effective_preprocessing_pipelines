@@ -5,11 +5,12 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 
+from .common import *
+from .pipeline_construction import get_filtered_datasets
 
 from os import listdir
 from os.path import isfile, join
 
-algorithms = ['RandomForest', 'NaiveBayes', 'KNearestNeighbors']
 
 def load_results(input_path, filtered_datasets):
     result = {}
@@ -37,6 +38,7 @@ def load_results(input_path, filtered_datasets):
 
     return result
 
+
 def find_pipeline_iterations(history):
     for iteration in history:
         if iteration['step'] == 'algorithm':
@@ -44,15 +46,19 @@ def find_pipeline_iterations(history):
         else:
             return iteration['iteration']
 
+
 def perform_algorithm_pipeline_analysis(results, toy):
     pipelines_iterations, algorithm_iterations = [], []
 
     for result in results:
-        results[result]['algorithm_iterations'] = find_pipeline_iterations(results[result]['history'])
-        results[result]['pipeline_iterations'] = results[result]['num_iterations'] - results[result]['algorithm_iterations']
+        results[result]['algorithm_iterations'] = find_pipeline_iterations(
+            results[result]['history'])
+        results[result]['pipeline_iterations'] = results[result]['num_iterations'] - \
+            results[result]['algorithm_iterations']
         algorithm_iterations.append(results[result]['algorithm_iterations'])
         pipelines_iterations.append(results[result]['pipeline_iterations'])
-        print(result, results[result]['pipeline_iterations'], results[result]['algorithm_iterations'])
+        print(result, results[result]['pipeline_iterations'],
+              results[result]['algorithm_iterations'])
     # print(min(pipelines_iterations), min(algorithm_iterations))
 
     scores = {}
@@ -66,14 +72,18 @@ def perform_algorithm_pipeline_analysis(results, toy):
         max_score = results[result]['baseline_score']
         for i in range(1, half_iteration+1):
             if i <= results[result]['algorithm_iterations']:
-                scores[acronym][result].append((i,results[result]['history'][i - 1]['max_history_score'] // 0.0001 / 100))
-                max_score = results[result]['history'][i - 1]['max_history_score'] // 0.0001 / 100
+                scores[acronym][result].append(
+                    (i, results[result]['history'][i - 1]['max_history_score'] // 0.0001 / 100))
+                max_score = results[result]['history'][i -
+                                                       1]['max_history_score'] // 0.0001 / 100
             else:
                 scores[acronym][result].append((i, max_score))
         for i in range(1, half_iteration+1):
-            scores[acronym][result].append((half_iteration + i, results[result]['history'][results[result]['algorithm_iterations'] + i - 1]['max_history_score'] // 0.0001 / 100))
+            scores[acronym][result].append((half_iteration + i, results[result]['history']
+                                           [results[result]['algorithm_iterations'] + i - 1]['max_history_score'] // 0.0001 / 100))
 
     return perform_analysis(results, scores, toy)
+
 
 def perform_analysis(results, scores, toy):
     scores_to_kpi = {}
@@ -87,10 +97,12 @@ def perform_analysis(results, scores, toy):
                 scores_to_kpi[acronym] = []
                 outcome[acronym] = []
             try:
-                scores_to_kpi[acronym][i].append(scores[acronym][result][i][1]  / results[result]['baseline_score'])
+                scores_to_kpi[acronym][i].append(
+                    scores[acronym][result][i][1] / results[result]['baseline_score'])
             except:
                 scores_to_kpi[acronym].append([])
-                scores_to_kpi[acronym][i].append(scores[acronym][result][i][1]  / results[result]['baseline_score'])
+                scores_to_kpi[acronym][i].append(
+                    scores[acronym][result][i][1] / results[result]['baseline_score'])
 
     for i in range(1, max_iteration+1):
         for key in outcome.keys():
@@ -98,6 +110,7 @@ def perform_analysis(results, scores, toy):
             #outcome[key].append(mean(scores_to_kpi[key][i]) // 0.01 / 100)
 
     return outcome
+
 
 def save_analysis(analysis, result_path, toy):
 
@@ -128,7 +141,8 @@ def save_analysis(analysis, result_path, toy):
     plt.rc('figure', titlesize=MEDIUM_SIZE)  # fontsize of the figure title
 
     plt.plot(x, analysis['nb'], label='NB', linewidth=2.5, color='lightcoral')
-    plt.plot(x, analysis['knn'], label='KNN', linewidth=2.5, color='darkturquoise')
+    plt.plot(x, analysis['knn'], label='KNN',
+             linewidth=2.5, color='darkturquoise')
     plt.plot(x, analysis['rf'], label='RF', linewidth=2.5, color='violet')
     plt.xlabel('Configurations visited')
     plt.ylabel('Ratio of predictive accuracy change')
@@ -138,8 +152,29 @@ def save_analysis(analysis, result_path, toy):
     plt.ylim(0.8, 1.5)
     plt.axvline(x=max_iteration/2, color='#aaaaaa', linestyle='--')
     plt.grid(False)
-    plt.tick_params(axis ='both', which ='both', length = 5, color='#aaaaaa')
-    plt.xticks(np.linspace(0, max_iteration, int(max_iteration/10 + max_iteration/100)))
+    plt.tick_params(axis='both', which='both', length=5, color='#aaaaaa')
+    plt.xticks(np.linspace(0, max_iteration, int(
+        max_iteration/10 + max_iteration/100)))
     fig = plt.gcf()
     fig.set_size_inches(12, 6, forward=True)
     fig.savefig(os.path.join(result_path, 'Figure2.pdf'))
+
+
+def pipeline_impact(toy):
+
+    path = "results"
+    result_path = "plots"
+    if toy:
+        path = os.path.join(path, "toy")
+        result_path = create_directory(result_path, 'toy')
+    input_path = os.path.join(path, "pipeline_impact")
+    result_path = create_directory(result_path, 'pipeline_impact')
+    filtered_data_sets = get_filtered_datasets(
+        experiment='pipeline_impact', toy=toy)
+
+    pipeline_algorithm_results = load_results(input_path, filtered_data_sets)
+
+    pipeline_algorithm_analysis = perform_algorithm_pipeline_analysis(
+        pipeline_algorithm_results, toy)
+
+    save_analysis(pipeline_algorithm_analysis, result_path, toy)

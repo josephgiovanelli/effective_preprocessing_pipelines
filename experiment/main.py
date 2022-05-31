@@ -5,9 +5,7 @@ from utils import scenarios, serializer, cli, datasets
 from policies import initiate
 
 import json
-import os
 import openml
-import signal
 
 
 def load_dataset(id, args):

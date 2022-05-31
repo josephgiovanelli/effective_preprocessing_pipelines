@@ -16,19 +16,12 @@ import argparse
 
 from auto_pipeline_builder import framework_table_pipelines, pseudo_exhaustive_pipelines
 from utils import scenarios as scenarios_util
-from results_processors.utils.common import create_directory
+from results_processors.utils.common import *
 from utils import serializer
 
 GLOBAL_SEED = 42
 
-parser = argparse.ArgumentParser(description="Automated Machine Learning Workflow creation and configuration")
-parser.add_argument("-p", "--pipeline", nargs="+", type=str, required=False, help="step of the pipeline to execute")
-parser.add_argument("-exp", "--experiment", nargs="?", type=str, required=True, help="type of the experiments")
-parser.add_argument("-mode", "--mode", nargs="?", type=str, required=False, help="algorithm or algorithm_pipeline")
-parser.add_argument("-toy", "--toy_example", action='store_true', default=False, help="wether it is a toy example or not")
-args = parser.parse_args()
-
-
+args = parse_args()
 scenario_path = create_directory("./", "scenarios")
 result_path = create_directory("./", "results")
 
@@ -44,7 +37,7 @@ scenario_path = create_directory(scenario_path, args.experiment)
 result_path = create_directory(result_path, args.experiment)
 
 if args.mode:
-    if args.mode not in ["algorithm", "pipeline_algorithm", "algorithm_pipeline"]:
+    if args.mode not in ["algorithm", "pipeline_algorithm"]:
         pipeline = args.mode.split("_")
         if pipeline[0] <= pipeline[1]:
             result_path = create_directory(result_path, args.mode)
@@ -151,7 +144,6 @@ def run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path):
             max_time = 1000
             try:
                 process = subprocess.Popen(cmd, shell=True, stdout=log_out, stderr=log_err)
-                raise Exception("My Exception")
                 process.wait(timeout = max_time)
             except Exception as e:
                 print(e)

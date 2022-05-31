@@ -18,19 +18,6 @@ from os.path import isfile, join
 from .common import *
 
 
-algorithms = ['RandomForest', 'NaiveBayes', 'KNearestNeighbors']
-toy_example = [11, 1464, 42]
-benchmark_suite = [3, 6, 11, 12, 14, 15, 16, 18, 22, 23, 28, 29, 31, 32, 37, 44, 46, 50, 54, 151, 182, 188, 38, 307,
-                   300, 458, 469, 554, 1049, 1050, 1053, 1063, 1067, 1068, 1590, 4134, 1510, 1489, 1494, 1497, 1501,
-                   1480, 1485, 1486, 1487, 1468, 1475, 1462, 1464, 4534, 6332, 1461, 4538, 1478, 23381, 40499,
-                   40668, 40966, 40982, 40994, 40983, 40975, 40984, 40979, 40996, 41027, 23517, 40923, 40927, 40978,
-                   40670, 40701]
-extended_benchmark_suite = [41145, 41156, 41157, 4541, 41158, 42742, 40498, 42734, 41162, 42733, 42732, 1596, 40981, 40685,
-                            4135, 41142, 41161, 41159, 41163, 41164, 41138, 41143, 41146, 41150, 40900, 41165, 41166, 41168, 41169,
-                            41147, 1111, 1169, 41167, 41144, 1515, 1457, 181]
-pipeline_impact_suite = [1461]
-
-
 def create_possible_categories(pipeline):
     first = pipeline[0][0].upper()
     second = pipeline[1][0].upper()
@@ -932,7 +919,7 @@ def save_chi2tests(result_path, tests):
         if value:
             saver(value, os.path.join(result_path, key + '.csv'))
 
-def experiments_summarizer(experiment, pipeline, toy):
+def experiments_summarizer(pipeline, toy):
     # configure environment
     # -p features rebalance -i results/pipeline_construction/features_rebalance/ -o results/pipeline_construction/features_rebalance/
     #args = parse_args()
@@ -944,7 +931,7 @@ def experiments_summarizer(experiment, pipeline, toy):
     result_path = create_directory(input_path, 'summary')
     categories = create_possible_categories(pipeline)
     filtered_data_sets = get_filtered_datasets(
-        experiment=experiment, toy=toy)
+        experiment='pipeline_construction', toy=toy)
 
     simple_results, grouped_by_algorithm_results, grouped_by_data_set_result, summary = extract_results(input_path,
                                                                                                         filtered_data_sets,
@@ -984,7 +971,7 @@ def experiments_summarizer(experiment, pipeline, toy):
         save_correlation_matrix(create_directory(result_path, 'correlations'), 'correlation_matrix', correlation_matrix,
                                 group_no_order)
 
-def experiments_summarizer_10x4cv(experiment, pipeline, toy):
+def experiments_summarizer_10x4cv(pipeline, toy):
     # configure environment
     path = "results"
     if toy:
@@ -994,7 +981,7 @@ def experiments_summarizer_10x4cv(experiment, pipeline, toy):
     result_path = create_directory(result_path, '10x4cv')
     categories = create_possible_categories(pipeline)
     filtered_data_sets = get_filtered_datasets(
-        experiment=experiment, toy=toy)
+        experiment='pipeline_construction', toy=toy)
     folds = 3 if toy else 4
     repeat = 10
 

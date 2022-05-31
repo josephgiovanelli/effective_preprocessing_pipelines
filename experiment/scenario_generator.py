@@ -7,8 +7,7 @@ from collections import OrderedDict
 
 import pandas as pd
 
-from commons import large_comparison_classification_tasks, extended_benchmark_suite, pipeline_impact_suite, benchmark_suite, algorithms
-from results_processors.utils.common import create_directory
+from results_processors.utils.common import *
 
 base = OrderedDict([
     ("title", ""),
@@ -19,37 +18,6 @@ base = OrderedDict([
         "seed": 42
     })
 ])
-
-def parse_args():
-
-    parser = argparse.ArgumentParser(
-        description="""
-            Automated Machine Learning Workflow creation and configuration
-            """
-    )
-
-    parser.add_argument(
-        "-exp",
-        "--experiment",
-        nargs="?",
-        type=str,
-        required=True,
-        help="type of the experiments",
-    )
-
-    parser.add_argument(
-        "-toy",
-        "--toy_example",
-        nargs="?",
-        type=bool,
-        required=False,
-        default=False,
-        help="wether it is a toy example or not",
-    )
-
-    args = parser.parse_args()
-
-    return args
 
 def __write_scenario(path, scenario):
     try:
@@ -101,52 +69,35 @@ for dataset in datasets:
         scenario["title"] = "{} on dataset n. {} with Split policy".format(
             algorithm, dataset
         )
-        if args.experiment == "pipeline_construction" or args.experiment == "evaluation1" or args.experiment == "evaluation2_3":
-            if args.toy_example:
-                runtime = 10
+        if args.toy_example:
+            runtime = 10
+            step_pipeline = 5
+        else:
+            if args.experiment == "pipeline_impact":
+                runtime = 130
+                step_pipeline = 50
             else:
-                runtime = 400 
-        elif args.experiment == "pipeline_impact":
-            if args.toy_example:
-                runtime = 10
-            else:
-                runtime = 150
+                runtime = 400
+                step_pipeline = 400
         scenario["setup"]["runtime"] = runtime
         scenario["setup"]["dataset"] = dataset
         scenario["setup"]["algorithm"] = algorithm
-        scenario["policy"] = {"step_pipeline": runtime}
+        scenario["policy"] = {"step_pipeline": step_pipeline}
 
         algorithm_acronym = "".join([c for c in algorithm if c.isupper()]).lower()
-        if args.experiment == "pipeline_construction" or args.experiment == "evaluation1":
-            if args.experiment == "evaluation1":
-                if args.toy_example:
-                    scenario["policy"]["step_pipeline"] = 5
-                else:
-                    scenario["policy"]["step_pipeline"] = 200
-            path = os.path.join(scenario_path, "{}_{}.yaml".format(algorithm_acronym, dataset))
-            __write_scenario(path, scenario)
-        elif args.experiment == "pipeline_impact" or args.experiment == "evaluation2_3":
-            experiment_steps = ['algorithm']
-            if args.experiment == "evaluation2_3":
-                experiment_steps.append("pipeline_algorithm")
-            else:
-                experiment_steps.append("algorithm_pipeline")
+
+        if args.experiment == "evaluation2_3":
+            experiment_steps = ['algorithm', 'pipeline_algorithm']
             for experiment_step in experiment_steps:
                 if experiment_step == "algorithm":
                     step_pipeline = 0
                 else:
-                    if args.experiment == "pipeline_impact":
-                        if args.toy_example:
-                            step_pipeline= 5
-                        else: 
-                            step_pipeline= 75
-                    else:
-                        if args.toy_example:
-                            step_pipeline= 5
-                        else: 
-                            step_pipeline= 200
+                    if args.toy_example:
+                        step_pipeline= 5
+                    else: 
+                        step_pipeline= 75
                 scenario["policy"]["step_pipeline"] = step_pipeline
-                if args.experiment == "evaluation2_3" and experiment_step == "pipeline_algorithm":
+                if experiment_step == "pipeline_algorithm":
                     if args.toy_example:
                         scenario["setup"]["runtime"] = 5
                     else: 
@@ -154,4 +105,12 @@ for dataset in datasets:
                 path = create_directory(scenario_path, experiment_step)
                 path = os.path.join(path, "{}_{}.yaml".format(algorithm_acronym, dataset))
                 __write_scenario(path, scenario)
+        else:
+            if args.experiment == "evaluation1":
+                if args.toy_example:
+                    scenario["policy"]["step_pipeline"] = 5
+                else:
+                    scenario["policy"]["step_pipeline"] = 200
+            path = os.path.join(scenario_path, "{}_{}.yaml".format(algorithm_acronym, dataset))
+            __write_scenario(path, scenario)
 print(f"Scenarios of the experiment '{args.experiment}' have been created.")
