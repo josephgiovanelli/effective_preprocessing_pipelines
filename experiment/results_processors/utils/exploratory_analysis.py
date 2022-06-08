@@ -1,10 +1,12 @@
 from __future__ import print_function
+import copy
 from os import listdir
 from os.path import isfile, join
 
 import os
 import json
 import itertools
+import subprocess
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -12,6 +14,7 @@ import numpy as np
 
 from .evaluation import get_filtered_datasets, load_results_pipelines, load_results_auto
 from .common import *
+
 
 def diff(first, second):
     second = set(second)
@@ -25,7 +28,8 @@ def transformation_analysis(evaluation2_3_results_path, new_results_path, plots_
     results_map = pd.DataFrame()
     for algorithm in ["nb", "knn", "rf"]:
         discretize_count[algorithm], normalize_count[algorithm] = 0, 0
-        df = pd.read_csv(os.path.join(evaluation2_3_results_path, "summary", "evaluation3", algorithm + ".csv"))
+        df = pd.read_csv(os.path.join(evaluation2_3_results_path,
+                         "summary", "evaluation3", algorithm + ".csv"))
         #df = df[(df["pa_percentage"] == 0.5)]
         ids = list(df["dataset"])
 
@@ -156,7 +160,8 @@ def physical_pipelines_analysis(evaluation2_3_results_path, new_results_path, pl
     results_map = pd.DataFrame()
     for algorithm in ["knn", "nb", "rf"]:
 
-        df = pd.read_csv(os.path.join(evaluation2_3_results_path, "summary", "evaluation3", algorithm + ".csv"))
+        df = pd.read_csv(os.path.join(evaluation2_3_results_path,
+                         "summary", "evaluation3", algorithm + ".csv"))
         ids = list(df["dataset"])
 
         files = [f for f in listdir(input_auto) if isfile(join(input_auto, f))]
@@ -282,10 +287,13 @@ def prototypes_impact_analysis(evaluation1_results_path, evaluation2_3_results_p
     filtered_data_sets = ['_'.join(i) for i in list(itertools.product(
         ["knn", "nb", "rf"], [str(integer) for integer in get_filtered_datasets(toy)]))]
 
-    results_pipelines = load_results_pipelines(evaluation1_results_path, filtered_data_sets)
-    
-    evaluation2_3_pipeline_algorithm_results_path = os.path.join(evaluation2_3_results_path, "pipeline_algorithm")
-    results_auto = load_results_auto(evaluation2_3_pipeline_algorithm_results_path, filtered_data_sets)
+    results_pipelines = load_results_pipelines(
+        evaluation1_results_path, filtered_data_sets)
+
+    evaluation2_3_pipeline_algorithm_results_path = os.path.join(
+        evaluation2_3_results_path, "pipeline_algorithm")
+    results_auto = load_results_auto(
+        evaluation2_3_pipeline_algorithm_results_path, filtered_data_sets)
     # print(results_auto)
     for algorithm in results_auto.keys():
         for dataset in results_auto[algorithm].keys():
@@ -324,6 +332,7 @@ def prototypes_impact_analysis(evaluation1_results_path, evaluation2_3_results_p
     fig.set_size_inches(12, 3)
     fig.savefig(os.path.join(plots_path, "Figure7.pdf"))
 
+
 def get_paths(toy):
     results_path = "raw_results"
     plots_path = "artifacts"
@@ -338,3 +347,123 @@ def get_paths(toy):
     plots_path = create_directory(plots_path, "exploratory_analysis")
     new_results_path = create_directory(results_path, "exploratory_analysis")
     return evaluation1_results_path, evaluation2_3_results_path, plots_path, new_results_path
+
+
+def meta_learning_input_preparation(results_path, evaluation2_3_results_path):
+    evaluation2_3_pipeline_algorithm_results_path = os.path.join(
+        evaluation2_3_results_path, "pipeline_algorithm")
+    evaluation3_summary_results_path = os.path.join(
+        evaluation2_3_results_path, "summary", "evaluation3")
+
+    # Meta-features Loading
+    all_classification = pd.read_csv(
+        'meta_features/extended_meta_features_all_classification.csv')
+    openml_cc_18 = pd.read_csv(
+        'meta_features/extended_meta_features_openml_cc_18.csv')
+    study_1 = pd.read_csv('meta_features/extended_meta_features_study_1.csv')
+    all_classification = all_classification[all_classification['ID'].isin(
+        diff(all_classification['ID'], openml_cc_18['ID']))]
+    meta_features = pd.concat(
+        [openml_cc_18, all_classification, study_1], ignore_index=True, sort=True)
+    algorithm_acronyms = ["".join(
+        [c for c in algorithm if c.isupper()]).lower() for algorithm in algorithms]
+
+    baseline_results = {}
+    # Results Loading
+    for algorithm in algorithm_acronyms:
+        baseline_results[algorithm] = pd.read_csv(os.path.join(
+            evaluation3_summary_results_path, algorithm + '.csv'))
+        baseline_results[algorithm].rename(
+            columns={"dataset": "ID"}, inplace=True)
+
+    results_map = {}
+    for algorithm in algorithm_acronyms:
+        results_map[algorithm] = pd.DataFrame()
+        df = pd.read_csv(os.path.join(
+            evaluation3_summary_results_path, algorithm + ".csv"))
+        ids = list(df["dataset"])
+
+        files = [f for f in listdir(evaluation2_3_pipeline_algorithm_results_path) if isfile(
+            join(evaluation2_3_pipeline_algorithm_results_path, f))]
+        results = [f[:-5] for f in files if f[-4:] == 'json']
+
+        for dataset in ids:
+            acronym = algorithm + "_" + str(dataset)
+            if acronym in results:
+                with open(os.path.join(evaluation2_3_pipeline_algorithm_results_path, acronym + '.json')) as json_file:
+                    data = json.load(json_file)
+                    pipeline = data['context']['best_config']['pipeline']
+
+                    encode_flag = pipeline["encode"][0].split("_", 1)[1]
+                    features_flag = pipeline["features"][0].split("_", 1)[1]
+                    impute_flag = pipeline["impute"][0].split("_", 1)[1]
+                    try:
+                        normalize_flag = pipeline["normalize"][0].split("_", 1)[
+                            1]
+                    except:
+                        normalize_flag = "NoneType"
+                    try:
+                        discretize_flag = pipeline["discretize"][0].split("_", 1)[
+                            1]
+                    except:
+                        discretize_flag = "NoneType"
+                    rebalance_flag = pipeline["rebalance"][0].split("_", 1)[1]
+
+                    if features_flag != "FeatureUnion":
+                        results_map[algorithm] = results_map[algorithm].append(pd.DataFrame({
+                            "ID": [dataset],
+                            "baseline": [baseline_results[algorithm].loc[baseline_results[algorithm]["ID"] == dataset, "baseline"].iloc[0]],
+                            "encode": [encode_flag],
+                            "features": [features_flag],
+                            "impute": [impute_flag],
+                            "normalize": [normalize_flag],
+                            "discretize": [discretize_flag],
+                            "rebalance": [rebalance_flag]
+                        }), ignore_index=True)
+                    else:
+                        results_map[algorithm] = results_map[algorithm].append(pd.DataFrame({
+                            "ID": [dataset],
+                            "baseline": [baseline_results[algorithm].loc[baseline_results[algorithm]["ID"] == dataset, "baseline"].iloc[0]],
+                            "encode": [encode_flag],
+                            "features": ["SelectKBest"],
+                            "impute": [impute_flag],
+                            "normalize": [normalize_flag],
+                            "discretize": [discretize_flag],
+                            "rebalance": [rebalance_flag]
+                        }), ignore_index=True)
+                        results_map[algorithm] = results_map[algorithm].append(pd.DataFrame({
+                            "ID": [dataset],
+                            "baseline": [baseline_results[algorithm].loc[baseline_results[algorithm]["ID"] == dataset, "baseline"].iloc[0]],
+                            "encode": [encode_flag],
+                            "features": ["PCA"],
+                            "impute": [impute_flag],
+                            "normalize": [normalize_flag],
+                            "discretize": [discretize_flag],
+                            "rebalance": [rebalance_flag]
+                        }), ignore_index=True)
+
+    for algorithm in algorithm_acronyms:
+        results_map[algorithm] = pd.merge(
+            results_map[algorithm], meta_features, on="ID")
+
+    data = copy.deepcopy(results_map)
+
+    # Data Preparation
+    manual_fs_data = data.copy()
+
+    for algorithm in algorithm_acronyms:
+        data[algorithm]["algorithm"] = algorithm
+        manual_fs_data[algorithm]["algorithm"] = algorithm
+    union = pd.concat([data["knn"], data["nb"], data["rf"]], ignore_index=True)
+    manual_fs_union = pd.concat(
+        [manual_fs_data["knn"], manual_fs_data["nb"], manual_fs_data["rf"]], ignore_index=True)
+
+    # Data Saving
+    manual_fs_union.to_csv(os.path.join(
+        results_path, 'meta_learning_input' + '.csv'), index=False)
+
+def run_meta_learning(toy):
+    # res = subprocess.call("Rscript experiment/results_processors/meta_learner.R", shell=True)
+    experiment = "toy" if toy else "paper"
+    res = subprocess.call(f"Rscript experiment/results_processors/meta_learner.R {experiment}", shell=True)
+    print(res)

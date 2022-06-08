@@ -1,6 +1,9 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
 FROM python:3.7
 
+RUN apt-get update && apt-get install -y --no-install-recommends gfortran build-essential r-base-dev
+RUN Rscript -e 'install.packages("party")'
+RUN Rscript -e 'install.packages("caret")'
 
 #VOLUME effective_preprocessing_pipeline
 
