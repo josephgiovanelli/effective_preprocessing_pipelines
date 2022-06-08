@@ -48,13 +48,16 @@ def main(args):
 
     print('SCENARIO:\n {}'.format(json.dumps(scenario, indent=4, sort_keys=True)))
 
-    try:
-        X, y = load_dataset(scenario['setup']['dataset'], args)
-        policy = initiate(scenario['setup']['policy'], config)
-        policy.run(X, y)
-    finally:
-        serializer.serialize_results(
-            scenario=scenario, result_path=args.result_path, policy=policy, pipeline=args.pipeline)
+    # try:
+    X, y = load_dataset(scenario['setup']['dataset'], args)
+    policy = initiate(scenario['setup']['policy'], config)
+    policy.run(X, y)
+    # except Exception as e:
+    #     print(e)
+    #     policy = None
+    # finally:
+    serializer.serialize_results(
+        scenario=scenario, result_path=args.result_path, policy=policy, pipeline=args.pipeline)
 
 
 if __name__ == "__main__":

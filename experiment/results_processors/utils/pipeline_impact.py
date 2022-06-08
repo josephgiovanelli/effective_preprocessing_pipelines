@@ -1,3 +1,4 @@
+import logging
 from statistics import mean
 
 import os
@@ -57,8 +58,7 @@ def perform_algorithm_pipeline_analysis(results, toy):
             results[result]['algorithm_iterations']
         algorithm_iterations.append(results[result]['algorithm_iterations'])
         pipelines_iterations.append(results[result]['pipeline_iterations'])
-        print(result, results[result]['pipeline_iterations'],
-              results[result]['algorithm_iterations'])
+        # print(result, results[result]['pipeline_iterations'], results[result]['algorithm_iterations'])
     # print(min(pipelines_iterations), min(algorithm_iterations))
 
     scores = {}
@@ -162,6 +162,7 @@ def save_analysis(analysis, result_path, toy):
 
 def pipeline_impact(toy):
 
+    logging.getLogger('matplotlib.font_manager').disabled = True
     path = "raw_results"
     result_path = "artifacts"
     if toy:

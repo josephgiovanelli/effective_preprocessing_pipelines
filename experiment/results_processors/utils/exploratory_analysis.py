@@ -462,8 +462,12 @@ def meta_learning_input_preparation(results_path, evaluation2_3_results_path):
     manual_fs_union.to_csv(os.path.join(
         results_path, 'meta_learning_input' + '.csv'), index=False)
 
+
 def run_meta_learning(toy):
     # res = subprocess.call("Rscript experiment/results_processors/meta_learner.R", shell=True)
     experiment = "toy" if toy else "paper"
-    res = subprocess.call(f"Rscript experiment/results_processors/meta_learner.R {experiment}", shell=True)
-    print(res)
+    subprocess.call(
+        f"Rscript experiment/results_processors/utils/meta_learner.R {experiment}", 
+        shell=True, 
+        stdout=subprocess.DEVNULL, 
+        stderr=subprocess.DEVNULL)

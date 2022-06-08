@@ -1,21 +1,22 @@
+from utils import serializer
+from results_processors.utils.common import *
+from utils import scenarios as scenarios_util
+from utils.auto_pipeline_builder import framework_table_pipelines, pseudo_exhaustive_pipelines
+from tqdm import tqdm
+from prettytable import PrettyTable
+from six import iteritems
+from functools import reduce
 import os
 import json
-from functools import reduce
 import shutil
-
+import warnings
 import yaml
-from six import iteritems
+import psutil
 import time
 import subprocess
 import datetime
+warnings.filterwarnings("ignore")
 
-from prettytable import PrettyTable
-from tqdm import tqdm
-
-from utils.auto_pipeline_builder import framework_table_pipelines, pseudo_exhaustive_pipelines
-from utils import scenarios as scenarios_util
-from results_processors.utils.common import *
-from utils import serializer
 
 GLOBAL_SEED = 42
 
@@ -23,7 +24,6 @@ args = parse_args()
 scenario_path = create_directory("./", "scenarios")
 result_path = create_directory("./", "raw_results")
 
-print(f"{args}")
 if args.toy_example == True:
     scenario_path = create_directory(scenario_path, "toy")
     result_path = create_directory(result_path, "toy")
@@ -41,19 +41,18 @@ if args.mode:
             result_path = create_directory(result_path, args.mode)
             result_path = create_directory(result_path, 'conf1')
         else:
-            result_path = create_directory(result_path, '_'.join(sorted(pipeline)))
+            result_path = create_directory(
+                result_path, '_'.join(sorted(pipeline)))
             result_path = create_directory(result_path, 'conf2')
     else:
         scenario_path = create_directory(scenario_path, args.mode)
         result_path = create_directory(result_path, args.mode)
 
 
-print('Gather list of scenarios')
 # Gather list of scenarios
 scenario_list = [p for p in os.listdir(scenario_path) if '.yaml' in p]
 result_list = [p for p in os.listdir(result_path) if '.json' in p]
 scenarios = {}
-print('Done.')
 
 # Determine which one have no result files
 for scenario in scenario_list:
@@ -90,42 +89,34 @@ for path, scenario in iteritems(scenarios):
                 scenario['status'] = 'No runtime info'
 
 # Display list of scenario to be run
-invalid_scenarios = {k:v for k,v in iteritems(scenarios) if v['status'] != 'Ok'}
+invalid_scenarios = {k: v for k, v in iteritems(
+    scenarios) if v['status'] != 'Ok'}
 t_invalid = PrettyTable(['PATH', 'STATUS'])
 t_invalid.align["PATH"] = "l"
 for v in invalid_scenarios.values():
     t_invalid.add_row([v['path'], v['status']])
 
-scenario_with_results = {k:v for k,v in iteritems(scenarios) if v['status'] == 'Ok' and v['raw_results'] is not None}
+scenario_with_results = {k: v for k, v in iteritems(
+    scenarios) if v['status'] == 'Ok' and v['raw_results'] is not None}
 t_with_results = PrettyTable(['PATH', 'RUNTIME',  'STATUS', 'RESULTS'])
 t_with_results.align["PATH"] = "l"
 t_with_results.align["RESULTS"] = "l"
 for v in scenario_with_results.values():
-    t_with_results.add_row([v['path'], str(v['runtime']) + 's', v['status'], v['raw_results']])
+    t_with_results.add_row(
+        [v['path'], str(v['runtime']) + 's', v['status'], v['raw_results']])
 
-to_run = {k:v for k,v in iteritems(scenarios) if v['status'] == 'Ok' and v['raw_results'] is None}
+to_run = {k: v for k, v in iteritems(
+    scenarios) if v['status'] == 'Ok' and v['raw_results'] is None}
 t_to_run = PrettyTable(['PATH', 'RUNTIME', 'STATUS'])
 t_to_run.align["PATH"] = "l"
 for v in to_run.values():
     t_to_run.add_row([v['path'], str(v['runtime']) + 's', v['status']])
 
-print('# INVALID SCENARIOS')
-print(t_invalid)
-
-print
-print('# SCENARIOS WITH AVAILABLE RESULTS')
-print(t_with_results)
-
-print
-print('# SCENARIOS TO BE RUN')
-print(t_to_run)
-print('TOTAL RUNTIME: {} ({}s)'.format(datetime.timedelta(seconds=total_runtime), total_runtime))
-print
-
-print("The total runtime is {}.".format(datetime.timedelta(seconds=total_runtime)))
-print
-
-import psutil
+print(f"\t\tnum invalid scenarios: {len(invalid_scenarios)}")
+print(f"\t\tnum scenarios with results: {len(scenario_with_results)}")
+print(f"\t\tnum scenarios to run: {len(to_run)}")
+print('\t\t\testimated time: {} ({}s)'.format(
+    datetime.timedelta(seconds=total_runtime), total_runtime))
 
 
 def kill(proc_pid):
@@ -134,6 +125,7 @@ def kill(proc_pid):
         proc.kill()
     process.kill()
 
+
 def run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path):
     open(stdout_path, "w")
     open(stderr_path, "w")
@@ -141,13 +133,17 @@ def run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path):
         with open(stderr_path, "a") as log_err:
             max_time = 1000
             try:
-                process = subprocess.Popen(cmd, shell=True, stdout=log_out, stderr=log_err)
-                process.wait(timeout = max_time)
+                process = subprocess.Popen(
+                    cmd, shell=True, stdout=log_out, stderr=log_err)
+                process.wait(timeout=max_time)
             except Exception as e:
                 print(e)
                 kill(process.pid)
-                print("\n\n"+ base_scenario + " does not finish in " + str(max_time) + "\n\n" )
-                serializer.serialize_results(scenario=current_scenario, result_path=result_path)
+                print("\n\n" + base_scenario +
+                      " does not finish in " + str(max_time) + "\n\n")
+                serializer.serialize_results(
+                    scenario=current_scenario, result_path=result_path)
+
 
 with tqdm(total=total_runtime) as pbar:
     for info in to_run.values():
@@ -155,7 +151,7 @@ with tqdm(total=total_runtime) as pbar:
         output = base_scenario.split('_')[0]
         pbar.set_description("Running scenario {}\n\r".format(info['path']))
 
-        current_scenario_path = os.path.join(scenario_path, info['path']) 
+        current_scenario_path = os.path.join(scenario_path, info['path'])
         current_scenario = scenarios_util.load(current_scenario_path)
 
         if args.experiment == "pipeline_construction" or args.experiment == "pipeline_impact":
@@ -164,11 +160,14 @@ with tqdm(total=total_runtime) as pbar:
                 pipeline = args.mode.split("_")
             else:
                 if base_scenario.startswith("knn"):
-                    pipeline = ['impute', 'encode', 'normalize', 'rebalance', 'features']
+                    pipeline = ['impute', 'encode',
+                                'normalize', 'rebalance', 'features']
                 elif base_scenario.startswith("nb"):
-                    pipeline = ['impute', 'encode', 'normalize', 'features', 'rebalance']
+                    pipeline = ['impute', 'encode',
+                                'normalize', 'features', 'rebalance']
                 else:
-                    pipeline = ['impute', 'encode', 'normalize', 'rebalance', 'features']
+                    pipeline = ['impute', 'encode',
+                                'normalize', 'rebalance', 'features']
 
             cmd = 'python experiment/main.py -s {} -c control.seed={} -p {} -r {} -exp {}'.format(
                 current_scenario_path,
@@ -176,11 +175,14 @@ with tqdm(total=total_runtime) as pbar:
                 reduce(lambda x, y: x + " " + y, pipeline),
                 result_path,
                 args.experiment)
-            
-            stdout_path = os.path.join(result_path, '{}_stdout.txt'.format(base_scenario))
-            stderr_path = os.path.join(result_path, '{}_stderr.txt'.format(base_scenario))
-            run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path)
-            
+
+            stdout_path = os.path.join(
+                result_path, '{}_stdout.txt'.format(base_scenario))
+            stderr_path = os.path.join(
+                result_path, '{}_stderr.txt'.format(base_scenario))
+            run_cmd(cmd, current_scenario, result_path,
+                    stdout_path, stderr_path)
+
         elif args.experiment == "evaluation1":
             pipelines = framework_table_pipelines()
 
@@ -198,13 +200,16 @@ with tqdm(total=total_runtime) as pbar:
                     len(pipelines),
                     args.experiment)
 
-                stdout_path = os.path.join(result_path, '{}_{}_stdout.txt'.format(base_scenario, str(i)))
-                stderr_path = os.path.join(result_path, '{}_{}_stderr.txt'.format(base_scenario, str(i)))
-                run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path)
+                stdout_path = os.path.join(
+                    result_path, '{}_{}_stdout.txt'.format(base_scenario, str(i)))
+                stderr_path = os.path.join(
+                    result_path, '{}_{}_stderr.txt'.format(base_scenario, str(i)))
+                run_cmd(cmd, current_scenario, result_path,
+                        stdout_path, stderr_path)
 
                 try:
                     os.rename(os.path.join(result_path, '{}.json'.format(base_scenario)),
-                            os.path.join(result_path, '{}.json'.format(base_scenario + "_" + str(i))))
+                              os.path.join(result_path, '{}.json'.format(base_scenario + "_" + str(i))))
                     with open(os.path.join(result_path, '{}.json'.format(base_scenario + "_" + str(i)))) as json_file:
                         data = json.load(json_file)
                         accuracy = data['context']['best_config']['score'] // 0.0001 / 100
@@ -243,13 +248,16 @@ with tqdm(total=total_runtime) as pbar:
                         len(pipelines),
                         args.experiment)
 
-                    stdout_path = os.path.join(result_path, '{}_{}_stdout.txt'.format(base_scenario, str(i)))
-                    stderr_path = os.path.join(result_path, '{}_{}_stderr.txt'.format(base_scenario, str(i)))
-                    run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path)
+                    stdout_path = os.path.join(
+                        result_path, '{}_{}_stdout.txt'.format(base_scenario, str(i)))
+                    stderr_path = os.path.join(
+                        result_path, '{}_{}_stderr.txt'.format(base_scenario, str(i)))
+                    run_cmd(cmd, current_scenario, result_path,
+                            stdout_path, stderr_path)
 
                     try:
                         os.rename(os.path.join(result_path, '{}.json'.format(base_scenario)),
-                                os.path.join(result_path,'{}_{}.json'.format(base_scenario, str(i))))
+                                  os.path.join(result_path, '{}_{}.json'.format(base_scenario, str(i))))
 
                         with open(
                                 os.path.join(result_path, '{}_{}.json'.format(base_scenario, str(i)))) as json_file:
@@ -266,12 +274,15 @@ with tqdm(total=total_runtime) as pbar:
                         if results[i] > results[max_i]:
                             max_i = i
 
-                    src_dir = os.path.join(result_path, '{}.json'.format(base_scenario + "_" + str(max_i)))
-                    dst_dir = os.path.join(result_path, '{}.json'.format(base_scenario + "_best_pipeline"))
+                    src_dir = os.path.join(result_path, '{}.json'.format(
+                        base_scenario + "_" + str(max_i)))
+                    dst_dir = os.path.join(result_path, '{}.json'.format(
+                        base_scenario + "_best_pipeline"))
                     shutil.copy(src_dir, dst_dir)
                 except:
-                    with open(os.path.join(result_path,'{}.txt'.format(base_scenario + "_best_pipeline")), "a") as log_out:
-                        log_out.write("trying to get the best pipeline: no available result")
+                    with open(os.path.join(result_path, '{}.txt'.format(base_scenario + "_best_pipeline")), "a") as log_out:
+                        log_out.write(
+                            "trying to get the best pipeline: no available result")
 
                 try:
                     with open(os.path.join(result_path, '{}.json'.format(base_scenario + "_best_pipeline"))) as json_file:
@@ -287,13 +298,17 @@ with tqdm(total=total_runtime) as pbar:
                         len(pipelines),
                         args.experiment)
 
-                    stdout_path = os.path.join(result_path, '{}_stdout.txt'.format(base_scenario))
-                    stderr_path = os.path.join(result_path, '{}_stderr.txt'.format(base_scenario))
-                    run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path)
+                    stdout_path = os.path.join(
+                        result_path, '{}_stdout.txt'.format(base_scenario))
+                    stderr_path = os.path.join(
+                        result_path, '{}_stderr.txt'.format(base_scenario))
+                    run_cmd(cmd, current_scenario, result_path,
+                            stdout_path, stderr_path)
 
                 except:
                     with open(os.path.join(result_path, '{}.txt'.format(base_scenario)), "a") as log_out:
-                        log_out.write("\ntrying to run best pipeline and algorithm: could not find a pipeline")
+                        log_out.write(
+                            "\ntrying to run best pipeline and algorithm: could not find a pipeline")
             elif args.mode == "algorithm":
                 cmd = 'python experiment/main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}'.format(
                     current_scenario_path,
@@ -304,9 +319,12 @@ with tqdm(total=total_runtime) as pbar:
                     0,
                     args.experiment)
 
-                stdout_path = os.path.join(result_path, '{}_stdout.txt'.format(base_scenario))
-                stderr_path = os.path.join(result_path, '{}_stderr.txt'.format(base_scenario))
-                run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path)
+                stdout_path = os.path.join(
+                    result_path, '{}_stdout.txt'.format(base_scenario))
+                stderr_path = os.path.join(
+                    result_path, '{}_stderr.txt'.format(base_scenario))
+                run_cmd(cmd, current_scenario, result_path,
+                        stdout_path, stderr_path)
 
             else:
                 raise Exception('unvalid mode option')

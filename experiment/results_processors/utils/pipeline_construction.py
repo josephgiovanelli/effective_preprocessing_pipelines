@@ -1,4 +1,5 @@
 import collections
+import logging
 import os
 import json
 import warnings
@@ -1067,6 +1068,7 @@ def experiments_summarizer_10x4cv(pipeline, toy):
         result_path, 'summary_test_with_mean_.csv'), index=False)
 
 def graph_maker(toy):
+    logging.getLogger('matplotlib.font_manager').disabled = True
     input_path = "raw_results"
     result_path = "artifacts"
     if toy:
@@ -1125,6 +1127,7 @@ def graph_maker(toy):
     fig.savefig(os.path.join(result_path, 'Figure4.pdf'), bbox_extra_artists=(lgd,text), bbox_inches='tight')
 
 def graph_maker_10x4cv(toy):
+    logging.getLogger('matplotlib.font_manager').disabled = True
     cv_file_name = 'summary_with_mean_.csv'
     pipeline_construction_path = 'raw_results'
     plot_path = 'artifacts'
