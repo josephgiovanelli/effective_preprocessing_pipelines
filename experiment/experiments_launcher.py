@@ -137,10 +137,9 @@ def run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path):
                     cmd, shell=True, stdout=log_out, stderr=log_err)
                 process.wait(timeout=max_time)
             except Exception as e:
-                print(e)
+                #print(e)
                 kill(process.pid)
-                print("\n\n" + base_scenario +
-                      " does not finish in " + str(max_time) + "\n\n")
+                print("\n\n" + base_scenario + " does not finish in " + str(max_time) + "\n\n")
                 serializer.serialize_results(
                     scenario=current_scenario, result_path=result_path)
 
@@ -215,7 +214,7 @@ with tqdm(total=total_runtime) as pbar:
                         accuracy = data['context']['best_config']['score'] // 0.0001 / 100
                         results.append(accuracy)
                 except Exception as e:
-                    print(e)
+                    #print(e)
                     accuracy = 0
 
                 data_to_write['pipelines'].append({
@@ -288,7 +287,7 @@ with tqdm(total=total_runtime) as pbar:
                     with open(os.path.join(result_path, '{}.json'.format(base_scenario + "_best_pipeline"))) as json_file:
                         data = json.load(json_file)
                         pipeline = data['pipeline']
-                    print(pipeline)
+                    #print(pipeline)
                     cmd = 'python experiment/main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}'.format(
                         current_scenario_path,
                         GLOBAL_SEED,

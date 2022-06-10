@@ -925,6 +925,8 @@ def experiments_summarizer(pipeline, toy):
     path = "raw_results"
     if toy:
         path = os.path.join(path, "toy")
+    else: 
+        path = os.path.join(path, "paper")
     input_path = os.path.join(path, "pipeline_construction", '_'.join(pipeline))
     result_path = create_directory(input_path, 'summary')
     categories = create_possible_categories(pipeline)

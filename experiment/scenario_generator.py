@@ -35,12 +35,9 @@ def __write_scenario(path, scenario):
 
 def get_filtered_datasets(toy):
     df = pd.read_csv("meta_features/simple-meta-features.csv")
-    df = df.loc[df['did'].isin(list(dict.fromkeys(
-        benchmark_suite + extended_benchmark_suite + [10, 20, 26])))]
-    df = df.loc[df['NumberOfMissingValues'] /
-                (df['NumberOfInstances'] * df['NumberOfFeatures']) < 0.1]
-    df = df.loc[df['NumberOfInstancesWithMissingValues'] /
-                df['NumberOfInstances'] < 0.1]
+    df = df.loc[df['did'].isin(list(dict.fromkeys(benchmark_suite + extended_benchmark_suite + [10, 20, 26])))]
+    df = df.loc[df['NumberOfMissingValues'] / (df['NumberOfInstances'] * df['NumberOfFeatures']) < 0.1]
+    df = df.loc[df['NumberOfInstancesWithMissingValues'] / df['NumberOfInstances'] < 0.1]
     df = df.loc[df['NumberOfInstances'] * df['NumberOfFeatures'] < 5000000]
     if toy:
         df = df.loc[df['NumberOfInstances'] <= 2000]
