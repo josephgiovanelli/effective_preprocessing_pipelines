@@ -17,5 +17,5 @@ python experiment/experiments_launcher.py -exp pipeline_impact "${params[@]}"
 
 # PLOTTING
 echo "Plotting..."
-python experiment/results_processors/pipeline_impact.py "${params[@]}"
+python experiment/results_processor.py -exp pipeline_impact "${params[@]}"
 echo -e "\tDone."

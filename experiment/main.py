@@ -4,19 +4,16 @@ from pipeline.PrototypeSingleton import PrototypeSingleton
 from utils import scenarios, serializer, cli, datasets
 from policies import initiate
 
+import os
 import json
-import openml
 
 
 def load_dataset(id, args):
-    dataset = openml.datasets.get_dataset(id)
-    X, y, categorical_indicator, _ = dataset.get_data(
-        dataset_format='array',
-        target=dataset.default_target_attribute
-    )
+    X, y, categorical_indicator = datasets.load_from_csv(id)
+
     if args.experiment == 'pipeline_construction' or (args.experiment == 'evaluation2_3' and args.mode == "algorithm"):
         X = SimpleImputer(strategy="constant").fit_transform(X)
-    print(dataset.name)
+    print(f"dataset id: {id}")
     print(X, y)
     PrototypeSingleton.getInstance().setPipeline(args.pipeline)
     num_features = [i for i, x in enumerate(

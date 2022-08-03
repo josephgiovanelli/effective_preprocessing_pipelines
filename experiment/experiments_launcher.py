@@ -1,5 +1,5 @@
 from utils import serializer
-from results_processors.utils.common import *
+from utils.common import *
 from utils import scenarios as scenarios_util
 from utils.auto_pipeline_builder import framework_table_pipelines, pseudo_exhaustive_pipelines
 from tqdm import tqdm
@@ -21,15 +21,13 @@ warnings.filterwarnings("ignore")
 GLOBAL_SEED = 42
 
 args = parse_args()
-scenario_path = create_directory("./", "scenarios")
-result_path = create_directory("./", "raw_results")
 
 if args.toy_example == True:
-    scenario_path = create_directory(scenario_path, "toy")
-    result_path = create_directory(result_path, "toy")
+    scenario_path = create_directory(SCENARIO_PATH, "toy")
+    result_path = create_directory(RAW_RESULT_PATH, "toy")
 else:
-    scenario_path = create_directory(scenario_path, "paper")
-    result_path = create_directory(result_path, "paper")
+    scenario_path = create_directory(SCENARIO_PATH, "paper")
+    result_path = create_directory(RAW_RESULT_PATH, "paper")
 
 scenario_path = create_directory(scenario_path, args.experiment)
 result_path = create_directory(result_path, args.experiment)

@@ -50,39 +50,42 @@ def pipeline_conf_to_full_pipeline(args, algorithm, seed, algo_config):
                     for p,v in fparams.items():
                         oparams.append((p, op_to_class[p](**v)))
                     operator = FeatureUnion(oparams)
-                elif transformation_param == 'encode':
-                    numerical_features, categorical_features = PrototypeSingleton.getInstance().getFeatures()
-                    operator = ColumnTransformer(
-                        transformers=[
-                            ('num', Pipeline(steps=[('identity_numerical', FunctionTransformer())]),
-                             numerical_features),
-                            ('cat', Pipeline(steps=[('encoding', globals()[operator_param](**params))]),
-                             categorical_features)])
-                    if operator_param == 'OneHotEncoder':
-                        PrototypeSingleton.getInstance().applyOneHotEncoding()
-                    else:
-                        PrototypeSingleton.getInstance().applyColumnTransformer()
-                elif transformation_param == 'normalize':
-                    numerical_features, categorical_features = PrototypeSingleton.getInstance().getFeatures()
-                    operator = ColumnTransformer(
-                        transformers=[
-                            ('num', Pipeline(steps=[('normalizing', globals()[operator_param](**params))]),
-                             numerical_features),
-                            ('cat', Pipeline(steps=[('identity_categorical', FunctionTransformer())]),
-                             categorical_features)])
-                    PrototypeSingleton.getInstance().applyColumnTransformer()
-                elif transformation_param == 'discretize':
-                    numerical_features, categorical_features = PrototypeSingleton.getInstance().getFeatures()
-                    operator = ColumnTransformer(
-                        transformers=[
-                            ('num', Pipeline(steps=[('discretizing', globals()[operator_param](**params))]),
-                             numerical_features),
-                            ('cat', Pipeline(steps=[('identity', FunctionTransformer())]),
-                             categorical_features)])
-                    PrototypeSingleton.getInstance().applyDiscretization()
                 else:
-                    operator = globals()[operator_param](**params)
-                operators.append((part, operator))
+                    if 'random_state' in globals()[operator_param]().get_params():
+                        operator = globals()[operator_param](random_state=seed, **params)
+                    else:
+                        operator = globals()[operator_param](**params)
+                    if transformation_param == 'encode':
+                        numerical_features, categorical_features = PrototypeSingleton.getInstance().getFeatures()
+                        operator = ColumnTransformer(
+                            transformers=[
+                                ('num', Pipeline(steps=[('identity_numerical', FunctionTransformer())]),
+                                numerical_features),
+                                ('cat', Pipeline(steps=[('encoding', operator)]),
+                                categorical_features)])
+                        if operator_param == 'OneHotEncoder':
+                            PrototypeSingleton.getInstance().applyOneHotEncoding()
+                        else:
+                            PrototypeSingleton.getInstance().applyColumnTransformer()
+                    elif transformation_param == 'normalize':
+                        numerical_features, categorical_features = PrototypeSingleton.getInstance().getFeatures()
+                        operator = ColumnTransformer(
+                            transformers=[
+                                ('num', Pipeline(steps=[('normalizing', operator)]),
+                                numerical_features),
+                                ('cat', Pipeline(steps=[('identity_categorical', FunctionTransformer())]),
+                                categorical_features)])
+                        PrototypeSingleton.getInstance().applyColumnTransformer()
+                    elif transformation_param == 'discretize':
+                        numerical_features, categorical_features = PrototypeSingleton.getInstance().getFeatures()
+                        operator = ColumnTransformer(
+                            transformers=[
+                                ('num', Pipeline(steps=[('discretizing', operator)]),
+                                numerical_features),
+                                ('cat', Pipeline(steps=[('identity', FunctionTransformer())]),
+                                categorical_features)])
+                        PrototypeSingleton.getInstance().applyDiscretization()
+                    operators.append((part, operator))
 
         PrototypeSingleton.getInstance().resetFeatures()
         if 'random_state' in algorithm().get_params():

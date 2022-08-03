@@ -36,5 +36,5 @@ python experiment/experiments_launcher.py -exp pipeline_construction -mode rebal
 
 # PLOTTING
 echo "Plotting..."
-python experiment/results_processors/pipeline_construction.py "${params[@]}"
+python experiment/results_processor.py -exp pipeline_construction "${params[@]}"
 echo -e "\tDone."

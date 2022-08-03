@@ -2,10 +2,10 @@ from pipeline.PrototypeSingleton import PrototypeSingleton
 from .policy import Policy
 from algorithm import space as ALGORITHM_SPACE
 from .objective import objective_pipeline, objective_algo
+from hyperopt import tpe, fmin, Trials
 
 import functools
-
-from hyperopt import tpe, fmin, Trials
+import numpy as np
 
 
 class Split(Policy):
@@ -62,7 +62,8 @@ class Split(Policy):
             max_time=max_time,
             trials=trials_algo,
             show_progressbar=False,
-            verbose=0
+            verbose=0,
+            rstate=np.random.RandomState(self.config['seed']) 
         )
 
         best_config = self.context['best_config']
@@ -88,7 +89,8 @@ class Split(Policy):
             max_time=max_time,
             trials=trials_pipelines,
             show_progressbar=False,
-            verbose=0
+            verbose=0,
+            rstate=np.random.RandomState(self.config['seed']) 
         )
 
         best_config = self.context['best_config']

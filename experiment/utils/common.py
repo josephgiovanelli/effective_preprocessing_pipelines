@@ -2,6 +2,14 @@ import argparse
 
 import os
 
+RESOURCES_PATH = os.path.join("./", "resources")
+SCENARIO_PATH = os.path.join(RESOURCES_PATH, "scenarios")
+RAW_RESULT_PATH = os.path.join(RESOURCES_PATH, "raw_results")
+ARTIFACTS_PATH = os.path.join(RESOURCES_PATH, "artifacts")
+META_FEATURES_PATH = os.path.join(RESOURCES_PATH, "meta_features")
+DATASETS_PATH = os.path.join(RESOURCES_PATH, "datasets")
+
+
 algorithms = ['RandomForest', 'NaiveBayes', 'KNearestNeighbors']
 
 #benchmark_suite = openml.study.get_suite('OpenML-CC18') # obtain the benchmark suite
@@ -56,3 +64,21 @@ def create_directory(result_path, directory):
         os.makedirs(result_path)
 
     return result_path
+
+def get_filtered_datasets(experiment, toy):
+    if experiment == "pipeline_impact":
+        return pipeline_impact_suite
+    else:
+        import pandas as pd
+        df = pd.read_csv(os.path.join(META_FEATURES_PATH, "simple-meta-features.csv"))
+        df = df.loc[df['did'].isin(list(dict.fromkeys(benchmark_suite + extended_benchmark_suite + [10, 20, 26])))]
+        df = df.loc[df['NumberOfMissingValues'] / (df['NumberOfInstances'] * df['NumberOfFeatures']) < 0.1]
+        df = df.loc[df['NumberOfInstancesWithMissingValues'] / df['NumberOfInstances'] < 0.1]
+        df = df.loc[df['NumberOfInstances'] * df['NumberOfFeatures'] < 5000000]
+        if toy:
+            df = df.loc[df['NumberOfInstances'] <= 2000]
+            df = df.loc[df['NumberOfFeatures'] <= 10]
+            df = df.sort_values(by=['NumberOfInstances', 'NumberOfFeatures'])
+            df = df[:10]
+        df = df['did']
+        return df.values.flatten().tolist()

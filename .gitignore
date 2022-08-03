@@ -125,11 +125,5 @@ dmypy.json
 .pyre/
 
 #added by joseph giovanelli
-.scenarios
-.raw_results
-.artifacts
-.models
-scenarios/
-raw_results/
-models/
-artifacts/
+.resources
+resources/

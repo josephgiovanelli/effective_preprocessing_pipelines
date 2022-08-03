@@ -24,5 +24,5 @@ python experiment/experiments_launcher.py -exp evaluation2_3 -mode pipeline_algo
 
 # PLOTTING
 echo "Plotting"
-python experiment/results_processors/evaluation.py "${params[@]}"
+python experiment/results_processor.py -exp evaluation "${params[@]}"
 echo -e "\tDone."

@@ -11,7 +11,7 @@ setwd("/home")
 # - meta-features_1, ..., meta-features_n: the value of the dataset meta-features
 # - algorithm: the used mining algorithm (NB, KNN, RF)
 # - transformation_1, ..., transformation_n: the operator (chosen by SMBO) for each of the transformations in the prototype
-union <- read.csv(paste("raw_results/", args[1],"/exploratory_analysis/meta_learning_input.csv", sep = ""), header = TRUE)
+union <- read.csv(paste("resources/raw_results/", args[1],"/exploratory_analysis/meta_learning_input.csv", sep = ""), header = TRUE)
 # Drop the dataset IDs
 union <- union[,-1]
 
