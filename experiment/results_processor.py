@@ -6,6 +6,9 @@ from results_processors.evaluation import evaluation1, evaluation2, evaluation3
 from results_processors.exploratory_analysis import exploratory_analysis
 import warnings
 warnings.filterwarnings("ignore")
+import logging
+import matplotlib.pyplot as plt
+logging.getLogger('matplotlib.font_manager').disabled = True
 
 
 def main():

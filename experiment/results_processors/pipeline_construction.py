@@ -774,6 +774,7 @@ def save_train_meta_learner(result_path, name, train_meta_learner, group_no_orde
 def chi2test(observed, distribution, prob=0.95):
     # the print after the first '->' are valid just if we comparing the observed frequencies with the uniform distribution
     table = [observed, distribution]
+    # print(table)
     stat, p, dof, expected = chi2_contingency(table)
     # print(table)
     # print(expected)
@@ -985,18 +986,22 @@ def experiments_summarizer_10x4cv(pipeline, toy):
                              summaries[batch]['train']['summary'][categories['second_first']]]
         test_frequencies = [summaries[batch]['test']['summary'][categories['first_second']],
                             summaries[batch]['test']['summary'][categories['second_first']]]
-        critical, stat, statistic_test, alpha, p, p_value = chi2test(
-            train_frequencies, test_frequencies, prob)
-        critical_train, stat_train, statistic_test_train, alpha_train, p_train, p_value_train = chi2test(
-            train_frequencies, [total_train * a, total_train * b], prob)
-        critical_test, stat_test, statistic_test_test, alpha_test, p_test, p_value_test = chi2test(
-            test_frequencies, [total_test * a, total_test * b], prob)
-        results = results.append({'critical': critical, 'stat': stat, 'statistic_test': statistic_test,
-                                 'alpha': alpha, 'p': p, 'p_value': p_value}, ignore_index=True)
-        results_train = results_train.append({'critical': critical_train, 'stat': stat_train, 'statistic_test': statistic_test_train,
-                                             'alpha': alpha_train, 'p': p_train, 'p_value': p_value_train}, ignore_index=True)
-        results_test = results_test.append({'critical': critical_test, 'stat': stat_test, 'statistic_test': statistic_test_test,
-                                           'alpha': alpha_test, 'p': p_test, 'p_value': p_value_test}, ignore_index=True)
+        # if not(all(v == 0 for v in train_frequencies) or all(v == 0 for v in test_frequencies)): 
+        try:
+            critical, stat, statistic_test, alpha, p, p_value = chi2test(
+                train_frequencies, test_frequencies, prob)
+            critical_train, stat_train, statistic_test_train, alpha_train, p_train, p_value_train = chi2test(
+                train_frequencies, [total_train * a, total_train * b], prob)
+            critical_test, stat_test, statistic_test_test, alpha_test, p_test, p_value_test = chi2test(
+                test_frequencies, [total_test * a, total_test * b], prob)
+            results = results.append({'critical': critical, 'stat': stat, 'statistic_test': statistic_test,
+                                    'alpha': alpha, 'p': p, 'p_value': p_value}, ignore_index=True)
+            results_train = results_train.append({'critical': critical_train, 'stat': stat_train, 'statistic_test': statistic_test_train,
+                                                'alpha': alpha_train, 'p': p_train, 'p_value': p_value_train}, ignore_index=True)
+            results_test = results_test.append({'critical': critical_test, 'stat': stat_test, 'statistic_test': statistic_test_test,
+                                            'alpha': alpha_test, 'p': p_test, 'p_value': p_value_test}, ignore_index=True)
+        except:
+            pass
     results.to_csv(os.path.join(result_path, 'summary.csv'), index=False)
     results_train.to_csv(os.path.join(
         result_path, 'summary_train.csv'), index=False)
@@ -1020,18 +1025,24 @@ def experiments_summarizer_10x4cv(pipeline, toy):
                                  summaries[batch]['train']['summary'][categories['second_first']]]
             test_frequencies = [summaries[batch]['test']['summary'][categories['first_second']],
                                 summaries[batch]['test']['summary'][categories['second_first']]]
-            critical, stat, statistic_test, alpha, p, p_value = chi2test(
-                train_frequencies, test_frequencies, prob)
-            critical_train, stat_train, statistic_test_train, alpha_train, p_train, p_value_train = chi2test(
-                train_frequencies, [total_train * a, total_train * b], prob)
-            critical_test, stat_test, statistic_test_test, alpha_test, p_test, p_value_test = chi2test(
-                test_frequencies, [total_test * a, total_test * b], prob)
-            batch_results = batch_results.append(
-                {'critical': critical, 'stat': stat, 'statistic_test': statistic_test, 'alpha': alpha, 'p': p, 'p_value': p_value}, ignore_index=True)
-            batch_train_results = batch_train_results.append(
-                {'critical': critical_train, 'stat': stat_train, 'statistic_test': statistic_test_train, 'alpha': alpha_train, 'p': p_train, 'p_value': p_value_train}, ignore_index=True)
-            batch_test_results = batch_test_results.append(
-                {'critical': critical_test, 'stat': stat_test, 'statistic_test': statistic_test_test, 'alpha': alpha_test, 'p': p_test, 'p_value': p_value_test}, ignore_index=True)
+            # print(f"train: {train_frequencies}")
+            # print(f"test: {test_frequencies}")
+            # if not(all(v == 0 for v in train_frequencies) or all(v == 0 for v in test_frequencies)): 
+            try:
+                critical, stat, statistic_test, alpha, p, p_value = chi2test(
+                    train_frequencies, test_frequencies, prob)
+                critical_train, stat_train, statistic_test_train, alpha_train, p_train, p_value_train = chi2test(
+                    train_frequencies, [total_train * a, total_train * b], prob)
+                critical_test, stat_test, statistic_test_test, alpha_test, p_test, p_value_test = chi2test(
+                    test_frequencies, [total_test * a, total_test * b], prob)
+                batch_results = batch_results.append(
+                    {'critical': critical, 'stat': stat, 'statistic_test': statistic_test, 'alpha': alpha, 'p': p, 'p_value': p_value}, ignore_index=True)
+                batch_train_results = batch_train_results.append(
+                    {'critical': critical_train, 'stat': stat_train, 'statistic_test': statistic_test_train, 'alpha': alpha_train, 'p': p_train, 'p_value': p_value_train}, ignore_index=True)
+                batch_test_results = batch_test_results.append(
+                    {'critical': critical_test, 'stat': stat_test, 'statistic_test': statistic_test_test, 'alpha': alpha_test, 'p': p_test, 'p_value': p_value_test}, ignore_index=True)
+            except:
+                pass
         batch_results = batch_results.mean().round(3)
         batch_train_results = batch_train_results.mean().round(3)
         batch_test_results = batch_test_results.mean().round(3)
@@ -1114,22 +1125,36 @@ def graph_maker_10x4cv(toy):
         pipeline_construction_path = os.path.join(RAW_RESULT_PATH, "toy")
         plot_path = os.path.join(ARTIFACTS_PATH, "toy")
     else:
-        pipeline_construction_path = os.path.join(RAW_RESULT_PATH, "toy")
-        plot_path = os.path.join(ARTIFACTS_PATH, "toy")
+        pipeline_construction_path = os.path.join(RAW_RESULT_PATH, "paper")
+        plot_path = os.path.join(ARTIFACTS_PATH, "paper")
     pipeline_construction_path = os.path.join(pipeline_construction_path, 'pipeline_construction')
     plot_path = os.path.join(plot_path, 'pipeline_construction')
 
     fn_path = os.path.join(pipeline_construction_path, 'features_normalize')
     fn_cv_path = os.path.join(fn_path, 'summary', '10x4cv')
-    fn_df = pd.read_csv(os.path.join(fn_cv_path, cv_file_name))
-    fn_df['fn'] = fn_df['p']
+    try:
+        fn_df = pd.read_csv(os.path.join(fn_cv_path, cv_file_name))
+        fn_df['fn'] = fn_df['p']
+    except:
+        pass
 
     df_path = os.path.join(pipeline_construction_path, 'discretize_features')
     df_cv_path = os.path.join(df_path, 'summary', '10x4cv')
-    df_df = pd.read_csv(os.path.join(df_cv_path, cv_file_name))
-    df_df['df'] = df_df['p']
+    try:
+        df_df = pd.read_csv(os.path.join(df_cv_path, cv_file_name))
+        df_df['df'] = df_df['p']
+    except:
+        pass
 
-    df = pd.concat([fn_df['fn'], df_df['df']], axis=1)
+    if "fn_df" in locals() and "df_df" in locals():
+        df = pd.concat([fn_df['fn'], df_df['df']], axis=1)
+        ticks_array = [r'$F \rightarrow N$', r'$D \rightarrow F$']
+    elif "fn_df" in locals():
+        df = fn_df['fn']
+        ticks_array = [r'$F \rightarrow N$']
+    elif "df_df" in locals():
+        df = df_df['df']
+        ticks_array = [r'$D \rightarrow F$']
     
     SMALL_SIZE = 8
     MEDIUM_SIZE = 12
@@ -1146,7 +1171,7 @@ def graph_maker_10x4cv(toy):
     fig, ax = plt.subplots()
     ax.boxplot(df, widths = 0.3)
     ax.axhline(y = 0.05, color = 'grey', linestyle = '--')
-    ax.set_xticklabels([r'$F \rightarrow N$', r'$D \rightarrow F$'])
+    ax.set_xticklabels(ticks_array)
     ax.set_ylabel('Means of the p-values')
     ax.set_yticks([0., 0.05, 0.2, 0.4, 0.6, 0.8, 1.])
     ax.set_ylim([0, 1])
@@ -1169,7 +1194,7 @@ def pipeline_construction(toy_example):
     experiments_summarizer_10x4cv(
         pipeline=['discretize', 'features'], toy=toy_example)
     experiments_summarizer_10x4cv(
-        pipeline=['features', 'normalize'], toy=atoy_example)
+        pipeline=['features', 'normalize'], toy=toy_example)
     experiments_summarizer_10x4cv(
         pipeline=['discretize', 'rebalance'], toy=toy_example)
 
