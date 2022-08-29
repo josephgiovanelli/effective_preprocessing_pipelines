@@ -1179,6 +1179,15 @@ def graph_maker_10x4cv(toy):
     fig.set_size_inches(12, 6, forward=True)
     fig.savefig(os.path.join(plot_path, 'Figure5.pdf'))
 
+def run_p_binom_test(toy):
+    # res = subprocess.call("Rscript experiment/results_processors/meta_learner.R", shell=True)
+    experiment = "toy" if toy else "paper"
+    subprocess.call(
+        f"Rscript experiment/results_processors/p_binom_test.R {experiment}", 
+        shell=True, 
+        stdout=subprocess.DEVNULL, 
+        stderr=subprocess.DEVNULL)
+
 def pipeline_construction(toy_example):
     experiments_summarizer(
         pipeline=['features', 'rebalance'], toy=toy_example)
@@ -1198,5 +1207,6 @@ def pipeline_construction(toy_example):
     experiments_summarizer_10x4cv(
         pipeline=['discretize', 'rebalance'], toy=toy_example)
 
+    run_p_binom_test(toy_example)
     graph_maker(toy_example)
     graph_maker_10x4cv(toy_example)
