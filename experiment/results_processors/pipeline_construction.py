@@ -3,6 +3,7 @@ import logging
 import os
 import json
 import warnings
+import subprocess
 from matplotlib import pyplot as plt
 
 import numpy as np
