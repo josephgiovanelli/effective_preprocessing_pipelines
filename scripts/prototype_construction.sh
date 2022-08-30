@@ -3,7 +3,7 @@ params=()
 [[ $1 == true ]] && params+=(-toy)
 
 echo ""
-echo "### PIPELINE CONSTRUCTION ###"
+echo "### PROTOTYPE CONSTRUCTION ###"
 echo ""
 
 # SCENARIO GENERETOR

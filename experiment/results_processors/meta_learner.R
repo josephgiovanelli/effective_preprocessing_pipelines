@@ -30,7 +30,7 @@ ctreeFitFeatures <- train(features ~ .,
                           method = "ctree2", 
                           na.action = na.pass, 
                           trControl = trainControl(method = "cv"))
-pdf(paste("artifacts/", args[1],"/exploratory_analysis/Figure10.pdf", sep = ""), width = 15, height = 6)
+pdf(paste(c("resources/artifacts/", args[1],"/exploratory_analysis/Figure10.pdf"), collapse = ""), width = 15, height = 6)
 plot(ctreeFitFeatures$finalModel)
 dev.off()
 
@@ -39,6 +39,6 @@ ctreeFitRebalance <- train(rebalance ~ .,
                            method = "ctree2", 
                            na.action = na.pass, 
                            trControl = trainControl(method = "cv"))
-pdf(paste("artifacts/", args[1],"/exploratory_analysis/Figure11.pdf", sep = ""), width = 15, height = 6)
+pdf(paste(c("resources/artifacts/", args[1],"/exploratory_analysis/Figure11.pdf"), collapse = ""), width = 15, height = 6)
 plot(ctreeFitRebalance$finalModel)
 dev.off()

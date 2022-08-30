@@ -49,12 +49,12 @@ def load_results_auto(input_path, filtered_data_sets):
                 data = json.load(json_file)
                 try:
                     accuracy = data['context']['best_config']['score'] // 0.0001 / 100
-                    baseline = data['context']['baseline_score'] // 0.0001 / 100
-                    # print()
-                    # print(accuracy, baseline)
-                    # print()
                 except:
                     accuracy = 0
+                
+                try:
+                    baseline = data['context']['baseline_score'] // 0.0001 / 100
+                except:
                     baseline = 0
         else:
             accuracy = 0
@@ -243,11 +243,14 @@ def load_evaluation2_results(input_path, filtered_data_sets, algorithm_compariso
                         else 'in_pipeline')
                     num_iterations = data['context']['iteration'] + 1
                     best_iteration = data['context']['best_config']['iteration'] + 1
-                    baseline_score = data['context']['baseline_score'] // 0.0001 / 100
                 except:
                     accuracy = 0
                     num_iterations = 0
                     best_iteration = 0
+                
+                try:
+                    baseline_score = data['context']['baseline_score'] // 0.0001 / 100
+                except:
                     baseline_score = 0
 
         else:

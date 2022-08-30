@@ -43,15 +43,18 @@ def transformation_analysis(evaluation2_3_results_path, new_results_path, plots_
                     data = json.load(json_file)
                     try:
                         pipeline = data['context']['best_config']['pipeline']
-                        for transformation in ["encode", "features", "impute", "normalize", "discretize", "rebalance"]:
+                    except:
+                        pass
+                    for transformation in ["encode", "features", "impute", "normalize", "discretize", "rebalance"]:
+                        try:
                             results_map = results_map.append(pd.DataFrame({
                                 "algorithm": [algorithm],
                                 "dataset": [dataset],
                                 "transformation": [pipeline[transformation][0].split("_")[0]],
                                 "operator": [pipeline[transformation][0].split("_")[1]]
                             }), ignore_index=True)
-                    except:
-                        pass
+                        except:
+                            pass
 
     results_map.to_csv(os.path.join(
         new_results_path, "pp_pipeline_operator_study.csv"), index=False)
@@ -393,56 +396,57 @@ def meta_learning_input_preparation(results_path, evaluation2_3_results_path):
             if acronym in results:
                 with open(os.path.join(evaluation2_3_pipeline_algorithm_results_path, acronym + '.json')) as json_file:
                     data = json.load(json_file)
+
                     try:
                         pipeline = data['context']['best_config']['pipeline']
-
-                        encode_flag = pipeline["encode"][0].split("_", 1)[1]
-                        features_flag = pipeline["features"][0].split("_", 1)[1]
-                        impute_flag = pipeline["impute"][0].split("_", 1)[1]
-                        try:
-                            normalize_flag = pipeline["normalize"][0].split("_", 1)[1]
-                        except:
-                            normalize_flag = "NoneType"
-                        try:
-                            discretize_flag = pipeline["discretize"][0].split("_", 1)[1]
-                        except:
-                            discretize_flag = "NoneType"
-                        rebalance_flag = pipeline["rebalance"][0].split("_", 1)[1]
-
-                        if features_flag != "FeatureUnion":
-                            results_map[algorithm] = results_map[algorithm].append(pd.DataFrame({
-                                "ID": [dataset],
-                                "baseline": [baseline_results[algorithm].loc[baseline_results[algorithm]["ID"] == dataset, "baseline"].iloc[0]],
-                                "encode": [encode_flag],
-                                "features": [features_flag],
-                                "impute": [impute_flag],
-                                "normalize": [normalize_flag],
-                                "discretize": [discretize_flag],
-                                "rebalance": [rebalance_flag]
-                            }), ignore_index=True)
-                        else:
-                            results_map[algorithm] = results_map[algorithm].append(pd.DataFrame({
-                                "ID": [dataset],
-                                "baseline": [baseline_results[algorithm].loc[baseline_results[algorithm]["ID"] == dataset, "baseline"].iloc[0]],
-                                "encode": [encode_flag],
-                                "features": ["SelectKBest"],
-                                "impute": [impute_flag],
-                                "normalize": [normalize_flag],
-                                "discretize": [discretize_flag],
-                                "rebalance": [rebalance_flag]
-                            }), ignore_index=True)
-                            results_map[algorithm] = results_map[algorithm].append(pd.DataFrame({
-                                "ID": [dataset],
-                                "baseline": [baseline_results[algorithm].loc[baseline_results[algorithm]["ID"] == dataset, "baseline"].iloc[0]],
-                                "encode": [encode_flag],
-                                "features": ["PCA"],
-                                "impute": [impute_flag],
-                                "normalize": [normalize_flag],
-                                "discretize": [discretize_flag],
-                                "rebalance": [rebalance_flag]
-                            }), ignore_index=True)
                     except:
                         pass
+
+                    encode_flag = pipeline["encode"][0].split("_", 1)[1]
+                    features_flag = pipeline["features"][0].split("_", 1)[1]
+                    impute_flag = pipeline["impute"][0].split("_", 1)[1]
+                    try:
+                        normalize_flag = pipeline["normalize"][0].split("_", 1)[1]
+                    except:
+                        normalize_flag = "NoneType"
+                    try:
+                        discretize_flag = pipeline["discretize"][0].split("_", 1)[1]
+                    except:
+                        discretize_flag = "NoneType"
+                    rebalance_flag = pipeline["rebalance"][0].split("_", 1)[1]
+
+                    # if features_flag != "FeatureUnion":
+                    results_map[algorithm] = results_map[algorithm].append(pd.DataFrame({
+                        "ID": [dataset],
+                        "baseline": [baseline_results[algorithm].loc[baseline_results[algorithm]["ID"] == dataset, "baseline"].iloc[0]],
+                        "encode": [encode_flag],
+                        "features": [features_flag],
+                        "impute": [impute_flag],
+                        "normalize": [normalize_flag],
+                        "discretize": [discretize_flag],
+                        "rebalance": [rebalance_flag]
+                    }), ignore_index=True)
+                    # else:
+                    #     results_map[algorithm] = results_map[algorithm].append(pd.DataFrame({
+                    #         "ID": [dataset],
+                    #         "baseline": [baseline_results[algorithm].loc[baseline_results[algorithm]["ID"] == dataset, "baseline"].iloc[0]],
+                    #         "encode": [encode_flag],
+                    #         "features": ["SelectKBest"],
+                    #         "impute": [impute_flag],
+                    #         "normalize": [normalize_flag],
+                    #         "discretize": [discretize_flag],
+                    #         "rebalance": [rebalance_flag]
+                    #     }), ignore_index=True)
+                    #     results_map[algorithm] = results_map[algorithm].append(pd.DataFrame({
+                    #         "ID": [dataset],
+                    #         "baseline": [baseline_results[algorithm].loc[baseline_results[algorithm]["ID"] == dataset, "baseline"].iloc[0]],
+                    #         "encode": [encode_flag],
+                    #         "features": ["PCA"],
+                    #         "impute": [impute_flag],
+                    #         "normalize": [normalize_flag],
+                    #         "discretize": [discretize_flag],
+                    #         "rebalance": [rebalance_flag]
+                    #     }), ignore_index=True)
 
     for algorithm in algorithm_acronyms:
         results_map[algorithm] = pd.merge(
