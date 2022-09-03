@@ -48,11 +48,42 @@ For more examples and ideas, visit:
 # Reproducing the experiments
 
 - Open the terminal.
-- Clone the repository (```git clone https://github.com/josephgiovanelli/effective_preprocessing_pipelines.git```) or download it from the Harvard DataVerse ().
-- Go to the created folder (```cd effective_preprocessing_pipelines```).
+- Clone the repository
+	```
+	git clone https://github.com/josephgiovanelli/effective_preprocessing_pipelines.git
+	```
+	or download it from the Harvard DataVerse ().
+- Go to the created folder.
+	```
+	cd effective_preprocessing_pipelines
+	```
 - Run the start script (be sure to either have downloaded the intermediary results for reproducing the paper results or add the ```-toy``` parameter):
-  - on Unix-like systems run the script ***start.sh*** in the root folder (```./start.sh``` or ```./start.sh -toy```).
-  - on Windows systems run the script ***start.bat*** in the root folder (```./start.bat```  or ```./start.bat -toy``` if using the Windows PowerShell, ```start.bat``` or ```start.bat -toy``` if using the Command Prompt).
+  - on Unix-like systems run the script ***start.sh*** in the root folder;
+	  ```
+	  ./start.sh
+	  ``` 
+	  or 
+	  ```
+	  ./start.sh -toy
+	  ```
+  - on Windows systems run the script ***start.bat*** in the root folder.
+  	
+	- If using the Windows PowerShell:
+		```
+		./start.bat
+		```  
+		or 
+		```
+		./start.bat -toy
+		``` 
+	- If using the Command Prompt:
+		```
+		start.bat
+		``` 
+		or 
+		```
+		start.bat -toy
+		```
   
 The script will search for an image of the needed [pre-built container](https://github.com/josephgiovanelli/effective_preprocessing_pipelines/releases/tag/0.1.0); if it is not found, it is downloaded. 
 
@@ -139,7 +170,7 @@ To give the necessary permissions to the files at hand, you can type:
 chmod 777 ./scripts/*
 ```
 
-If the error is given also for the scripts ***start.sh*** and/or ***wrapper_experiments.sh***, you can also type:
+If the error is given also for the scripts ***start.sh*** and/or ***wrapper_experiments.sh***, you can type:
 ```
 chmod 777 start.sh
 chmod 777 wrapper_experiments.sh
