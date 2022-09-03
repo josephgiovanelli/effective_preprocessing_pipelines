@@ -14,12 +14,13 @@ echo -e "\tDone."
 
 # EXPERIMENTS
 echo "Running experiments"
-echo -e "\tEvaluation 1"
+echo -e "\tExhaustive prototypes + ML algorithms"
 ## Evaluation 1
 python experiment/experiments_launcher.py -exp evaluation1 "${params[@]}"
 ## Evaluation 2 and 3
-echo -e "\tEvaluation 2 and 3"
+echo -e "\tOnly ML algorithms"
 python experiment/experiments_launcher.py -exp evaluation2_3 -mode algorithm "${params[@]}"
+echo -e "\tEffective prototypes + ML algorithms"
 python experiment/experiments_launcher.py -exp evaluation2_3 -mode pipeline_algorithm "${params[@]}"
 
 # PLOTTING

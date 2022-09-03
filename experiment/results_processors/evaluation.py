@@ -210,8 +210,9 @@ def save_comparison(results_pipelines, results_auto, result_path, plot_path):
     plt.xticks([1, 2, 3], ['NB', 'KNN', 'RF'])
     plt.ylabel('Normalized distance', labelpad=15.0)
     plt.xlabel('Algorithms', labelpad=15.0)
-    plt.yticks(np.linspace(0, 1.2, 7))
-    plt.ylim(0.0, 1.25)
+    if "paper" in plot_path:
+        plt.yticks(np.linspace(0, 1.2, 7))
+        plt.ylim(0.0, 1.25)
     #plt.title('Evaluation of the prototype building through the proposed precedence')
     #plt.tight_layout()
     plt.tight_layout(pad=0.2)

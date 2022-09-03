@@ -125,7 +125,7 @@ def save_analysis(analysis, result_path, toy):
     #             row.append(str(analysis[key][i]))
     #         out.write(','.join(row) + '\n')
 
-    x = np.linspace(0, max_iteration, max_iteration)
+    x = np.linspace(0, max_iteration, num=max_iteration)
 
     SMALL_SIZE = 14
     MEDIUM_SIZE = 16
@@ -152,8 +152,8 @@ def save_analysis(analysis, result_path, toy):
     plt.axvline(x=max_iteration/2, color='#aaaaaa', linestyle='--')
     plt.grid(False)
     plt.tick_params(axis='both', which='both', length=5, color='#aaaaaa')
-    plt.xticks(np.linspace(0, max_iteration, int(
-        max_iteration/10 + max_iteration/100)))
+    if not toy:
+        plt.xticks(np.linspace(0, max_iteration, int(max_iteration/10 + max_iteration/100)))
     fig = plt.gcf()
     fig.set_size_inches(12, 6, forward=True)
     fig.savefig(os.path.join(result_path, 'Figure2.pdf'))

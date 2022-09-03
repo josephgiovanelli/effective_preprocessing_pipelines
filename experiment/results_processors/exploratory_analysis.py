@@ -76,8 +76,21 @@ def transformation_analysis(evaluation2_3_results_path, new_results_path, plots_
     # print(result)
 
     labels = ["NB", "KNN", "RF"]
-    colors = ['mediumpurple', 'xkcd:dark grass green', 'xkcd:kermit green', 'xkcd:lime green', 'xkcd:light pea green', 'xkcd:dark coral', 'xkcd:salmon',
-              'xkcd:sun yellow', 'xkcd:straw', 'xkcd:aqua green', 'xkcd:light aquamarine', 'xkcd:pumpkin orange', 'xkcd:apricot', 'xkcd:light peach']
+    colors = [
+        'mediumpurple', 
+        'xkcd:dark grass green', 
+        'xkcd:kermit green', 
+        'xkcd:lime green', 
+        'xkcd:light pea green', 
+        'xkcd:dark coral', 
+        'xkcd:salmon',
+        'xkcd:sun yellow', 
+        'xkcd:straw', 
+        'xkcd:aqua green', 
+        'xkcd:light aquamarine', 
+        'xkcd:pumpkin orange', 
+        'xkcd:apricot', 
+        'xkcd:light peach']
     x = np.arange(len(labels))  # the label locations
     width = 0.125  # the width of the bars
     SMALL_SIZE = 8
@@ -96,7 +109,15 @@ def transformation_analysis(evaluation2_3_results_path, new_results_path, plots_
     i = 0
     cumulative = False
     last_transformation, last_operator = '', ''
-    for transformation in ['encode', 'normalize', 'discretize', 'impute', 'rebalance', 'features']:
+    transformation_map = {
+        'encode': 0,
+        'normalize': 1,
+        'discretize': 5,
+        'impute': 7,
+        'rebalance': 9,
+        'features': 11
+    }
+    for transformation, i in transformation_map.items():
         for operator in result.index.get_level_values('operator').unique():
             try:
                 result.loc[transformation, operator]

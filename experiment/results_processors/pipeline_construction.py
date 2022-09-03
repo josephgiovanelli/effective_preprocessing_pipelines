@@ -1208,6 +1208,6 @@ def pipeline_construction(toy_example):
     experiments_summarizer_10x4cv(
         pipeline=['discretize', 'rebalance'], toy=toy_example)
 
-    run_p_binom_test(toy_example)
     graph_maker(toy_example)
     graph_maker_10x4cv(toy_example)
+    run_p_binom_test(toy_example)
