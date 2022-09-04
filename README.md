@@ -47,16 +47,18 @@ For more examples and ideas, visit:
 
 # Reproducing the experiments
 
-1. Get the material
+1. Get the repository
 
-	You can either clone this repository from GitHub (which contains only the material to start the experiments) or download the full material from the Harvard DataVerse.
+	You can either clone this repository from GitHub (which contains only the code and the datasets to start the experiments, without the intermediary results) or download the full material (code, datasets, and intermediary results) from the Harvard DataVerse.
 	
 	To clone the repository, open the terminal and type:
 	```
 	git clone https://github.com/josephgiovanelli/effective_preprocessing_pipelines.git
 	```
+	This will download the repository under the folder effective_preprocessing_pipelines.
 	
-	To download the full material from the Harvard DataVerse, you can access the link [https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/O2XQ1P](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/O2XQ1P) and press the "Access Dataset" button.
+	
+	To download the full material from the Harvard DataVerse, you can access the link [https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/O2XQ1P](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/O2XQ1P) and press the "Access Dataset" button. This will download an archive (i.e., effective_preprocessing_pipelines.zip); unzip it and go to the next step.
 
 2. Run the experiments
 	- Go to the created folder.
