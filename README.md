@@ -47,45 +47,53 @@ For more examples and ideas, visit:
 
 # Reproducing the experiments
 
-- Open the terminal.
-- Clone the repository
+1. Get the material
+
+	You can either clone this repository from GitHub (which contains only the material to start the experiments) or download the full material from the Harvard DataVerse.
+	
+	To clone the repository, open the terminal and type:
 	```
 	git clone https://github.com/josephgiovanelli/effective_preprocessing_pipelines.git
 	```
-	or download it from the Harvard DataVerse ().
-- Go to the created folder.
-	```
-	cd effective_preprocessing_pipelines
-	```
-- Run the start script (be sure to either have downloaded the intermediary results for reproducing the paper results or add the ```-toy``` parameter):
-  - on Unix-like systems run the script ***start.sh*** in the root folder;
-	  ```
-	  ./start.sh
-	  ``` 
-	  or 
-	  ```
-	  ./start.sh -toy
-	  ```
-  - on Windows systems run the script ***start.bat*** in the root folder.
-  	
-	- If using the Windows PowerShell:
+	
+	To download the full material from the Harvard DataVerse, you can access the link [https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/O2XQ1P](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/O2XQ1P) and press the "Access Dataset" button.
+
+2. Run the experiments
+	- Go to the created folder.
 		```
-		./start.bat
-		```  
-		or 
+		cd effective_preprocessing_pipelines
 		```
-		./start.bat -toy
-		``` 
-	- If using the Command Prompt:
-		```
-		start.bat
-		``` 
-		or 
-		```
-		start.bat -toy
-		```
+	- Run the start script.
+	
+		 If you have downloaded the full material from the Harvard Dataverse, you have the intermediary results for reproducing all the paper artifacts without a time-consuming computation; otherwise we suggest you to add the ```-toy``` parameter to the running script, which allows to test the reproducibility of the experiments -- but with a less time-consuming computation.
+	  - on Unix-like systems run the script ***start.sh*** in the root folder;
+		  ```
+		  ./start.sh
+		  ``` 
+		  or 
+		  ```
+		  ./start.sh -toy
+		  ```
+	  - on Windows systems run the script ***start.bat*** in the root folder.
+
+		- If using the Windows PowerShell:
+			```
+			./start.bat
+			```  
+			or 
+			```
+			./start.bat -toy
+			``` 
+		- If using the Command Prompt:
+			```
+			start.bat
+			``` 
+			or 
+			```
+			start.bat -toy
+			```
   
-The script will search for an image of the needed [pre-built container](https://github.com/josephgiovanelli/effective_preprocessing_pipelines/releases/tag/0.1.0); if it is not found, it is downloaded. 
+	The script will search for an image of the needed [pre-built container](https://github.com/josephgiovanelli/effective_preprocessing_pipelines/releases/tag/0.1.0); if it is not found, it is downloaded. 
 
 ***Expected output:***
 
