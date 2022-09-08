@@ -113,8 +113,14 @@ for v in to_run.values():
 print(f"\t\tnum invalid scenarios: {len(invalid_scenarios)}")
 print(f"\t\tnum scenarios with results: {len(scenario_with_results)}")
 print(f"\t\tnum scenarios to run: {len(to_run)}")
-print('\t\t\testimated time: {} ({}s)'.format(
-    datetime.timedelta(seconds=total_runtime), total_runtime))
+if len(to_run) > 0:
+    factor = 5
+    print('\t\t\tmin estimated time: {} ({}s)'.format(
+        datetime.timedelta(seconds=total_runtime), 
+        total_runtime))
+    print('\t\t\tmax estimated time: {} ({}s)'.format(
+        datetime.timedelta(seconds=total_runtime*factor), 
+        total_runtime*factor))
 
 
 def kill(proc_pid):
@@ -129,7 +135,7 @@ def run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path):
     open(stderr_path, "w")
     with open(stdout_path, "a") as log_out:
         with open(stderr_path, "a") as log_err:
-            max_time = 1000
+            max_time = 50 if args.toy_example else 1000
             try:
                 process = subprocess.Popen(
                     cmd, shell=True, stdout=log_out, stderr=log_err)
@@ -137,16 +143,18 @@ def run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path):
             except Exception as e:
                 #print(e)
                 kill(process.pid)
-                print("\n\n" + base_scenario + " does not finish in " + str(max_time) + "\n\n")
+                print("\n" + base_scenario + " did not finish in time\n")
                 serializer.serialize_results(
                     scenario=current_scenario, result_path=result_path)
 
 if to_run.values():
-    with tqdm(total=total_runtime) as pbar:
+    with tqdm(total=len(to_run)) as pbar:
         for info in to_run.values():
             base_scenario = info['path'].split('.yaml')[0]
             output = base_scenario.split('_')[0]
-            pbar.set_description("Running scenario {}\n\r".format(info['path']))
+            # pbar.set_description("{} on dataset n.{}".format(
+            #     info['path'].split("_")[0].upper(), 
+            #     info['path'].split("_")[1].split(".")[0]))
 
             current_scenario_path = os.path.join(scenario_path, info['path'])
             current_scenario = scenarios_util.load(current_scenario_path)
@@ -172,6 +180,8 @@ if to_run.values():
                     reduce(lambda x, y: x + " " + y, pipeline),
                     result_path,
                     args.experiment)
+                if args.toy_example:
+                    cmd += " -toy true"
 
                 stdout_path = os.path.join(
                     result_path, '{}_stdout.txt'.format(base_scenario))
@@ -196,6 +206,9 @@ if to_run.values():
                         result_path,
                         len(pipelines),
                         args.experiment)
+                    if args.toy_example:
+                        cmd += " -toy true"
+                    
 
                     stdout_path = os.path.join(
                         result_path, '{}_{}_stdout.txt'.format(base_scenario, str(i)))
@@ -244,6 +257,8 @@ if to_run.values():
                             "pipeline_algorithm",
                             len(pipelines),
                             args.experiment)
+                        if args.toy_example:
+                            cmd += " -toy true"
 
                         stdout_path = os.path.join(
                             result_path, '{}_{}_stdout.txt'.format(base_scenario, str(i)))
@@ -294,6 +309,8 @@ if to_run.values():
                             "algorithm",
                             len(pipelines),
                             args.experiment)
+                        if args.toy_example:
+                            cmd += " -toy true"
 
                         stdout_path = os.path.join(
                             result_path, '{}_stdout.txt'.format(base_scenario))
@@ -314,7 +331,9 @@ if to_run.values():
                         result_path,
                         "algorithm",
                         0,
-                        args.experiment)
+                        args.experiment) 
+                    if args.toy_example:
+                        cmd += " -toy true"
 
                     stdout_path = os.path.join(
                         result_path, '{}_stdout.txt'.format(base_scenario))
@@ -327,4 +346,12 @@ if to_run.values():
                     raise Exception('unvalid mode option')
             else:
                 raise Exception('unvalid experiment option')
-            pbar.update(info['runtime'])
+            pbar.update()
+            # pbar.update(info['runtime'] 
+            #     if args.experiment == "pipeline_construction" 
+            #     or args.experiment == "pipeline_impact" 
+            #     else (info['runtime'] * 24 
+            #         if args.experiment == "evaluation1"
+            #         else (info['runtime'] + info['runtime'] * 5
+            #             if args.experiment == "evaluation2_3" and args.mode == "pipeline_algorithm"
+            #             else info['runtime'] )))

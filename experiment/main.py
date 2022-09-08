@@ -14,7 +14,8 @@ def load_dataset(id, args):
     if args.experiment == 'pipeline_construction' or (args.experiment == 'evaluation2_3' and args.mode == "algorithm"):
         X = SimpleImputer(strategy="constant").fit_transform(X)
     print(f"dataset id: {id}")
-    print(X, y)
+    print(f"X:\n{X}")
+    print(f"y:\n{y}")
     PrototypeSingleton.getInstance().setPipeline(args.pipeline)
     num_features = [i for i, x in enumerate(
         categorical_indicator) if x == False]

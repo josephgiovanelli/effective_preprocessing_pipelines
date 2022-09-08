@@ -35,13 +35,14 @@ class Split(Policy):
         else:
             budget = self.config['step_pipeline']
 
-        if self.config["experiment"] == "pipeline_impact" or self.config['toy']:
+        if self.config["experiment"] == "pipeline_impact":
             max_evals = budget
-            max_time = 80000
+            max_time = 1 if self.config['toy'] else 80000
         else:
-            max_evals = None
+            max_evals = 1 if self.config['toy'] else None
             max_time = budget
         
+        # print(f"toy: {self.config['toy']}, max_evals: {max_evals}, max_time: {max_time}")
         return max_evals, max_time
             
 
