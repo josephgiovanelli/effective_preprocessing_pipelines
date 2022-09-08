@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo ""
-echo "### EVALUATION ###"
+echo "### EXPERIMENTAL EVALUATION (EE) ###"
 echo ""
 
 # SCENARIO GENERETOR

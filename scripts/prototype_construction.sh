@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo ""
-echo "### PROTOTYPE CONSTRUCTION ###"
+echo "### PROTOTYPE CONSTRUCTION (PC) ###"
 echo ""
 
 # SCENARIO GENERETOR
@@ -12,24 +12,24 @@ echo -e "\tDone."
 # EXPERIMENTS
 echo "Running experiments..."
 ## Features Rebalance
-echo -e "\tFeatures Rebalance"
+echo -e "\tFeatures - Rebalance"
 python experiment/experiments_launcher.py -exp pipeline_construction -mode features_rebalance $1
-echo -e "\tRebalance Features"
+echo -e "\tRebalance - Features"
 python experiment/experiments_launcher.py -exp pipeline_construction -mode rebalance_features $1
 ## Features Discretize
-echo -e "\tDiscretize Features"
+echo -e "\tDiscretize - Features"
 python experiment/experiments_launcher.py -exp pipeline_construction -mode discretize_features $1
-echo -e "\tFeatures Discretize"
+echo -e "\tFeatures - Discretize"
 python experiment/experiments_launcher.py -exp pipeline_construction -mode features_discretize $1
 ## Features Normalize
-echo -e "\tFeatures Normalize"
+echo -e "\tFeatures - Normalize"
 python experiment/experiments_launcher.py -exp pipeline_construction -mode features_normalize $1
-echo -e "\tNormalize Features"
+echo -e "\tNormalize - Features"
 python experiment/experiments_launcher.py -exp pipeline_construction -mode normalize_features $1
 ## Discretize Rebalance
-echo -e "\tDiscretize Rebalance"
+echo -e "\tDiscretize - Rebalance"
 python experiment/experiments_launcher.py -exp pipeline_construction -mode discretize_rebalance $1
-echo -e "\tRebalance Discretize"
+echo -e "\tRebalance - Discretize"
 python experiment/experiments_launcher.py -exp pipeline_construction -mode rebalance_discretize $1
 
 # PLOTTING

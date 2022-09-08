@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo ""
-echo "### EXPLORATORY ANALYSIS: Pipeline impact ###"
+echo "### EXPLORATORY ANALYSIS (EA): Pipeline impact ###"
 echo ""
 
 # SCENARIO GENERETOR
@@ -19,7 +19,7 @@ python experiment/results_processor.py -exp pipeline_impact $1
 echo -e "\tDone."
 
 echo ""
-echo "### EXPLORATORY ANALYSIS: Statistics and meta-learning ###"
+echo "### EXPLORATORY ANALYSIS (EA): Statistics and meta-learning ###"
 echo ""
 
 # EXPLORATORY ANALYSIS
