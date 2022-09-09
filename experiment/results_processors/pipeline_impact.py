@@ -115,7 +115,6 @@ def perform_analysis(results, scores, toy):
         except:
            pass
 
-    print(scores_to_kpi)
     for i in range(1, max_iteration+1):
         for key in outcome.keys():
             outcome[key].append(mean(scores_to_kpi[key][i]))
