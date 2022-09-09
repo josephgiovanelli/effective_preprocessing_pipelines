@@ -85,7 +85,6 @@ for path, scenario in iteritems(scenarios):
                     total_runtime += runtime
             except:
                 scenario['status'] = 'No runtime info'
-        print(runtime, total_runtime)
 
 # Display list of scenario to be run
 invalid_scenarios = {k: v for k, v in iteritems(
