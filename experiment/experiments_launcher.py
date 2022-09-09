@@ -79,12 +79,13 @@ for path, scenario in iteritems(scenarios):
                 if args.experiment == "evaluation1":
                     runtime *= 24
                 if args.experiment == "evaluation2_3" and args.mode == "pipeline_algorithm":
-                    runtime *= 2
+                    runtime *= 4
                 scenario['runtime'] = runtime
                 if scenario['raw_results'] is None:
                     total_runtime += runtime
             except:
                 scenario['status'] = 'No runtime info'
+        print(runtime, total_runtime)
 
 # Display list of scenario to be run
 invalid_scenarios = {k: v for k, v in iteritems(
@@ -115,12 +116,9 @@ print(f"\t\tnum scenarios with results: {len(scenario_with_results)}")
 print(f"\t\tnum scenarios to run: {len(to_run)}")
 if len(to_run) > 0:
     factor = 5
-    print('\t\t\tmin estimated time: {} ({}s)'.format(
-        datetime.timedelta(seconds=total_runtime), 
-        total_runtime))
-    print('\t\t\tmax estimated time: {} ({}s)'.format(
-        datetime.timedelta(seconds=total_runtime*factor), 
-        total_runtime*factor))
+    print('\t\t\testimated time: {} ({}s)'.format(
+        datetime.timedelta(seconds=total_runtime*2), 
+        total_runtime*2))
 
 
 def kill(proc_pid):
@@ -143,7 +141,7 @@ def run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path):
             except Exception as e:
                 #print(e)
                 kill(process.pid)
-                print("\n" + base_scenario + " did not finish in time\n")
+                # print("\n" + base_scenario + " did not finish in time\n")
                 serializer.serialize_results(
                     scenario=current_scenario, result_path=result_path)
 
