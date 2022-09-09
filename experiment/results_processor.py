@@ -5,14 +5,20 @@ from results_processors.pipeline_construction import pipeline_construction
 from results_processors.evaluation import evaluation1, evaluation2, evaluation3
 from results_processors.exploratory_analysis import exploratory_analysis
 import warnings
+
 warnings.filterwarnings("ignore")
 import logging
-import matplotlib.pyplot as plt
-logging.getLogger('matplotlib.font_manager').disabled = True
+
+logging.getLogger("matplotlib.font_manager").disabled = True
 
 
-def main():
-    args = parse_args()
+def process_results(args):
+    """
+    Process the results according to the given parameters
+
+    Args:
+        args: taken from utils.common.parse_args
+    """
     if args.experiment == "pipeline_impact":
         pipeline_impact(args.toy_example)
     elif args.experiment == "pipeline_construction":
@@ -24,4 +30,7 @@ def main():
     elif args.experiment == "exploratory_analysis":
         exploratory_analysis(args.toy_example)
 
-main()
+
+if __name__ == "__main__":
+    args = parse_args()
+    process_results(args)
