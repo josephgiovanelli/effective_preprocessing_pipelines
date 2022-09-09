@@ -21,20 +21,23 @@ def load_results(input_path, filtered_datasets):
             acronym = ''.join([a for a in algorithm if a.isupper()]).lower()
             acronym += '_' + str(dataset)
             if acronym in results:
-                with open(os.path.join(input_path, acronym + '.json')) as json_file:
-                    data = json.load(json_file)
-                    best_accuracy = data['context']['best_config']['score'] // 0.0001 / 100
-                    best_config = data['context']['best_config']['iteration']
-                    num_iterations = data['context']['iteration'] + 1
-                    baseline_score = data['context']['baseline_score'] // 0.0001 / 100
-                    history = data['context']['history']
+                try:
+                    with open(os.path.join(input_path, acronym + '.json')) as json_file:
+                        data = json.load(json_file)
+                        best_accuracy = data['context']['best_config']['score'] // 0.0001 / 100
+                        best_config = data['context']['best_config']['iteration']
+                        num_iterations = data['context']['iteration'] + 1
+                        baseline_score = data['context']['baseline_score'] // 0.0001 / 100
+                        history = data['context']['history']
 
-                    result[acronym] = {}
-                    result[acronym]['best_accuracy'] = best_accuracy
-                    result[acronym]['best_config'] = best_config
-                    result[acronym]['num_iterations'] = num_iterations
-                    result[acronym]['baseline_score'] = baseline_score
-                    result[acronym]['history'] = history
+                        result[acronym] = {}
+                        result[acronym]['best_accuracy'] = best_accuracy
+                        result[acronym]['best_config'] = best_config
+                        result[acronym]['num_iterations'] = num_iterations
+                        result[acronym]['baseline_score'] = baseline_score
+                        result[acronym]['history'] = history
+                except:
+                    pass
 
     return result
 
@@ -63,24 +66,26 @@ def perform_algorithm_pipeline_analysis(results, toy):
     scores = {}
     half_iteration = 5 if toy else 50
     for result in results:
-        acronym = result.split('_')[0]
-        if not(acronym in scores):
-            scores[acronym] = {}
-        scores[acronym][result] = []
-        scores[acronym][result].append((0, results[result]['baseline_score']))
-        max_score = results[result]['baseline_score']
-        for i in range(1, half_iteration+1):
-            if i <= results[result]['algorithm_iterations']:
-                scores[acronym][result].append(
-                    (i, results[result]['history'][i - 1]['max_history_score'] // 0.0001 / 100))
-                max_score = results[result]['history'][i -
-                                                       1]['max_history_score'] // 0.0001 / 100
-            else:
-                scores[acronym][result].append((i, max_score))
-        for i in range(1, half_iteration+1):
-            scores[acronym][result].append((half_iteration + i, results[result]['history']
-                                           [results[result]['algorithm_iterations'] + i - 1]['max_history_score'] // 0.0001 / 100))
-
+        try:
+            acronym = result.split('_')[0]
+            if not(acronym in scores):
+                scores[acronym] = {}
+            scores[acronym][result] = []
+            scores[acronym][result].append((0, results[result]['baseline_score']))
+            max_score = results[result]['baseline_score']
+            for i in range(1, half_iteration+1):
+                if i <= results[result]['algorithm_iterations']:
+                    scores[acronym][result].append(
+                        (i, results[result]['history'][i - 1]['max_history_score'] // 0.0001 / 100))
+                    max_score = results[result]['history'][i -
+                                                        1]['max_history_score'] // 0.0001 / 100
+                else:
+                    scores[acronym][result].append((i, max_score))
+            for i in range(1, half_iteration+1):
+                scores[acronym][result].append((half_iteration + i, results[result]['history']
+                                            [results[result]['algorithm_iterations'] + i - 1]['max_history_score'] // 0.0001 / 100))
+        except:
+            pass
     return perform_analysis(results, scores, toy)
 
 
@@ -90,19 +95,27 @@ def perform_analysis(results, scores, toy):
 
     max_iteration = 10 if toy else 100
     for result in results:
-        for i in range(0, max_iteration+1):
-            acronym = result.split('_')[0]
-            if not (acronym in scores_to_kpi):
-                scores_to_kpi[acronym] = []
-                outcome[acronym] = []
-            try:
-                scores_to_kpi[acronym][i].append(
-                    scores[acronym][result][i][1] / results[result]['baseline_score'])
-            except:
-                scores_to_kpi[acronym].append([])
-                scores_to_kpi[acronym][i].append(
-                    scores[acronym][result][i][1] / results[result]['baseline_score'])
+        try:
+            for i in range(0, max_iteration+1):
+                acronym = result.split('_')[0]
+                if not (acronym in scores_to_kpi):
+                    scores_to_kpi[acronym] = []
+                    outcome[acronym] = []
+                try:
+                    scores_to_kpi[acronym][i].append(
+                        scores[acronym][result][i][1] / results[result]['baseline_score'])
+                except:
+                    scores_to_kpi[acronym].append([])
+                
+                try:
+                    scores_to_kpi[acronym][i].append(
+                        scores[acronym][result][i][1] / results[result]['baseline_score'])
+                except:
+                    scores_to_kpi[acronym][i].append(max(scores_to_kpi[acronym])[0])
+        except:
+           pass
 
+    print(scores_to_kpi)
     for i in range(1, max_iteration+1):
         for key in outcome.keys():
             outcome[key].append(mean(scores_to_kpi[key][i]))
@@ -139,10 +152,20 @@ def save_analysis(analysis, result_path, toy):
     plt.rc('legend', fontsize=MEDIUM_SIZE)  # legend fontsize
     plt.rc('figure', titlesize=MEDIUM_SIZE)  # fontsize of the figure title
 
-    plt.plot(x, analysis['nb'], label='NB', linewidth=2.5, color='lightcoral')
-    plt.plot(x, analysis['knn'], label='KNN',
-             linewidth=2.5, color='darkturquoise')
-    plt.plot(x, analysis['rf'], label='RF', linewidth=2.5, color='violet')
+    try:
+        plt.plot(x, analysis['nb'], label='NB', linewidth=2.5, color='lightcoral')
+    except:
+        pass
+    
+    try:
+        plt.plot(x, analysis['knn'], label='KNN', linewidth=2.5, color='darkturquoise')
+    except:
+        pass
+
+    try:
+        plt.plot(x, analysis['rf'], label='RF', linewidth=2.5, color='violet')
+    except:
+        pass
     plt.xlabel('Configurations visited')
     plt.ylabel('Ratio of predictive accuracy change')
     #plt.title("Optimization on bank-marketing data-set")
