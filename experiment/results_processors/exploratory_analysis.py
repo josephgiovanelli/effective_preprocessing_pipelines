@@ -22,6 +22,7 @@ def diff(first, second):
 
 
 def transformation_analysis(custom_prototypes_results_path, new_results_path, plots_path):
+
     # configure environment
     input_auto = os.path.join(custom_prototypes_results_path, "pipeline_algorithm")
     discretize_count, normalize_count = {}, {}
@@ -30,7 +31,6 @@ def transformation_analysis(custom_prototypes_results_path, new_results_path, pl
         discretize_count[algorithm], normalize_count[algorithm] = 0, 0
         df = pd.read_csv(os.path.join(custom_prototypes_results_path,
                          "summary", "custom_vs_ml_algorithm", algorithm + ".csv"))
-        #df = df[(df["pa_percentage"] == 0.5)]
         ids = list(df["dataset"])
 
         files = [f for f in listdir(input_auto) if isfile(join(input_auto, f))]
@@ -73,7 +73,6 @@ def transformation_analysis(custom_prototypes_results_path, new_results_path, pl
     result = result.reset_index()
     result = result[result['operator'] != 'NoneType']
     result = result.set_index(['transformation', 'operator', 'algorithm'])
-    # print(result)
 
     labels = ["NB", "KNN", "RF"]
     colors = [
@@ -93,9 +92,7 @@ def transformation_analysis(custom_prototypes_results_path, new_results_path, pl
         'xkcd:light peach']
     x = np.arange(len(labels))  # the label locations
     width = 0.125  # the width of the bars
-    SMALL_SIZE = 8
     MEDIUM_SIZE = 15
-    BIGGER_SIZE = 21
 
     plt.rc('font', size=MEDIUM_SIZE)  # controls default text sizes
     plt.rc('axes', titlesize=MEDIUM_SIZE)  # fontsize of the axes title
@@ -157,6 +154,7 @@ def transformation_analysis(custom_prototypes_results_path, new_results_path, pl
                     cumulative = False
                 last_transformation, last_operator = transformation, operator
                 i += 1
+
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel('Usage')
     ax.set_xlabel('Algorithms')
@@ -165,20 +163,18 @@ def transformation_analysis(custom_prototypes_results_path, new_results_path, pl
     ax.set_yticklabels(['{:,.0%}'.format(x) for x in vals])
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
-    # ax.legend()
 
     handles, labels = plt.gca().get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
-    lgd = fig.legend(by_label.values(), by_label.keys(),
-                     loc='lower center', ncol=3, bbox_to_anchor=(0.55, 1.0))
+    lgd = fig.legend(by_label.values(), by_label.keys(), loc='lower center', ncol=3, bbox_to_anchor=(0.55, 1.0))
     text = fig.text(-0.2, 1.05, "", transform=ax.transAxes)
     fig.tight_layout()
     fig.set_size_inches(10, 5)
-    fig.savefig(os.path.join(plots_path, "Figure9.pdf"),
-                bbox_extra_artists=(lgd, text), bbox_inches='tight')
+    fig.savefig(os.path.join(plots_path, "Figure9.pdf"), bbox_extra_artists=(lgd, text), bbox_inches='tight')
 
 
 def physical_pipelines_analysis(custom_prototypes_results_path, new_results_path, plots_path):
+
     # configure environment
     input_auto = os.path.join(custom_prototypes_results_path, "pipeline_algorithm")
     results_map = pd.DataFrame()
@@ -200,8 +196,7 @@ def physical_pipelines_analysis(custom_prototypes_results_path, new_results_path
                         accuracy = data['context']['best_config']['score'] // 0.0001 / 100
                         pipeline = data['context']['best_config']['pipeline']
                         pipeline_conf = data['pipeline']
-                        pipeline_conf = ''.join([a[0]
-                                                for a in pipeline_conf]).upper()
+                        pipeline_conf = ''.join([a[0] for a in pipeline_conf]).upper()
 
                         encode_flag = "None" in pipeline["encode"][0]
                         features_flag = "None" in pipeline["features"][0]
@@ -233,10 +228,8 @@ def physical_pipelines_analysis(custom_prototypes_results_path, new_results_path
                     results_map = results_map.append(pd.DataFrame(
                         {"algorithm": [algorithm], "pipeline": [pipeline_conf]}), ignore_index=True)
 
-    results_map.to_csv(os.path.join(
-        new_results_path, "physical_pipelines.csv"), index=False)
-    results_map = results_map.pivot_table(
-        index='algorithm', columns='pipeline', aggfunc=len, fill_value=0)
+    results_map.to_csv(os.path.join(new_results_path, "physical_pipelines.csv"), index=False)
+    results_map = results_map.pivot_table(index='algorithm', columns='pipeline', aggfunc=len, fill_value=0)
     results_map["sum"] = results_map.sum(axis=1)
     results_map = results_map.div(results_map["sum"], axis=0)
     results_map = results_map.drop(['sum'], axis=1)
@@ -244,8 +237,7 @@ def physical_pipelines_analysis(custom_prototypes_results_path, new_results_path
     results_map = results_map.set_index(["algorithm"])
     results_map = results_map.reindex(["nb", "knn", "rf"])
     results_map = results_map.reset_index()
-    results_map.to_csv(os.path.join(
-        new_results_path, "physical_pipelines_pivoted.csv"), index=False)
+    results_map.to_csv(os.path.join(new_results_path, "physical_pipelines_pivoted.csv"), index=False)
     results_map = results_map.rename(columns={
         'DF': r'$D \to F$',
         'RF': r'$R \to F$',
@@ -273,9 +265,7 @@ def physical_pipelines_analysis(custom_prototypes_results_path, new_results_path
               'xkcd:aquamarine', 'xkcd:dodger blue', 'xkcd:sun yellow', 'xkcd:flat green', 'xkcd:red orange', 'xkcd:lighter purple', 'xkcd:silver']
     x = np.arange(len(labels))  # the label locations
     width = 0.125  # the width of the bars
-    SMALL_SIZE = 8
     MEDIUM_SIZE = 12
-    BIGGER_SIZE = 21
     plt.rc('font', size=MEDIUM_SIZE)  # controls default text sizes
     plt.rc('axes', titlesize=MEDIUM_SIZE)  # fontsize of the axes title
     plt.rc('axes', labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
@@ -297,31 +287,26 @@ def physical_pipelines_analysis(custom_prototypes_results_path, new_results_path
     ax.set_yticklabels(['{:,.0%}'.format(x) for x in vals])
     ax.set_xticks(x*2.5+0.88)
     ax.set_xticklabels(labels)
-    # ax.legend()
 
     handles, labels = plt.gca().get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
-    lgd = fig.legend(by_label.values(), by_label.keys(),
-                     loc='lower center', ncol=5, bbox_to_anchor=(0.55, 1.0))
+    lgd = fig.legend(by_label.values(), by_label.keys(), loc='lower center', ncol=5, bbox_to_anchor=(0.55, 1.0))
     text = fig.text(-0.2, 1.05, "", transform=ax.transAxes)
     fig.tight_layout()
     fig.set_size_inches(10, 5)
-    fig.savefig(os.path.join(plots_path, "Figure8.pdf"),
-                bbox_extra_artists=(lgd, text), bbox_inches='tight')
+    fig.savefig(os.path.join(plots_path, "Figure8.pdf"), bbox_extra_artists=(lgd, text), bbox_inches='tight')
 
 
 def prototypes_impact_analysis(exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, toy):
     filtered_data_sets = ['_'.join(i) for i in list(itertools.product(
         ["knn", "nb", "rf"], [str(integer) for integer in get_filtered_datasets("exploratory_analysis", toy)]))]
 
-    results_pipelines = load_results_pipelines(
-        exhaustive_prototypes_results_path, filtered_data_sets)
+    results_pipelines = load_results_pipelines(exhaustive_prototypes_results_path, filtered_data_sets)
 
     custom_prototypes_pipeline_algorithm_results_path = os.path.join(
         custom_prototypes_results_path, "pipeline_algorithm")
-    results_auto = load_results_auto(
-        custom_prototypes_pipeline_algorithm_results_path, filtered_data_sets)
-    # print(results_auto)
+    results_auto = load_results_auto(custom_prototypes_pipeline_algorithm_results_path, filtered_data_sets)
+    
     for algorithm in results_auto.keys():
         for dataset in results_auto[algorithm].keys():
             if results_auto[algorithm][dataset][1] == 0:
@@ -330,7 +315,7 @@ def prototypes_impact_analysis(exhaustive_prototypes_results_path, custom_protot
                 evaluation_3 = evaluation_3.set_index(['dataset'])
                 results_auto[algorithm][dataset] = (
                     results_auto[algorithm][dataset][0], evaluation_3.loc[int(dataset)]["baseline"])
-    # print(results_auto)
+                    
     impacts = pd.DataFrame()
     for algorithm in results_auto.keys():
         for dataset in results_auto[algorithm].keys():
@@ -340,7 +325,7 @@ def prototypes_impact_analysis(exhaustive_prototypes_results_path, custom_protot
                         elem['index']) + 1, 'impact': elem['accuracy']-results_auto[algorithm][dataset][1]}, ignore_index=True)
             except:
                 pass
-    # print(impacts)
+            
     knn = impacts[impacts["algorithm"] == "knn"]
     nb = impacts[impacts["algorithm"] == "nb"]
     rf = impacts[impacts["algorithm"] == "rf"]
@@ -381,17 +366,12 @@ def meta_learning_input_preparation(results_path, custom_prototypes_results_path
         custom_prototypes_results_path, "summary", "custom_vs_ml_algorithm")
 
     # Meta-features Loading
-    all_classification = pd.read_csv(
-        os.path.join(META_FEATURES_PATH, "extended_meta_features_all_classification.csv"))
-    openml_cc_18 = pd.read_csv(
-        os.path.join(META_FEATURES_PATH, "extended_meta_features_openml_cc_18.csv"))
+    all_classification = pd.read_csv(os.path.join(META_FEATURES_PATH, "extended_meta_features_all_classification.csv"))
+    openml_cc_18 = pd.read_csv(os.path.join(META_FEATURES_PATH, "extended_meta_features_openml_cc_18.csv"))
     study_1 = pd.read_csv(os.path.join(META_FEATURES_PATH, "extended_meta_features_study_1.csv"))
-    all_classification = all_classification[all_classification['ID'].isin(
-        diff(all_classification['ID'], openml_cc_18['ID']))]
-    meta_features = pd.concat(
-        [openml_cc_18, all_classification, study_1], ignore_index=True, sort=True)
-    algorithm_acronyms = ["".join(
-        [c for c in algorithm if c.isupper()]).lower() for algorithm in algorithms]
+    all_classification = all_classification[all_classification['ID'].isin(diff(all_classification['ID'], openml_cc_18['ID']))]
+    meta_features = pd.concat([openml_cc_18, all_classification, study_1], ignore_index=True, sort=True)
+    algorithm_acronyms = ["".join([c for c in algorithm if c.isupper()]).lower() for algorithm in algorithms]
 
     baseline_results = {}
     # Results Loading
@@ -436,7 +416,6 @@ def meta_learning_input_preparation(results_path, custom_prototypes_results_path
                         discretize_flag = "NoneType"
                     rebalance_flag = pipeline["rebalance"][0].split("_", 1)[1]
 
-                    # if features_flag != "FeatureUnion":
                     results_map[algorithm] = results_map[algorithm].append(pd.DataFrame({
                         "ID": [dataset],
                         "baseline": [baseline_results[algorithm].loc[baseline_results[algorithm]["ID"] == dataset, "baseline"].iloc[0]],
@@ -447,27 +426,6 @@ def meta_learning_input_preparation(results_path, custom_prototypes_results_path
                         "discretize": [discretize_flag],
                         "rebalance": [rebalance_flag]
                     }), ignore_index=True)
-                    # else:
-                    #     results_map[algorithm] = results_map[algorithm].append(pd.DataFrame({
-                    #         "ID": [dataset],
-                    #         "baseline": [baseline_results[algorithm].loc[baseline_results[algorithm]["ID"] == dataset, "baseline"].iloc[0]],
-                    #         "encode": [encode_flag],
-                    #         "features": ["SelectKBest"],
-                    #         "impute": [impute_flag],
-                    #         "normalize": [normalize_flag],
-                    #         "discretize": [discretize_flag],
-                    #         "rebalance": [rebalance_flag]
-                    #     }), ignore_index=True)
-                    #     results_map[algorithm] = results_map[algorithm].append(pd.DataFrame({
-                    #         "ID": [dataset],
-                    #         "baseline": [baseline_results[algorithm].loc[baseline_results[algorithm]["ID"] == dataset, "baseline"].iloc[0]],
-                    #         "encode": [encode_flag],
-                    #         "features": ["PCA"],
-                    #         "impute": [impute_flag],
-                    #         "normalize": [normalize_flag],
-                    #         "discretize": [discretize_flag],
-                    #         "rebalance": [rebalance_flag]
-                    #     }), ignore_index=True)
 
     for algorithm in algorithm_acronyms:
         results_map[algorithm] = pd.merge(
@@ -491,7 +449,7 @@ def meta_learning_input_preparation(results_path, custom_prototypes_results_path
 
 
 def run_meta_learning(toy):
-    # res = subprocess.call("Rscript experiment/results_processors/meta_learner.R", shell=True)
+    
     experiment = "toy" if toy else "paper"
     subprocess.call(
         f"Rscript experiment/results_processors/meta_learner.R {experiment}", 
@@ -501,21 +459,15 @@ def run_meta_learning(toy):
 
 
 def exploratory_analysis(toy_example):
-    args = parse_args()
-    exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, new_results_path = get_paths(
-        toy_example)
+    exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, new_results_path = get_paths(toy_example)
 
     print("EA04. Perform exploratory analysis: prototypes versus physical pipeline")
     print("EA05. Perform exploratory analysis: plot results")
-    prototypes_impact_analysis(
-        exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, toy_example)
-    transformation_analysis(custom_prototypes_results_path,
-                            new_results_path, plots_path)
-    physical_pipelines_analysis(
-        custom_prototypes_results_path, new_results_path, plots_path)
+    prototypes_impact_analysis(exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, toy_example)
+    transformation_analysis(custom_prototypes_results_path, new_results_path, plots_path)
+    physical_pipelines_analysis(custom_prototypes_results_path, new_results_path, plots_path)
     print("EA06. Extract meta-features from datasets")
-    meta_learning_input_preparation(
-        new_results_path, custom_prototypes_results_path)
+    meta_learning_input_preparation(new_results_path, custom_prototypes_results_path)
     print("EA07. Perform meta-learning")
     run_meta_learning(toy_example)
     print("EA08. Plot and check the significance of the results")

@@ -1,10 +1,7 @@
 from utils import serializer
 from utils.common import *
 from utils import scenarios as scenarios_util
-from utils.auto_pipeline_builder import (
-    framework_table_pipelines,
-    pseudo_exhaustive_pipelines,
-)
+from utils.auto_pipeline_builder import framework_table_pipelines, pseudo_exhaustive_pipelines
 from tqdm import tqdm
 from prettytable import PrettyTable
 from six import iteritems
@@ -59,9 +56,7 @@ def run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path, toy):
                 )
                 process.wait(timeout=max_time)
             except Exception as e:
-                # print(e)
                 kill(process.pid)
-                # print("\n" + base_scenario + " did not finish in time\n")
                 serializer.serialize_results(
                     scenario=current_scenario, result_path=result_path
                 )
@@ -130,10 +125,7 @@ def launch_experiments(args):
                     scenario["status"] = "Ok"
                     if args.experiment == "exhaustive_prototypes":
                         runtime *= 24
-                    if (
-                        args.experiment == "custom_prototypes"
-                        and args.mode == "pipeline_algorithm"
-                    ):
+                    if args.experiment == "custom_prototypes" and args.mode == "pipeline_algorithm":
                         runtime *= 4
                     scenario["runtime"] = runtime
                     if scenario["raw_results"] is None:
@@ -192,40 +184,18 @@ def launch_experiments(args):
                 current_scenario = scenarios_util.load(current_scenario_path)
 
                 # Run experiments regarding the PC and EA workflows
-                if (
-                    args.experiment == "prototype_construction"
-                    or args.experiment == "pipeline_impact"
-                ):
+                if args.experiment == "prototype_construction" or args.experiment == "pipeline_impact":
 
+                    # Define the pipeline to optimize
                     if args.experiment == "prototype_construction":
                         pipeline = args.mode.split("_")
                     else:
-
-                        # Define the pipelin to optimize
                         if base_scenario.startswith("knn"):
-                            pipeline = [
-                                "impute",
-                                "encode",
-                                "normalize",
-                                "rebalance",
-                                "features",
-                            ]
+                            pipeline = ["impute", "encode", "normalize", "rebalance", "features"]
                         elif base_scenario.startswith("nb"):
-                            pipeline = [
-                                "impute",
-                                "encode",
-                                "normalize",
-                                "features",
-                                "rebalance",
-                            ]
+                            pipeline = ["impute", "encode", "normalize", "features", "rebalance"]
                         else:
-                            pipeline = [
-                                "impute",
-                                "encode",
-                                "normalize",
-                                "rebalance",
-                                "features",
-                            ]
+                            pipeline = ["impute", "encode", "normalize", "rebalance", "features"]
 
                     # Create the command
                     cmd = "python experiment/main.py -s {} -c control.seed={} -p {} -r {} -exp {}".format(
@@ -239,12 +209,8 @@ def launch_experiments(args):
                         cmd += " -toy true"
 
                     # Set stdoout and stderr
-                    stdout_path = os.path.join(
-                        result_path, "{}_stdout.txt".format(base_scenario)
-                    )
-                    stderr_path = os.path.join(
-                        result_path, "{}_stderr.txt".format(base_scenario)
-                    )
+                    stdout_path = os.path.join(result_path, "{}_stdout.txt".format(base_scenario))
+                    stderr_path = os.path.join(result_path, "{}_stderr.txt".format(base_scenario))
 
                     # Launch the experiments
                     run_cmd(
@@ -255,8 +221,10 @@ def launch_experiments(args):
                         stderr_path,
                         args.toy_example,
                     )
+
                 # Run experiments regarding the EE workflow (exhaustive experiments)
                 elif args.experiment == "exhaustive_prototypes":
+
                     # Get the exhaustive prototypes
                     pipelines = framework_table_pipelines()
 
@@ -279,14 +247,9 @@ def launch_experiments(args):
                             cmd += " -toy true"
 
                         # Set stdout and stderr
-                        stdout_path = os.path.join(
-                            result_path,
-                            "{}_{}_stdout.txt".format(base_scenario, str(i)),
-                        )
-                        stderr_path = os.path.join(
-                            result_path,
-                            "{}_{}_stderr.txt".format(base_scenario, str(i)),
-                        )
+                        stdout_path = os.path.join(result_path, "{}_{}_stdout.txt".format(base_scenario, str(i)))
+                        stderr_path = os.path.join(result_path, "{}_{}_stderr.txt".format(base_scenario, str(i)))
+
                         # Launch the experiments
                         run_cmd(
                             cmd,
@@ -300,26 +263,14 @@ def launch_experiments(args):
                         # Rename the output
                         try:
                             os.rename(
-                                os.path.join(
-                                    result_path, "{}.json".format(base_scenario)
-                                ),
-                                os.path.join(
-                                    result_path,
-                                    "{}.json".format(base_scenario + "_" + str(i)),
-                                ),
+                                os.path.join(result_path, "{}.json".format(base_scenario)),
+                                os.path.join(result_path, "{}.json".format(base_scenario + "_" + str(i)))
                             )
                             with open(
-                                os.path.join(
-                                    result_path,
-                                    "{}.json".format(base_scenario + "_" + str(i)),
-                                )
+                                os.path.join(result_path, "{}.json".format(base_scenario + "_" + str(i)))
                             ) as json_file:
                                 data = json.load(json_file)
-                                accuracy = (
-                                    data["context"]["best_config"]["score"]
-                                    // 0.0001
-                                    / 100
-                                )
+                                accuracy = (data["context"]["best_config"]["score"] // 0.0001 / 100)
                                 results.append(accuracy)
                         except Exception:
                             accuracy = 0
@@ -336,8 +287,7 @@ def launch_experiments(args):
                     # Store the best pipeline
                     try:
                         with open(
-                            os.path.join(result_path, "{}.json".format(base_scenario)),
-                            "w",
+                            os.path.join(result_path, "{}.json".format(base_scenario)), "w"
                         ) as outfile:
                             json.dump(data_to_write, outfile)
                     except:
@@ -368,14 +318,9 @@ def launch_experiments(args):
                                 cmd += " -toy true"
 
                             # Set stdout and stderr
-                            stdout_path = os.path.join(
-                                result_path,
-                                "{}_{}_stdout.txt".format(base_scenario, str(i)),
-                            )
-                            stderr_path = os.path.join(
-                                result_path,
-                                "{}_{}_stderr.txt".format(base_scenario, str(i)),
-                            )
+                            stdout_path = os.path.join(result_path, "{}_{}_stdout.txt".format(base_scenario, str(i)))
+                            stderr_path = os.path.join(result_path, "{}_{}_stderr.txt".format(base_scenario, str(i)))
+
                             # Launch the experiments
                             run_cmd(
                                 cmd,
@@ -389,27 +334,14 @@ def launch_experiments(args):
                             # Rename the output files
                             try:
                                 os.rename(
-                                    os.path.join(
-                                        result_path, "{}.json".format(base_scenario)
-                                    ),
-                                    os.path.join(
-                                        result_path,
-                                        "{}_{}.json".format(base_scenario, str(i)),
-                                    ),
+                                    os.path.join(result_path, "{}.json".format(base_scenario)),
+                                    os.path.join(result_path, "{}_{}.json".format(base_scenario, str(i))),
                                 )
-
                                 with open(
-                                    os.path.join(
-                                        result_path,
-                                        "{}_{}.json".format(base_scenario, str(i)),
-                                    )
+                                    os.path.join(result_path, "{}_{}.json".format(base_scenario, str(i)))
                                 ) as json_file:
                                     data = json.load(json_file)
-                                    accuracy = (
-                                        data["context"]["best_config"]["score"]
-                                        // 0.0001
-                                        / 100
-                                    )
+                                    accuracy = (data["context"]["best_config"]["score"] // 0.0001 / 100)
                                     results.append(accuracy)
                             except:
                                 accuracy = 0
@@ -421,39 +353,22 @@ def launch_experiments(args):
                             for i in range(1, len(pipelines)):
                                 if results[i] > results[max_i]:
                                     max_i = i
-
-                            src_dir = os.path.join(
-                                result_path,
-                                "{}.json".format(base_scenario + "_" + str(max_i)),
-                            )
-                            dst_dir = os.path.join(
-                                result_path,
-                                "{}.json".format(base_scenario + "_best_pipeline"),
-                            )
+                            src_dir = os.path.join(result_path, "{}.json".format(base_scenario + "_" + str(max_i)))
+                            dst_dir = os.path.join(result_path, "{}.json".format(base_scenario + "_best_pipeline"))
                             shutil.copy(src_dir, dst_dir)
                         except:
                             with open(
-                                os.path.join(
-                                    result_path,
-                                    "{}.txt".format(base_scenario + "_best_pipeline"),
-                                ),
-                                "a",
+                                os.path.join(result_path, "{}.txt".format(base_scenario + "_best_pipeline")), "a"
                             ) as log_out:
-                                log_out.write(
-                                    "trying to get the best pipeline: no available result"
-                                )
+                                log_out.write("trying to get the best pipeline: no available result")
 
                         # Run the algorithm optimization after with the best pipeline
                         try:
                             with open(
-                                os.path.join(
-                                    result_path,
-                                    "{}.json".format(base_scenario + "_best_pipeline"),
-                                )
+                                os.path.join(result_path,"{}.json".format(base_scenario + "_best_pipeline"))
                             ) as json_file:
                                 data = json.load(json_file)
                                 pipeline = data["pipeline"]
-
                             cmd = "python experiment/main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}".format(
                                 current_scenario_path,
                                 GLOBAL_SEED,
@@ -467,12 +382,9 @@ def launch_experiments(args):
                                 cmd += " -toy true"
 
                             # Set stdout and stderr
-                            stdout_path = os.path.join(
-                                result_path, "{}_stdout.txt".format(base_scenario)
-                            )
-                            stderr_path = os.path.join(
-                                result_path, "{}_stderr.txt".format(base_scenario)
-                            )
+                            stdout_path = os.path.join(result_path, "{}_stdout.txt".format(base_scenario))
+                            stderr_path = os.path.join(result_path, "{}_stderr.txt".format(base_scenario))
+
                             # Launch the experiments
                             run_cmd(
                                 cmd,
@@ -485,14 +397,10 @@ def launch_experiments(args):
 
                         except:
                             with open(
-                                os.path.join(
-                                    result_path, "{}.txt".format(base_scenario)
-                                ),
-                                "a",
+                                os.path.join(result_path, "{}.txt".format(base_scenario)), "a"
                             ) as log_out:
-                                log_out.write(
-                                    "\ntrying to run best pipeline and algorithm: could not find a pipeline"
-                                )
+                                log_out.write("\ntrying to run best pipeline and algorithm: could not find a pipeline")
+
                     # Run the experiments of the EE workflow (Just HPO experiments)
                     elif args.mode == "algorithm":
                         cmd = "python experiment/main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}".format(
@@ -508,12 +416,9 @@ def launch_experiments(args):
                             cmd += " -toy true"
 
                         # Set stdout and stderr
-                        stdout_path = os.path.join(
-                            result_path, "{}_stdout.txt".format(base_scenario)
-                        )
-                        stderr_path = os.path.join(
-                            result_path, "{}_stderr.txt".format(base_scenario)
-                        )
+                        stdout_path = os.path.join(result_path, "{}_stdout.txt".format(base_scenario))
+                        stderr_path = os.path.join(result_path, "{}_stderr.txt".format(base_scenario))
+                        
                         # Launch the experiments
                         run_cmd(
                             cmd,

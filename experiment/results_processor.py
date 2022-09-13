@@ -24,11 +24,8 @@ def process_results(args):
     elif args.experiment == "prototype_construction":
         prototype_construction(args.toy_example)
     elif args.experiment == "empirical_evaluation":
-        print("EE03. Compare and plot the results from EE01 and EE02")
         custom_vs_ml_algorithm(args.toy_example, plot=True)
-        print("EE06. Compare and plot the results from EE04 and EE05")
         custom_vs_exhaustive(args.toy_example, plot=True)
-        print("EE08. Check for the existence of a universal pipeline prototype")
         exhaustive_prototypes(args.toy_example, plot=True)
     elif args.experiment == "exploratory_analysis":
         custom_vs_ml_algorithm(args.toy_example, plot=False)

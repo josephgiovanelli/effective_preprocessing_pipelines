@@ -56,12 +56,9 @@ def perform_algorithm_pipeline_analysis(results, toy):
     for result in results:
         results[result]['algorithm_iterations'] = find_pipeline_iterations(
             results[result]['history'])
-        results[result]['pipeline_iterations'] = results[result]['num_iterations'] - \
-            results[result]['algorithm_iterations']
+        results[result]['pipeline_iterations'] = results[result]['num_iterations'] - results[result]['algorithm_iterations']
         algorithm_iterations.append(results[result]['algorithm_iterations'])
         pipelines_iterations.append(results[result]['pipeline_iterations'])
-        # print(result, results[result]['pipeline_iterations'], results[result]['algorithm_iterations'])
-    # print(min(pipelines_iterations), min(algorithm_iterations))
 
     scores = {}
     half_iteration = 5 if toy else 50
@@ -77,8 +74,7 @@ def perform_algorithm_pipeline_analysis(results, toy):
                 if i <= results[result]['algorithm_iterations']:
                     scores[acronym][result].append(
                         (i, results[result]['history'][i - 1]['max_history_score'] // 0.0001 / 100))
-                    max_score = results[result]['history'][i -
-                                                        1]['max_history_score'] // 0.0001 / 100
+                    max_score = results[result]['history'][i - 1]['max_history_score'] // 0.0001 / 100
                 else:
                     scores[acronym][result].append((i, max_score))
             for i in range(1, half_iteration+1):
@@ -118,7 +114,6 @@ def perform_analysis(results, scores, toy):
     for i in range(1, max_iteration+1):
         for key in outcome.keys():
             outcome[key].append(mean(scores_to_kpi[key][i]))
-            #outcome[key].append(mean(scores_to_kpi[key][i]) // 0.01 / 100)
 
     return outcome
 
@@ -126,16 +121,6 @@ def perform_analysis(results, scores, toy):
 def save_analysis(analysis, result_path, toy):
 
     max_iteration = 10 if toy else 100
-
-    # with open(os.path.join(result_path, 'result_with_impact.csv'), 'w') as out:
-    #     out.write(','.join(analysis.keys()) + '\n')
-
-    # with open(os.path.join(result_path, 'result_with_impact.csv'), 'a') as out:
-    #     for i in range(0, max_iteration):
-    #         row = []
-    #         for key in analysis.keys():
-    #             row.append(str(analysis[key][i]))
-    #         out.write(','.join(row) + '\n')
 
     x = np.linspace(0, max_iteration, num=max_iteration)
 
@@ -167,7 +152,6 @@ def save_analysis(analysis, result_path, toy):
         pass
     plt.xlabel('Configurations visited')
     plt.ylabel('Ratio of predictive accuracy change')
-    #plt.title("Optimization on bank-marketing data-set")
     plt.legend()
     plt.xlim(0, max_iteration)
     plt.ylim(0.8, 1.5)
@@ -192,12 +176,10 @@ def pipeline_impact(toy):
         result_path = create_directory(ARTIFACTS_PATH, 'paper')
     input_path = os.path.join(path, "pipeline_impact")
     result_path = create_directory(result_path, 'pipeline_impact')
-    filtered_data_sets = get_filtered_datasets(
-        experiment='pipeline_impact', toy=toy)
+    filtered_data_sets = get_filtered_datasets(experiment='pipeline_impact', toy=toy)
 
     pipeline_algorithm_results = load_results(input_path, filtered_data_sets)
 
-    pipeline_algorithm_analysis = perform_algorithm_pipeline_analysis(
-        pipeline_algorithm_results, toy)
+    pipeline_algorithm_analysis = perform_algorithm_pipeline_analysis(pipeline_algorithm_results, toy)
 
     save_analysis(pipeline_algorithm_analysis, result_path, toy)
