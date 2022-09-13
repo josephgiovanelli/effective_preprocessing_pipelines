@@ -1435,7 +1435,6 @@ def graph_maker(toy):
         input_path = os.path.join(RAW_RESULT_PATH, "paper")
         result_path = os.path.join(ARTIFACTS_PATH, "paper")
     input_path = os.path.join(input_path, "prototype_construction")
-    result_path = create_directory(result_path, "prototype_construction")
 
     data = {}
     data[0] = {
@@ -1569,10 +1568,7 @@ def graph_maker_10x4cv(toy):
     else:
         prototype_construction_path = os.path.join(RAW_RESULT_PATH, "paper")
         plot_path = os.path.join(ARTIFACTS_PATH, "paper")
-    prototype_construction_path = os.path.join(
-        prototype_construction_path, "prototype_construction"
-    )
-    plot_path = os.path.join(plot_path, "prototype_construction")
+    prototype_construction_path = os.path.join(prototype_construction_path, "prototype_construction")
 
     fn_path = os.path.join(prototype_construction_path, "features_normalize")
     fn_cv_path = os.path.join(fn_path, "summary", "10x4cv")

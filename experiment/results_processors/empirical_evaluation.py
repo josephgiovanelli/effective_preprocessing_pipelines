@@ -598,8 +598,6 @@ def exhaustive_prototypes(toy, plot):
     else:
         results_path = os.path.join(RAW_RESULT_PATH, "paper")
         plots_path = os.path.join(ARTIFACTS_PATH, "paper")
-    results_path = os.path.join(results_path, "exhaustive_prototypes")
-    plots_path = create_directory(plots_path, "exhaustive_prototypes")
 
     filtered_data_sets = [
         "_".join(i)
@@ -646,7 +644,6 @@ def custom_vs_exhaustive(toy, plot):
     exhaustive_prototypes_results_path = os.path.join(
         results_path, "exhaustive_prototypes"
     )
-    plots_path = create_directory(plots_path, "custom_vs_exhaustive")
     new_results_path = create_directory(custom_prototypes_results_path, "summary")
     new_results_path = create_directory(new_results_path, "custom_vs_exhaustive")
 
@@ -692,7 +689,6 @@ def custom_vs_ml_algorithm(toy, plot):
     input_algorithm = os.path.join(results_path, "algorithm")
     results_path = create_directory(results_path, "summary")
     results_path = create_directory(results_path, "custom_vs_ml_algorithm")
-    plots_path = create_directory(plots_path, "custom_vs_ml_algorithm")
 
     filtered_data_sets = [
         "_".join(i)

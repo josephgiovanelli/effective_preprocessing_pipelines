@@ -354,7 +354,6 @@ def get_paths(toy):
         plots_path = os.path.join(ARTIFACTS_PATH, "paper")
     custom_prototypes_results_path = os.path.join(results_path, "custom_prototypes")
     exhaustive_prototypes_results_path = os.path.join(results_path, "exhaustive_prototypes")
-    plots_path = create_directory(plots_path, "exploratory_analysis")
     new_results_path = create_directory(results_path, "exploratory_analysis")
     return exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, new_results_path
 

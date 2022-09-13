@@ -19,4 +19,4 @@ output <- data.frame("T1" = c("F", "D", "F", "D"),
                      "p-value" = c(fnp, dfp, frp, drp)
                     )
 
-write.csv(output, paste(c("resources/artifacts/", args[1], "/prototype_construction/Table4.csv"), collapse = ""), row.names = FALSE)
+write.csv(output, paste(c("resources/artifacts/", args[1], "/Table4.csv"), collapse = ""), row.names = FALSE)

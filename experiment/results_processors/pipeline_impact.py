@@ -175,7 +175,6 @@ def pipeline_impact(toy):
         path = os.path.join(RAW_RESULT_PATH, "paper")
         result_path = create_directory(ARTIFACTS_PATH, 'paper')
     input_path = os.path.join(path, "pipeline_impact")
-    result_path = create_directory(result_path, 'pipeline_impact')
     filtered_data_sets = get_filtered_datasets(experiment='pipeline_impact', toy=toy)
 
     pipeline_algorithm_results = load_results(input_path, filtered_data_sets)
