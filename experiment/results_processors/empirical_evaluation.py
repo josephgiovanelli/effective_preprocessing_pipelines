@@ -445,7 +445,7 @@ def exhaustive_prototypes(toy, plot):
     plots_path = create_directory(plots_path, "exhaustive_prototypes")
 
     filtered_data_sets = ['_'.join(i) for i in list(itertools.product(["knn", "nb", "rf"], [
-        str(integer) for integer in get_filtered_datasets("evaluation", toy)]))]
+        str(integer) for integer in get_filtered_datasets("empirical_evaluation", toy)]))]
     # print(filtered_data_sets)
 
     results = load_results_pipelines(results_path, filtered_data_sets)
@@ -478,7 +478,7 @@ def custom_vs_exhaustive(toy, plot):
     new_results_path = create_directory(new_results_path, "custom_vs_exhaustive")
 
     filtered_data_sets = ['_'.join(i) for i in list(itertools.product(["knn", "nb", "rf"], [
-        str(integer) for integer in get_filtered_datasets("evaluation", toy)]))]
+        str(integer) for integer in get_filtered_datasets("empirical_evaluation", toy)]))]
     # print(filtered_data_sets)
 
     results_pipelines = load_results_pipelines(
@@ -508,7 +508,7 @@ def custom_vs_ml_algorithm(toy, plot):
     plots_path = create_directory(plots_path, "custom_vs_ml_algorithm")
 
     filtered_data_sets = ['_'.join(i) for i in list(itertools.product(["knn", "nb", "rf"], [
-        str(integer) for integer in get_filtered_datasets("evaluation", toy)]))]
+        str(integer) for integer in get_filtered_datasets("empirical_evaluation", toy)]))]
 
     auto_results = load_custom_vs_exhaustive_results(
         input_auto, filtered_data_sets, algorithm_comparison=True)
