@@ -22,8 +22,8 @@ def load_dataset(id, args):
     X, y, categorical_indicator = datasets.load_from_csv(id)
 
     # Impute missing values if needed
-    if args.experiment == "pipeline_construction" or (
-        args.experiment == "evaluation2_3" and args.mode == "algorithm"
+    if args.experiment == "prototype_construction" or (
+        args.experiment == "custom_prototypes" and args.mode == "algorithm"
     ):
         X = SimpleImputer(strategy="constant").fit_transform(X)
     print(f"dataset id: {id}")
@@ -59,7 +59,7 @@ def main(args):
     config = scenarios.to_config(scenario, args)
 
     # Adapt the config according to the experiment
-    if args.experiment == "evaluation2_3":
+    if args.experiment == "custom_prototypes":
         if args.mode == "pipeline_algorithm":
             config["time"] /= args.num_pipelines
             config["step_pipeline"] /= args.num_pipelines

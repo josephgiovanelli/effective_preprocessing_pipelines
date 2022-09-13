@@ -115,7 +115,7 @@ def summarize_winners(winners_map):
 
     return summary_map
 
-def save_summary(summary_map, results_path, plots_path):
+def save_summary(summary_map, results_path, plots_path, plot):
     if os.path.exists('summary.csv'):
         os.remove('summary.csv')
     total = {}
@@ -136,42 +136,41 @@ def save_summary(summary_map, results_path, plots_path):
             win[algorithm] = winners_temp[1:]
             pipelines = pipelines[1:]
 
-    winners = {'pipelines': pipelines, 'nb': [e / 168 * 100 for e in win['nb']], 'knn': [e / 168 * 100 for e in win['knn']], 'rf': [e / 168 * 100 for e in win['rf']]}
-    winners['total'] = [winners['nb'][j] +  winners['knn'][j] +  winners['rf'][j] for j in range(len(winners['knn']))]
-    winners = pd.DataFrame.from_dict(winners)
-    #winners = winn ers.sort_values(by=['total'], ascending=False)
+    if plot:
+        winners = {'pipelines': pipelines, 'nb': [e / 168 * 100 for e in win['nb']], 'knn': [e / 168 * 100 for e in win['knn']], 'rf': [e / 168 * 100 for e in win['rf']]}
+        winners['total'] = [winners['nb'][j] +  winners['knn'][j] +  winners['rf'][j] for j in range(len(winners['knn']))]
+        winners = pd.DataFrame.from_dict(winners)
+        #winners = winn ers.sort_values(by=['total'], ascending=False)
 
-    SMALL_SIZE = 14
-    MEDIUM_SIZE = 16
-    BIGGER_SIZE = 18
+        SMALL_SIZE = 14
+        MEDIUM_SIZE = 16
+        BIGGER_SIZE = 18
 
-    plt.rc('font', size=MEDIUM_SIZE)  # controls default text sizes
-    plt.rc('axes', titlesize=BIGGER_SIZE)  # fontsize of the axes title
-    plt.rc('axes', labelsize=BIGGER_SIZE)  # fontsize of the x and y labels
-    plt.rc('xtick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
-    plt.rc('ytick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
-    plt.rc('legend', fontsize=MEDIUM_SIZE)  # legend fontsize
-    plt.rc('figure', titlesize=MEDIUM_SIZE)  # fontsize of the figure title
-
-
-    plt.bar([str(int(a) + 1) for a in winners['pipelines']], winners['nb'], label=algorithm_map['nb'], color="lightcoral")
-    plt.bar([str(int(a) + 1) for a in winners['pipelines']], winners['knn'], bottom=winners['nb'], label=algorithm_map['knn'], color="darkturquoise")
-    plt.bar([str(int(a) + 1) for a in winners['pipelines']], winners['rf'], bottom=winners['nb'] +  winners['knn'], label=algorithm_map['rf'], color="violet")
-
-    plt.xlabel('Prototype ID', labelpad=10.0)
-    plt.ylabel('Percentage of cases for which a prototype\nachieved the best performance', labelpad=10.0)
-    plt.yticks(ticks=np.linspace(0, 20, 11), labels=['{}%'.format(int(x)) for x in np.linspace(0, 20, 11)])
-    #plt.title('Comparison of the goodness of the prototypes')
-    plt.legend()
-    fig = plt.gcf()
-    fig.set_size_inches(12, 6)
-    fig.savefig(os.path.join(plots_path, 'Figure12.pdf'))
-
-    plt.clf()
+        plt.rc('font', size=MEDIUM_SIZE)  # controls default text sizes
+        plt.rc('axes', titlesize=BIGGER_SIZE)  # fontsize of the axes title
+        plt.rc('axes', labelsize=BIGGER_SIZE)  # fontsize of the x and y labels
+        plt.rc('xtick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
+        plt.rc('ytick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
+        plt.rc('legend', fontsize=MEDIUM_SIZE)  # legend fontsize
+        plt.rc('figure', titlesize=MEDIUM_SIZE)  # fontsize of the figure title
 
 
+        plt.bar([str(int(a) + 1) for a in winners['pipelines']], winners['nb'], label=algorithm_map['nb'], color="lightcoral")
+        plt.bar([str(int(a) + 1) for a in winners['pipelines']], winners['knn'], bottom=winners['nb'], label=algorithm_map['knn'], color="darkturquoise")
+        plt.bar([str(int(a) + 1) for a in winners['pipelines']], winners['rf'], bottom=winners['nb'] +  winners['knn'], label=algorithm_map['rf'], color="violet")
 
-def save_comparison(results_pipelines, results_auto, result_path, plot_path):
+        plt.xlabel('Prototype ID', labelpad=10.0)
+        plt.ylabel('Percentage of cases for which a prototype\nachieved the best performance', labelpad=10.0)
+        plt.yticks(ticks=np.linspace(0, 20, 11), labels=['{}%'.format(int(x)) for x in np.linspace(0, 20, 11)])
+        #plt.title('Comparison of the goodness of the prototypes')
+        plt.legend()
+        fig = plt.gcf()
+        fig.set_size_inches(12, 6)
+        fig.savefig(os.path.join(plots_path, 'Figure12.pdf'))
+
+        plt.clf()
+
+def save_comparison(results_pipelines, results_auto, result_path, plot_path, plot):
     if os.path.exists('comparison.csv'):
         os.remove('comparison.csv')
     algorithm_map = {'nb': 'NaiveBayes', 'knn': 'KNearestNeighbors', 'rf': 'RandomForest'}
@@ -187,42 +186,43 @@ def save_comparison(results_pipelines, results_auto, result_path, plot_path):
                           str(results_auto[algorithm][dataset][1]) + ',' + str(score) + '\n')
                 plot_results[algorithm][dataset] = score
 
-    SMALL_SIZE = 14
-    MEDIUM_SIZE = 16
-    BIGGER_SIZE = 18
+    if plot:
+        SMALL_SIZE = 14
+        MEDIUM_SIZE = 16
+        BIGGER_SIZE = 18
 
-    plt.rc('font', size=SMALL_SIZE)  # controls default text sizes
-    plt.rc('axes', titlesize=BIGGER_SIZE)  # fontsize of the axes title
-    plt.rc('axes', labelsize=BIGGER_SIZE)  # fontsize of the x and y labels
-    plt.rc('xtick', labelsize=MEDIUM_SIZE)  # fontsize of the tick labels
-    plt.rc('ytick', labelsize=MEDIUM_SIZE)  # fontsize of the tick labels
-    plt.rc('legend', fontsize=SMALL_SIZE)  # legend fontsize
-    plt.rc('figure', titlesize=SMALL_SIZE)  # fontsize of the figure title
+        plt.rc('font', size=SMALL_SIZE)  # controls default text sizes
+        plt.rc('axes', titlesize=BIGGER_SIZE)  # fontsize of the axes title
+        plt.rc('axes', labelsize=BIGGER_SIZE)  # fontsize of the x and y labels
+        plt.rc('xtick', labelsize=MEDIUM_SIZE)  # fontsize of the tick labels
+        plt.rc('ytick', labelsize=MEDIUM_SIZE)  # fontsize of the tick labels
+        plt.rc('legend', fontsize=SMALL_SIZE)  # legend fontsize
+        plt.rc('figure', titlesize=SMALL_SIZE)  # fontsize of the figure title
 
-    plt.axhline(y=1.0, color='#aaaaaa', linestyle='--')
+        plt.axhline(y=1.0, color='#aaaaaa', linestyle='--')
 
-    plt.boxplot([[value for value in plot_results['nb'].values() if value != 0],
-                 [value for value in plot_results['knn'].values() if value != 0],
-                 [value for value in plot_results['rf'].values() if value != 0]])
+        plt.boxplot([[value for value in plot_results['nb'].values() if value != 0],
+                    [value for value in plot_results['knn'].values() if value != 0],
+                    [value for value in plot_results['rf'].values() if value != 0]])
 
 
-    #plt.xlabel('Algorithms', labelpad=15.0)
-    plt.xticks([1, 2, 3], ['NB', 'KNN', 'RF'])
-    plt.ylabel('Normalized distance', labelpad=15.0)
-    plt.xlabel('Algorithms', labelpad=15.0)
-    if "paper" in plot_path:
-        plt.yticks(np.linspace(0, 1.2, 7))
-        plt.ylim(0.0, 1.25)
-    #plt.title('Evaluation of the prototype building through the proposed precedence')
-    #plt.tight_layout()
-    plt.tight_layout(pad=0.2)
-    fig = plt.gcf()
-    fig.set_size_inches(10, 5)
-    fig.savefig(os.path.join(plot_path, 'Figure13.pdf'))
+        #plt.xlabel('Algorithms', labelpad=15.0)
+        plt.xticks([1, 2, 3], ['NB', 'KNN', 'RF'])
+        plt.ylabel('Normalized distance', labelpad=15.0)
+        plt.xlabel('Algorithms', labelpad=15.0)
+        if "paper" in plot_path:
+            plt.yticks(np.linspace(0, 1.2, 7))
+            plt.ylim(0.0, 1.25)
+        #plt.title('Evaluation of the prototype building through the proposed precedence')
+        #plt.tight_layout()
+        plt.tight_layout(pad=0.2)
+        fig = plt.gcf()
+        fig.set_size_inches(10, 5)
+        fig.savefig(os.path.join(plot_path, 'Figure13.pdf'))
 
-    plt.clf()
+        plt.clf()
 
-def load_evaluation2_results(input_path, filtered_data_sets, algorithm_comparison = False):
+def load_custom_vs_exhaustive_results(input_path, filtered_data_sets, algorithm_comparison = False):
     #exceptions = ['nb_37', 'rf_1510', 'rf_1497', 'knn_1489', 'rf_1462', 'nb_46', 'knn_23517', 'rf_1063', 'nb_23517',
     #              'rf_40701', 'nb_1501', 'rf_44', 'nb_1497', 'knn_1486', 'rf_28']
     results_map = {}
@@ -273,7 +273,7 @@ def load_evaluation2_results(input_path, filtered_data_sets, algorithm_compariso
 
     return results_map
 
-def merge_evaluation2_results(auto_results, other_results, other_label, filtered_data_sets):
+def merge_custom_vs_exhaustive_results(auto_results, other_results, other_label, filtered_data_sets):
     auto_label = 'pipeline_algorithm'
     comparison = {}
     summary = {}
@@ -336,7 +336,7 @@ def merge_evaluation2_results(auto_results, other_results, other_label, filtered
 
     return comparison, summary
 
-def save_evaluation2_comparison(comparison, result_path):
+def save_custom_vs_exhaustive_comparison(comparison, result_path):
     def values_to_string(values):
         return [str(value).replace(',', '') for value in values]
 
@@ -352,7 +352,7 @@ def save_evaluation2_comparison(comparison, result_path):
                 result_string = ','.join(values_to_string(results.values()))
                 out.write(dataset + ',' + result_string + '\n')
 
-def save_evaluation2_summary(summary, result_path):
+def save_custom_vs_exhaustive_summary(summary, result_path):
     if os.path.exists('summary.csv'):
         os.remove('summary.csv')
     with open(os.path.join(result_path, 'summary.csv'), 'w') as out:
@@ -363,7 +363,7 @@ def save_evaluation2_summary(summary, result_path):
             result_string = ','.join([str(elem) for elem in results.values()])
             out.write(algorithm + ',' + result_string + '\n')
 
-def plot_evaluation2_comparison(comparison, result_path):
+def plot_custom_vs_exhaustive_comparison(comparison, result_path):
     import matplotlib.pyplot as plt
     import numpy as np
 
@@ -433,7 +433,7 @@ def plot_evaluation2_comparison(comparison, result_path):
 
     plt.clf()
 
-def evaluation1(toy):
+def exhaustive_prototypes(toy, plot):
     # configure environment
     if toy:
         results_path = os.path.join(RAW_RESULT_PATH, "toy")
@@ -441,8 +441,8 @@ def evaluation1(toy):
     else:
         results_path = os.path.join(RAW_RESULT_PATH, "paper")
         plots_path = os.path.join(ARTIFACTS_PATH, "paper")
-    results_path = os.path.join(results_path, "evaluation1")
-    plots_path = create_directory(plots_path, "evaluation1")
+    results_path = os.path.join(results_path, "exhaustive_prototypes")
+    plots_path = create_directory(plots_path, "exhaustive_prototypes")
 
     filtered_data_sets = ['_'.join(i) for i in list(itertools.product(["knn", "nb", "rf"], [
         str(integer) for integer in get_filtered_datasets("evaluation", toy)]))]
@@ -458,9 +458,9 @@ def evaluation1(toy):
     # print(summary)
 
     results_path = create_directory(results_path, "summary")
-    save_summary(summary, results_path, plots_path)
+    save_summary(summary, results_path, plots_path, plot)
 
-def evaluation2(toy):
+def custom_vs_exhaustive(toy, plot):
     # configure environment
     if toy:
         results_path = os.path.join(RAW_RESULT_PATH, "toy")
@@ -469,30 +469,30 @@ def evaluation2(toy):
         results_path = os.path.join(RAW_RESULT_PATH, "paper")
         plots_path = os.path.join(ARTIFACTS_PATH, "paper")
 
-    evaluation2_3_results_path = os.path.join(results_path, "evaluation2_3")
-    evaluation2_3_pipeline_algorithm_results_path = os.path.join(
-        evaluation2_3_results_path, "pipeline_algorithm")
-    evaluation1_results_path = os.path.join(results_path, "evaluation1")
-    plots_path = create_directory(plots_path, "evaluation2")
-    new_results_path = create_directory(evaluation2_3_results_path, "summary")
-    new_results_path = create_directory(new_results_path, "evaluation2")
+    custom_prototypes_results_path = os.path.join(results_path, "custom_prototypes")
+    custom_prototypes_pipeline_algorithm_results_path = os.path.join(
+        custom_prototypes_results_path, "pipeline_algorithm")
+    exhaustive_prototypes_results_path = os.path.join(results_path, "exhaustive_prototypes")
+    plots_path = create_directory(plots_path, "custom_vs_exhaustive")
+    new_results_path = create_directory(custom_prototypes_results_path, "summary")
+    new_results_path = create_directory(new_results_path, "custom_vs_exhaustive")
 
     filtered_data_sets = ['_'.join(i) for i in list(itertools.product(["knn", "nb", "rf"], [
         str(integer) for integer in get_filtered_datasets("evaluation", toy)]))]
     # print(filtered_data_sets)
 
     results_pipelines = load_results_pipelines(
-        evaluation1_results_path, filtered_data_sets)
+        exhaustive_prototypes_results_path, filtered_data_sets)
     results_pipelines = get_winners_accuracy(results_pipelines)
     results_auto = load_results_auto(
-        evaluation2_3_pipeline_algorithm_results_path, filtered_data_sets)
+        custom_prototypes_pipeline_algorithm_results_path, filtered_data_sets)
     # print(results_pipelines)
     # print(results_auto)
 
     save_comparison(results_pipelines, results_auto,
-                    new_results_path, plots_path)
+                    new_results_path, plots_path, plot)
 
-def evaluation3(toy):
+def custom_vs_ml_algorithm(toy, plot):
     # configure environment
     if toy:
         results_path = os.path.join(RAW_RESULT_PATH, "toy")
@@ -500,24 +500,25 @@ def evaluation3(toy):
     else:
         results_path = os.path.join(RAW_RESULT_PATH, "paper")
         plots_path = os.path.join(ARTIFACTS_PATH, "paper")
-    results_path = os.path.join(results_path, "evaluation2_3")
+    results_path = os.path.join(results_path, "custom_prototypes")
     input_auto = os.path.join(results_path, "pipeline_algorithm")
     input_algorithm = os.path.join(results_path, "algorithm")
     results_path = create_directory(results_path, "summary")
-    results_path = create_directory(results_path, "evaluation3")
-    plots_path = create_directory(plots_path, "evaluation3")
+    results_path = create_directory(results_path, "custom_vs_ml_algorithm")
+    plots_path = create_directory(plots_path, "custom_vs_ml_algorithm")
 
     filtered_data_sets = ['_'.join(i) for i in list(itertools.product(["knn", "nb", "rf"], [
         str(integer) for integer in get_filtered_datasets("evaluation", toy)]))]
 
-    auto_results = load_evaluation2_results(
+    auto_results = load_custom_vs_exhaustive_results(
         input_auto, filtered_data_sets, algorithm_comparison=True)
-    algorithm_results = load_evaluation2_results(
+    algorithm_results = load_custom_vs_exhaustive_results(
         input_algorithm, filtered_data_sets, algorithm_comparison=True)
 
-    comparison, summary = merge_evaluation2_results(
+    comparison, summary = merge_custom_vs_exhaustive_results(
         auto_results, algorithm_results, 'algorithm', filtered_data_sets)
     # print(comparison)
-    save_evaluation2_comparison(comparison, results_path)
-    save_evaluation2_summary(summary, results_path)
-    plot_evaluation2_comparison(comparison, plots_path)
+    save_custom_vs_exhaustive_comparison(comparison, results_path)
+    save_custom_vs_exhaustive_summary(summary, results_path)
+    if plot:
+        plot_custom_vs_exhaustive_comparison(comparison, plots_path)

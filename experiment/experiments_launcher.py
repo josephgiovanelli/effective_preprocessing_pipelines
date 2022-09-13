@@ -128,10 +128,10 @@ def launch_experiments(args):
                 try:
                     runtime = details["setup"]["runtime"]
                     scenario["status"] = "Ok"
-                    if args.experiment == "evaluation1":
+                    if args.experiment == "exhaustive_prototypes":
                         runtime *= 24
                     if (
-                        args.experiment == "evaluation2_3"
+                        args.experiment == "custom_prototypes"
                         and args.mode == "pipeline_algorithm"
                     ):
                         runtime *= 4
@@ -193,11 +193,11 @@ def launch_experiments(args):
 
                 # Run experiments regarding the PC and EA workflows
                 if (
-                    args.experiment == "pipeline_construction"
+                    args.experiment == "prototype_construction"
                     or args.experiment == "pipeline_impact"
                 ):
 
-                    if args.experiment == "pipeline_construction":
+                    if args.experiment == "prototype_construction":
                         pipeline = args.mode.split("_")
                     else:
 
@@ -256,7 +256,7 @@ def launch_experiments(args):
                         args.toy_example,
                     )
                 # Run experiments regarding the EE workflow (exhaustive experiments)
-                elif args.experiment == "evaluation1":
+                elif args.experiment == "exhaustive_prototypes":
                     # Get the exhaustive prototypes
                     pipelines = framework_table_pipelines()
 
@@ -344,7 +344,7 @@ def launch_experiments(args):
                         print("I didn't manage to write")
 
                 # Run the experiments of the EE workflow (effective experiments)
-                elif args.experiment == "evaluation2_3":
+                elif args.experiment == "custom_prototypes":
 
                     if args.mode == "pipeline_algorithm":
 

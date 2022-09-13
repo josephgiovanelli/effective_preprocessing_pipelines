@@ -6,22 +6,16 @@ echo ""
 
 # SCENARIO GENERETOR
 echo "Creating scenarios"
-python experiment/scenario_generator.py -exp evaluation1 $1
-python experiment/scenario_generator.py -exp evaluation2_3 $1
-echo -e "\tDone."
+python experiment/scenario_generator.py -exp exhaustive_prototypes $1
+python experiment/scenario_generator.py -exp custom_prototypes $1
 
 # EXPERIMENTS
-echo "Running experiments"
-echo -e "\tExhaustive prototypes + ML algorithms"
-## Evaluation 1
-python experiment/experiments_launcher.py -exp evaluation1 $1
-## Evaluation 2 and 3
-echo -e "\tOnly ML algorithms"
-python experiment/experiments_launcher.py -exp evaluation2_3 -mode algorithm $1
-echo -e "\tEffective prototypes + ML algorithms"
-python experiment/experiments_launcher.py -exp evaluation2_3 -mode pipeline_algorithm $1
+echo "EE01. SMBO on ML algorithms"
+python experiment/experiments_launcher.py -exp custom_prototypes -mode algorithm $1
+echo "EE02-EE04. SMBO on effective pre-processing prototypes and ML algorithms"
+python experiment/experiments_launcher.py -exp custom_prototypes -mode pipeline_algorithm $1
+echo "EE05-EE07. SMBO on exhaustive pre-processing prototypes and ML algorithms"
+python experiment/experiments_launcher.py -exp exhaustive_prototypes $1
 
-# PLOTTING
-echo "Plotting"
-python experiment/results_processor.py -exp evaluation $1
-echo -e "\tDone."
+# POST-PROCESSING
+python experiment/results_processor.py -exp empirical_evaluation $1

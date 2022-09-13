@@ -906,11 +906,11 @@ def experiments_summarizer(pipeline, toy):
         path = os.path.join(RAW_RESULT_PATH, "toy")
     else: 
         path = os.path.join(RAW_RESULT_PATH, "paper")
-    input_path = os.path.join(path, "pipeline_construction", '_'.join(pipeline))
+    input_path = os.path.join(path, "prototype_construction", '_'.join(pipeline))
     result_path = create_directory(input_path, 'summary')
     categories = create_possible_categories(pipeline)
     filtered_data_sets = get_filtered_datasets(
-        experiment='pipeline_construction', toy=toy)
+        experiment='prototype_construction', toy=toy)
 
     simple_results, grouped_by_algorithm_results, grouped_by_data_set_result, summary = extract_results(input_path,
                                                                                                         filtered_data_sets,
@@ -956,12 +956,12 @@ def experiments_summarizer_10x4cv(pipeline, toy):
         path = os.path.join(RAW_RESULT_PATH, "toy")
     else: 
         path = os.path.join(RAW_RESULT_PATH, "paper")
-    input_path = os.path.join(path, "pipeline_construction", '_'.join(pipeline))
+    input_path = os.path.join(path, "prototype_construction", '_'.join(pipeline))
     result_path = create_directory(input_path, 'summary')
     result_path = create_directory(result_path, '10x4cv')
     categories = create_possible_categories(pipeline)
     filtered_data_sets = get_filtered_datasets(
-        experiment='pipeline_construction', toy=toy)
+        experiment='prototype_construction', toy=toy)
     folds = 3 if toy else 4
     repeat = 10
 
@@ -1067,8 +1067,8 @@ def graph_maker(toy):
     else:
         input_path = os.path.join(RAW_RESULT_PATH, "paper")
         result_path = os.path.join(ARTIFACTS_PATH, "paper")
-    input_path = os.path.join(input_path, "pipeline_construction")
-    result_path = create_directory(result_path, "pipeline_construction")
+    input_path = os.path.join(input_path, "prototype_construction")
+    result_path = create_directory(result_path, "prototype_construction")
 
     data = {}
     data[0] = {'title': r'$T_1$ = Feat. Eng., $T_2$ = Normalize', 'data': pd.read_csv(os.path.join(input_path, 'features_normalize', 'summary', 'algorithms_summary', 'summary.csv')).reindex([1, 0, 2, 3])}
@@ -1123,15 +1123,15 @@ def graph_maker_10x4cv(toy):
     logging.getLogger('matplotlib.font_manager').disabled = True
     cv_file_name = 'summary_with_mean_.csv'
     if toy:
-        pipeline_construction_path = os.path.join(RAW_RESULT_PATH, "toy")
+        prototype_construction_path = os.path.join(RAW_RESULT_PATH, "toy")
         plot_path = os.path.join(ARTIFACTS_PATH, "toy")
     else:
-        pipeline_construction_path = os.path.join(RAW_RESULT_PATH, "paper")
+        prototype_construction_path = os.path.join(RAW_RESULT_PATH, "paper")
         plot_path = os.path.join(ARTIFACTS_PATH, "paper")
-    pipeline_construction_path = os.path.join(pipeline_construction_path, 'pipeline_construction')
-    plot_path = os.path.join(plot_path, 'pipeline_construction')
+    prototype_construction_path = os.path.join(prototype_construction_path, 'prototype_construction')
+    plot_path = os.path.join(plot_path, 'prototype_construction')
 
-    fn_path = os.path.join(pipeline_construction_path, 'features_normalize')
+    fn_path = os.path.join(prototype_construction_path, 'features_normalize')
     fn_cv_path = os.path.join(fn_path, 'summary', '10x4cv')
     try:
         fn_df = pd.read_csv(os.path.join(fn_cv_path, cv_file_name))
@@ -1139,7 +1139,7 @@ def graph_maker_10x4cv(toy):
     except:
         pass
 
-    df_path = os.path.join(pipeline_construction_path, 'discretize_features')
+    df_path = os.path.join(prototype_construction_path, 'discretize_features')
     df_cv_path = os.path.join(df_path, 'summary', '10x4cv')
     try:
         df_df = pd.read_csv(os.path.join(df_cv_path, cv_file_name))
@@ -1189,7 +1189,8 @@ def run_p_binom_test(toy):
         stdout=subprocess.DEVNULL, 
         stderr=subprocess.DEVNULL)
 
-def pipeline_construction(toy_example):
+def prototype_construction(toy_example):
+    print("PC02. Perform significance test over the results")
     experiments_summarizer(
         pipeline=['features', 'rebalance'], toy=toy_example)
     experiments_summarizer(
@@ -1199,6 +1200,7 @@ def pipeline_construction(toy_example):
     experiments_summarizer(
         pipeline=['discretize', 'rebalance'], toy=toy_example)
 
+    print("PC03. Validate results with 10x4 CV")
     experiments_summarizer_10x4cv(
         pipeline=['features', 'rebalance'], toy=toy_example)
     experiments_summarizer_10x4cv(
@@ -1208,6 +1210,8 @@ def pipeline_construction(toy_example):
     experiments_summarizer_10x4cv(
         pipeline=['discretize', 'rebalance'], toy=toy_example)
 
+    print("PC04. Select winning order for each pair (using results from PC02 and PC03")
+    print("PC05. Combine ordered pairs of transformations")
     graph_maker(toy_example)
     graph_maker_10x4cv(toy_example)
     run_p_binom_test(toy_example)

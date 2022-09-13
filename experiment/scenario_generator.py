@@ -92,7 +92,7 @@ def generate_scenarios(args):
             algorithm_acronym = "".join([c for c in algorithm if c.isupper()]).lower()
 
             # If it is evaluation
-            if args.experiment == "evaluation2_3":
+            if args.experiment == "custom_prototypes":
                 experiment_steps = ["algorithm", "pipeline_algorithm"]
                 # We set the scenario according to the mode (here experiment_step)
                 for experiment_step in experiment_steps:
@@ -115,7 +115,7 @@ def generate_scenarios(args):
                     )
                     __write_scenario(path, scenario)
             else:
-                if args.experiment == "evaluation1":
+                if args.experiment == "exhaustive_prototypes":
                     if args.toy_example:
                         scenario["policy"]["step_pipeline"] = 5
                     else:

@@ -21,15 +21,15 @@ def diff(first, second):
     return [item for item in first if item not in second]
 
 
-def transformation_analysis(evaluation2_3_results_path, new_results_path, plots_path):
+def transformation_analysis(custom_prototypes_results_path, new_results_path, plots_path):
     # configure environment
-    input_auto = os.path.join(evaluation2_3_results_path, "pipeline_algorithm")
+    input_auto = os.path.join(custom_prototypes_results_path, "pipeline_algorithm")
     discretize_count, normalize_count = {}, {}
     results_map = pd.DataFrame()
     for algorithm in ["nb", "knn", "rf"]:
         discretize_count[algorithm], normalize_count[algorithm] = 0, 0
-        df = pd.read_csv(os.path.join(evaluation2_3_results_path,
-                         "summary", "evaluation3", algorithm + ".csv"))
+        df = pd.read_csv(os.path.join(custom_prototypes_results_path,
+                         "summary", "custom_vs_ml_algorithm", algorithm + ".csv"))
         #df = df[(df["pa_percentage"] == 0.5)]
         ids = list(df["dataset"])
 
@@ -57,7 +57,7 @@ def transformation_analysis(evaluation2_3_results_path, new_results_path, plots_
                             pass
 
     results_map.to_csv(os.path.join(
-        new_results_path, "pp_pipeline_operator_study.csv"), index=False)
+        new_results_path, "transformations.csv"), index=False)
 
     result = results_map.groupby(
         ['algorithm', 'transformation', 'operator']).count()
@@ -178,14 +178,14 @@ def transformation_analysis(evaluation2_3_results_path, new_results_path, plots_
                 bbox_extra_artists=(lgd, text), bbox_inches='tight')
 
 
-def physical_pipelines_analysis(evaluation2_3_results_path, new_results_path, plots_path):
+def physical_pipelines_analysis(custom_prototypes_results_path, new_results_path, plots_path):
     # configure environment
-    input_auto = os.path.join(evaluation2_3_results_path, "pipeline_algorithm")
+    input_auto = os.path.join(custom_prototypes_results_path, "pipeline_algorithm")
     results_map = pd.DataFrame()
     for algorithm in ["knn", "nb", "rf"]:
 
-        df = pd.read_csv(os.path.join(evaluation2_3_results_path,
-                         "summary", "evaluation3", algorithm + ".csv"))
+        df = pd.read_csv(os.path.join(custom_prototypes_results_path,
+                         "summary", "custom_vs_ml_algorithm", algorithm + ".csv"))
         ids = list(df["dataset"])
 
         files = [f for f in listdir(input_auto) if isfile(join(input_auto, f))]
@@ -234,7 +234,7 @@ def physical_pipelines_analysis(evaluation2_3_results_path, new_results_path, pl
                         {"algorithm": [algorithm], "pipeline": [pipeline_conf]}), ignore_index=True)
 
     results_map.to_csv(os.path.join(
-        new_results_path, "pp_pipeline_study2.csv"), index=False)
+        new_results_path, "physical_pipelines.csv"), index=False)
     results_map = results_map.pivot_table(
         index='algorithm', columns='pipeline', aggfunc=len, fill_value=0)
     results_map["sum"] = results_map.sum(axis=1)
@@ -245,7 +245,7 @@ def physical_pipelines_analysis(evaluation2_3_results_path, new_results_path, pl
     results_map = results_map.reindex(["nb", "knn", "rf"])
     results_map = results_map.reset_index()
     results_map.to_csv(os.path.join(
-        new_results_path, "pp_pipeline_study2_pivoted.csv"), index=False)
+        new_results_path, "physical_pipelines_pivoted.csv"), index=False)
     results_map = results_map.rename(columns={
         'DF': r'$D \to F$',
         'RF': r'$R \to F$',
@@ -310,23 +310,23 @@ def physical_pipelines_analysis(evaluation2_3_results_path, new_results_path, pl
                 bbox_extra_artists=(lgd, text), bbox_inches='tight')
 
 
-def prototypes_impact_analysis(evaluation1_results_path, evaluation2_3_results_path, plots_path, toy):
+def prototypes_impact_analysis(exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, toy):
     filtered_data_sets = ['_'.join(i) for i in list(itertools.product(
         ["knn", "nb", "rf"], [str(integer) for integer in get_filtered_datasets("exploratory_analysis", toy)]))]
 
     results_pipelines = load_results_pipelines(
-        evaluation1_results_path, filtered_data_sets)
+        exhaustive_prototypes_results_path, filtered_data_sets)
 
-    evaluation2_3_pipeline_algorithm_results_path = os.path.join(
-        evaluation2_3_results_path, "pipeline_algorithm")
+    custom_prototypes_pipeline_algorithm_results_path = os.path.join(
+        custom_prototypes_results_path, "pipeline_algorithm")
     results_auto = load_results_auto(
-        evaluation2_3_pipeline_algorithm_results_path, filtered_data_sets)
+        custom_prototypes_pipeline_algorithm_results_path, filtered_data_sets)
     # print(results_auto)
     for algorithm in results_auto.keys():
         for dataset in results_auto[algorithm].keys():
             if results_auto[algorithm][dataset][1] == 0:
                 evaluation_3 = pd.read_csv(os.path.join(
-                    evaluation2_3_results_path, "summary", "evaluation3", algorithm + ".csv"))
+                    custom_prototypes_results_path, "summary", "custom_vs_ml_algorithm", algorithm + ".csv"))
                 evaluation_3 = evaluation_3.set_index(['dataset'])
                 results_auto[algorithm][dataset] = (
                     results_auto[algorithm][dataset][0], evaluation_3.loc[int(dataset)]["baseline"])
@@ -367,18 +367,18 @@ def get_paths(toy):
     else:
         results_path = os.path.join(RAW_RESULT_PATH, "paper")
         plots_path = os.path.join(ARTIFACTS_PATH, "paper")
-    evaluation2_3_results_path = os.path.join(results_path, "evaluation2_3")
-    evaluation1_results_path = os.path.join(results_path, "evaluation1")
+    custom_prototypes_results_path = os.path.join(results_path, "custom_prototypes")
+    exhaustive_prototypes_results_path = os.path.join(results_path, "exhaustive_prototypes")
     plots_path = create_directory(plots_path, "exploratory_analysis")
     new_results_path = create_directory(results_path, "exploratory_analysis")
-    return evaluation1_results_path, evaluation2_3_results_path, plots_path, new_results_path
+    return exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, new_results_path
 
 
-def meta_learning_input_preparation(results_path, evaluation2_3_results_path):
-    evaluation2_3_pipeline_algorithm_results_path = os.path.join(
-        evaluation2_3_results_path, "pipeline_algorithm")
-    evaluation3_summary_results_path = os.path.join(
-        evaluation2_3_results_path, "summary", "evaluation3")
+def meta_learning_input_preparation(results_path, custom_prototypes_results_path):
+    custom_prototypes_pipeline_algorithm_results_path = os.path.join(
+        custom_prototypes_results_path, "pipeline_algorithm")
+    custom_vs_ml_algorithm_summary_results_path = os.path.join(
+        custom_prototypes_results_path, "summary", "custom_vs_ml_algorithm")
 
     # Meta-features Loading
     all_classification = pd.read_csv(
@@ -397,7 +397,7 @@ def meta_learning_input_preparation(results_path, evaluation2_3_results_path):
     # Results Loading
     for algorithm in algorithm_acronyms:
         baseline_results[algorithm] = pd.read_csv(os.path.join(
-            evaluation3_summary_results_path, algorithm + '.csv'))
+            custom_vs_ml_algorithm_summary_results_path, algorithm + '.csv'))
         baseline_results[algorithm].rename(
             columns={"dataset": "ID"}, inplace=True)
 
@@ -405,17 +405,17 @@ def meta_learning_input_preparation(results_path, evaluation2_3_results_path):
     for algorithm in algorithm_acronyms:
         results_map[algorithm] = pd.DataFrame()
         df = pd.read_csv(os.path.join(
-            evaluation3_summary_results_path, algorithm + ".csv"))
+            custom_vs_ml_algorithm_summary_results_path, algorithm + ".csv"))
         ids = list(df["dataset"])
 
-        files = [f for f in listdir(evaluation2_3_pipeline_algorithm_results_path) if isfile(
-            join(evaluation2_3_pipeline_algorithm_results_path, f))]
+        files = [f for f in listdir(custom_prototypes_pipeline_algorithm_results_path) if isfile(
+            join(custom_prototypes_pipeline_algorithm_results_path, f))]
         results = [f[:-5] for f in files if f[-4:] == 'json']
 
         for dataset in ids:
             acronym = algorithm + "_" + str(dataset)
             if acronym in results:
-                with open(os.path.join(evaluation2_3_pipeline_algorithm_results_path, acronym + '.json')) as json_file:
+                with open(os.path.join(custom_prototypes_pipeline_algorithm_results_path, acronym + '.json')) as json_file:
                     data = json.load(json_file)
 
                     try:
@@ -502,15 +502,20 @@ def run_meta_learning(toy):
 
 def exploratory_analysis(toy_example):
     args = parse_args()
-    evaluation1_results_path, evaluation2_3_results_path, plots_path, new_results_path = get_paths(
+    exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, new_results_path = get_paths(
         toy_example)
 
+    print("EA04. Perform exploratory analysis: prototypes versus physical pipeline")
+    print("EA05. Perform exploratory analysis: plot results")
     prototypes_impact_analysis(
-        evaluation1_results_path, evaluation2_3_results_path, plots_path, toy_example)
-    transformation_analysis(evaluation2_3_results_path,
+        exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, toy_example)
+    transformation_analysis(custom_prototypes_results_path,
                             new_results_path, plots_path)
     physical_pipelines_analysis(
-        evaluation2_3_results_path, new_results_path, plots_path)
+        custom_prototypes_results_path, new_results_path, plots_path)
+    print("EA06. Extract meta-features from datasets")
     meta_learning_input_preparation(
-        new_results_path, evaluation2_3_results_path)
+        new_results_path, custom_prototypes_results_path)
+    print("EA07. Perform meta-learning")
     run_meta_learning(toy_example)
+    print("EA08. Plot and check the significance of the results")

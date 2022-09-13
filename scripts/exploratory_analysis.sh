@@ -1,28 +1,31 @@
 #!/bin/bash
 
 echo ""
-echo "### EXPLORATORY ANALYSIS (EA): Pipeline impact ###"
+echo "### EXPLORATORY ANALYSIS (EA) ###"
 echo ""
 
 # SCENARIO GENERETOR
-echo "Creating scenarios..."
+echo "Creating scenarios"
 python experiment/scenario_generator.py -exp pipeline_impact $1
-echo -e "\tDone."
+python experiment/scenario_generator.py -exp exhaustive_prototypes $1
+python experiment/scenario_generator.py -exp custom_prototypes $1
 
 # EXPERIMENTS
-echo "Running experiments..."
+echo "EA01. SMBO on fixed pre-processing prototypes and ML algorithms"
 python experiment/experiments_launcher.py -exp pipeline_impact $1
 
-# PLOTTING
-echo "Plotting..."
+# POST-PROCESSING
+echo "EA02. Plot pipeline impact"
 python experiment/results_processor.py -exp pipeline_impact $1
-echo -e "\tDone."
 
-echo ""
-echo "### EXPLORATORY ANALYSIS (EA): Statistics and meta-learning ###"
-echo ""
+# EXPERIMENTS
+echo "EA03. SMBO on exhaustive/custom prototypes and ML algorithms"
+echo -e "\t SMBO on ML algorithms"
+python experiment/experiments_launcher.py -exp custom_prototypes -mode algorithm $1
+echo -e "\tSMBO on custom prototypes and ML algorithms"
+python experiment/experiments_launcher.py -exp custom_prototypes -mode pipeline_algorithm $1
+echo -e "\tSMBO on exhaustive prototypes and ML algorithms"
+python experiment/experiments_launcher.py -exp exhaustive_prototypes $1
 
-# EXPLORATORY ANALYSIS
-echo "Performing the analysis..."
+# POST-PROCESSING
 python experiment/results_processor.py -exp exploratory_analysis $1
-echo -e "\tDone."
