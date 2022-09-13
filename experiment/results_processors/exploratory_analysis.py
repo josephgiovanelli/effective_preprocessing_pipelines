@@ -12,7 +12,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .emprical_evaluation import load_results_pipelines, load_results_auto
+from .empirical_evaluation import load_results_pipelines, load_results_auto
 from utils.common import *
 
 
