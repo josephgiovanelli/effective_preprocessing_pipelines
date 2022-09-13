@@ -5,8 +5,9 @@ echo "### PROTOTYPE CONSTRUCTION (PC) ###"
 echo ""
 
 # SCENARIO GENERETOR
-echo "Creating scenarios"
+echo "Creating scenarios..."
 python experiment/scenario_generator.py -exp prototype_construction $1
+echo -e "\tDone."
 
 # EXPERIMENTS
 echo "PC01. Run experiments with pairs of transformations"

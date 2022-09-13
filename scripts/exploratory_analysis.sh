@@ -5,10 +5,11 @@ echo "### EXPLORATORY ANALYSIS (EA) ###"
 echo ""
 
 # SCENARIO GENERETOR
-echo "Creating scenarios"
+echo "Creating scenarios..."
 python experiment/scenario_generator.py -exp pipeline_impact $1
 python experiment/scenario_generator.py -exp exhaustive_prototypes $1
 python experiment/scenario_generator.py -exp custom_prototypes $1
+echo -e "\tDone."
 
 # EXPERIMENTS
 echo "EA01. SMBO on fixed pre-processing prototypes and ML algorithms"

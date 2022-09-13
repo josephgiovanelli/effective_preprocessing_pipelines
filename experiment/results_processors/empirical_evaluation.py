@@ -629,6 +629,9 @@ def exhaustive_prototypes(toy, plot):
 def custom_vs_exhaustive(toy, plot):
     if plot:
         print("EE06. Compare and plot the results from EE04 and EE05")
+        print("\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
+        print("\t(We do not provide the status bar because it really depends on the memory usage, please do not cancel the execution)")
+
     # configure environment
     if toy:
         results_path = os.path.join(RAW_RESULT_PATH, "toy")

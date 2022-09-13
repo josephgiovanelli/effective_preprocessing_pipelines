@@ -5,9 +5,10 @@ echo "### EXPERIMENTAL EVALUATION (EE) ###"
 echo ""
 
 # SCENARIO GENERETOR
-echo "Creating scenarios"
+echo "Creating scenarios..."
 python experiment/scenario_generator.py -exp exhaustive_prototypes $1
 python experiment/scenario_generator.py -exp custom_prototypes $1
+echo -e "\tDone."
 
 # EXPERIMENTS
 echo "EE01. SMBO on ML algorithms"

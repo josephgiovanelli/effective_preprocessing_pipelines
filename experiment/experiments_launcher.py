@@ -99,6 +99,11 @@ def launch_experiments(args):
     result_list = [p for p in os.listdir(result_path) if ".json" in p]
     scenarios = {}
 
+    print("\t\tChecking scenarios with results...")
+    if args.experiment == "exhaustive_prototypes" and args.toy_example == False:
+        print("\t\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
+        print("\t\t(We do not provide the status bar because it really depends on the memory usage, please do not cancel the execution)")
+
     # Determine which one have no result files
     for scenario in scenario_list:
         base_scenario = scenario.split(".yaml")[0]
