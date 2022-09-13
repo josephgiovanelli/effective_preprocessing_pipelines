@@ -462,8 +462,9 @@ def exploratory_analysis(toy_example):
 
     print("EA04. Perform exploratory analysis: prototypes versus physical pipeline")
     print("EA05. Plot results")
-    print("\n\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
-    print("\t(We do not provide the status bar because it really depends on the memory usage, please do not cancel the execution)\n")
+    if not toy:
+        print("\n\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
+        print("\t(We do not provide the status bar because it really depends on the memory usage, please do not cancel the execution)\n")
     prototypes_impact_analysis(exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, toy_example)
     transformation_analysis(custom_prototypes_results_path, new_results_path, plots_path)
     physical_pipelines_analysis(custom_prototypes_results_path, new_results_path, plots_path)
