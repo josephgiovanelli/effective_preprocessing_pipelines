@@ -16,7 +16,7 @@ echo -e "EA01. SMBO on fixed pre-processing prototypes and ML algorithms\n"
 python experiment/experiments_launcher.py -exp pipeline_impact $1
 
 # POST-PROCESSING
-echo "EA02. Plot pipeline impact\n"
+echo -e "EA02. Plot pipeline impact\n"
 python experiment/results_processor.py -exp pipeline_impact $1
 
 # EXPERIMENTS
