@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo ""
-echo "### PROTOTYPE CONSTRUCTION (PC) ###"
+echo -e "\n\n### PROTOTYPE CONSTRUCTION (PC) ###"
 echo ""
 
 # SCENARIO GENERETOR
@@ -10,7 +10,7 @@ python experiment/scenario_generator.py -exp prototype_construction $1
 echo -e "\tDone.\n"
 
 # EXPERIMENTS
-echo "PC01. Run experiments with pairs of transformations\n"
+echo -e "PC01. Run experiments with pairs of transformations\n"
 ## Features Rebalance
 echo -e "\tFeatures - Rebalance\n"
 python experiment/experiments_launcher.py -exp prototype_construction -mode features_rebalance $1

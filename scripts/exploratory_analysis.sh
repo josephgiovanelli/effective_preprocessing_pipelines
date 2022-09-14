@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo ""
-echo "### EXPLORATORY ANALYSIS (EA) ###"
+echo -e "\n\n### EXPLORATORY ANALYSIS (EA) ###"
 echo ""
 
 # SCENARIO GENERETOR
@@ -12,7 +12,7 @@ python experiment/scenario_generator.py -exp custom_prototypes $1
 echo -e "\tDone.\n"
 
 # EXPERIMENTS
-echo "EA01. SMBO on fixed pre-processing prototypes and ML algorithms\n"
+echo -e "EA01. SMBO on fixed pre-processing prototypes and ML algorithms\n"
 python experiment/experiments_launcher.py -exp pipeline_impact $1
 
 # POST-PROCESSING
@@ -20,7 +20,7 @@ echo "EA02. Plot pipeline impact\n"
 python experiment/results_processor.py -exp pipeline_impact $1
 
 # EXPERIMENTS
-echo "EA03. SMBO on exhaustive/custom prototypes and ML algorithms\n"
+echo -e "EA03. SMBO on exhaustive/custom prototypes and ML algorithms\n"
 echo -e "\t SMBO on ML algorithms\n"
 python experiment/experiments_launcher.py -exp custom_prototypes -mode algorithm $1
 echo -e "\tSMBO on custom prototypes and ML algorithms\n"
