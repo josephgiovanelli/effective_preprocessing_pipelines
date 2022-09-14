@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo ""
-echo "\n\n### EXPLORATORY ANALYSIS (EA) ###"
+echo "### EXPLORATORY ANALYSIS (EA) ###"
 echo ""
 
 # SCENARIO GENERETOR
