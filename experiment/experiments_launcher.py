@@ -70,7 +70,7 @@ def launch_experiments(args):
     """
 
     
-    print("\n\t\tChecking scenarios with results...\n")
+    print("\t\tChecking scenarios with results...\n")
     if ((args.experiment == "exhaustive_prototypes" or 
         (args.experiment == "custom_prototypes" and args.mode == "pipeline_algorithm")) and 
         args.toy_example == False):
@@ -176,12 +176,10 @@ def launch_experiments(args):
     print(f"\t\tnum scenarios to run: {len(to_run)}")
     if len(to_run) > 0:
         print(
-            "\t\t\testimated time: {} ({}s)".format(
+            "\t\t\testimated time: {} ({}s)\n".format(
                 datetime.timedelta(seconds=total_runtime * 2), total_runtime * 2
             )
         )
-    else:
-        print()
 
     # Run experiment one by one
     if to_run.values():
@@ -444,7 +442,8 @@ def launch_experiments(args):
                 else:
                     raise Exception("unvalid experiment option")
                 pbar.update()
-
+    
+    print()
 
 if __name__ == "__main__":
     args = parse_args()
