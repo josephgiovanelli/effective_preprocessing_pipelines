@@ -591,6 +591,7 @@ def plot_custom_vs_exhaustive_comparison(comparison, result_path):
 def exhaustive_prototypes(toy, plot):
     if plot:
         print("EE08. Check for the existence of a universal pipeline prototype")
+
     # configure environment
     if toy:
         results_path = os.path.join(RAW_RESULT_PATH, "toy")
@@ -628,10 +629,12 @@ def exhaustive_prototypes(toy, plot):
 
 
 def custom_vs_exhaustive(toy, plot):
-    if plot and not toy:
+    if plot:
         print("EE06. Compare and plot the results from EE04 and EE05")
+        
+    if not toy:
         print("\n\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
-        print("\t(We do not provide the status bar because it really depends on the memory usage, please do not cancel the execution)\n")
+        print("\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n")
 
     # configure environment
     if toy:
@@ -681,6 +684,9 @@ def custom_vs_exhaustive(toy, plot):
 def custom_vs_ml_algorithm(toy, plot):
     if plot:
         print("EE03. Compare and plot the results from EE01 and EE02")
+    else:
+        print("EA04. Perform exploratory analysis: prototypes versus physical pipeline")
+
     # configure environment
     if toy:
         results_path = os.path.join(RAW_RESULT_PATH, "toy")

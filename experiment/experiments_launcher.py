@@ -73,7 +73,7 @@ def launch_experiments(args):
     print("\t\tChecking scenarios with results...")
     if args.experiment == "exhaustive_prototypes" and args.toy_example == False:
         print("\n\t\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
-        print("\t\t(We do not provide the status bar because it really depends on the memory usage, please do not cancel the execution)\n")
+        print("\t\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n")
 
     # Get scenario and result path
     if args.toy_example == True:
