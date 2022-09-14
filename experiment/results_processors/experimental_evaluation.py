@@ -590,7 +590,12 @@ def plot_custom_vs_exhaustive_comparison(comparison, result_path):
 
 def exhaustive_prototypes(toy, plot):
     if plot:
-        print("EE08. Check for the existence of a universal pipeline prototype")
+        print("EE08. Check for the existence of a universal pipeline prototype\n")
+        
+        if not toy:
+            print("\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
+            print("\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n")
+
 
     # configure environment
     if toy:
@@ -608,7 +613,7 @@ def exhaustive_prototypes(toy, plot):
                 ["knn", "nb", "rf"],
                 [
                     str(integer)
-                    for integer in get_filtered_datasets("empirical_evaluation", toy)
+                    for integer in get_filtered_datasets("experimental_evaluation", toy)
                 ],
             )
         )
@@ -630,11 +635,11 @@ def exhaustive_prototypes(toy, plot):
 
 def custom_vs_exhaustive(toy, plot):
     if plot:
-        print("EE06. Compare and plot the results from EE04 and EE05")
+        print("EE06. Compare and plot the results from EE04 and EE05\n")
         
-    if not toy:
-        print("\n\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
-        print("\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n")
+        if not toy:
+            print("\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
+            print("\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n")
 
     # configure environment
     if toy:
@@ -661,7 +666,7 @@ def custom_vs_exhaustive(toy, plot):
                 ["knn", "nb", "rf"],
                 [
                     str(integer)
-                    for integer in get_filtered_datasets("empirical_evaluation", toy)
+                    for integer in get_filtered_datasets("experimental_evaluation", toy)
                 ],
             )
         )
@@ -683,9 +688,13 @@ def custom_vs_exhaustive(toy, plot):
 
 def custom_vs_ml_algorithm(toy, plot):
     if plot:
-        print("EE03. Compare and plot the results from EE01 and EE02")
+        print("EE03. Compare and plot the results from EE01 and EE02\n")
     else:
-        print("EA04. Perform exploratory analysis: prototypes versus physical pipeline")
+        print("EA04. Perform exploratory analysis: prototypes versus physical pipeline\n")
+        
+    if not toy:
+        print("\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
+        print("\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n")
 
     # configure environment
     if toy:
@@ -707,7 +716,7 @@ def custom_vs_ml_algorithm(toy, plot):
                 ["knn", "nb", "rf"],
                 [
                     str(integer)
-                    for integer in get_filtered_datasets("empirical_evaluation", toy)
+                    for integer in get_filtered_datasets("experimental_evaluation", toy)
                 ],
             )
         )

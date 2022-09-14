@@ -1631,20 +1631,20 @@ def run_p_binom_test(toy):
 
 
 def prototype_construction(toy_example):
-    print("PC02. Perform significance test over the results")
+    print("PC02. Perform significance test over the results\n")
     experiments_summarizer(pipeline=["features", "rebalance"], toy=toy_example)
     experiments_summarizer(pipeline=["discretize", "features"], toy=toy_example)
     experiments_summarizer(pipeline=["features", "normalize"], toy=toy_example)
     experiments_summarizer(pipeline=["discretize", "rebalance"], toy=toy_example)
 
-    print("PC03. Validate results with 10x4 CV")
+    print("PC03. Validate results with 10x4 CV\n")
     experiments_summarizer_10x4cv(pipeline=["features", "rebalance"], toy=toy_example)
     experiments_summarizer_10x4cv(pipeline=["discretize", "features"], toy=toy_example)
     experiments_summarizer_10x4cv(pipeline=["features", "normalize"], toy=toy_example)
     experiments_summarizer_10x4cv(pipeline=["discretize", "rebalance"], toy=toy_example)
 
-    print("PC04. Select winning order for each pair (using results from PC02 and PC03")
-    print("PC05. Combine ordered pairs of transformations")
+    print("PC04. Select winning order for each pair (using results from PC02 and PC03)\n")
+    print("PC05. Combine ordered pairs of transformations\n")
     graph_maker(toy_example)
     graph_maker_10x4cv(toy_example)
     run_p_binom_test(toy_example)

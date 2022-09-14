@@ -171,7 +171,7 @@ It might be possible that your operating system needs the authorization to run t
 ***Possible output***:
 ```
 ./wrapper_experiments.sh: ./scripts/prototype_construction.sh: /bin/bash: bad interpreter: Permission denied
-./wrapper_experiments.sh: ./scripts/empirical_evaluation.sh: /bin/bash: bad interpreter: Permission denied
+./wrapper_experiments.sh: ./scripts/experimental_evaluation.sh: /bin/bash: bad interpreter: Permission denied
 ./wrapper_experiments.sh: ./scripts/exploratory_analysis.sh: /bin/bash: bad interpreter: Permission denied
 ```
 

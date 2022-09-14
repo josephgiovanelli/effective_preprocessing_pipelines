@@ -2,7 +2,7 @@ from __future__ import print_function
 from utils.common import *
 from results_processors.pipeline_impact import pipeline_impact
 from results_processors.prototype_construction import prototype_construction
-from results_processors.empirical_evaluation import exhaustive_prototypes, custom_vs_exhaustive, custom_vs_ml_algorithm
+from results_processors.experimental_evaluation import exhaustive_prototypes, custom_vs_exhaustive, custom_vs_ml_algorithm
 from results_processors.exploratory_analysis import exploratory_analysis
 import warnings
 
@@ -23,7 +23,7 @@ def process_results(args):
         pipeline_impact(args.toy_example)
     elif args.experiment == "prototype_construction":
         prototype_construction(args.toy_example)
-    elif args.experiment == "empirical_evaluation":
+    elif args.experiment == "experimental_evaluation":
         custom_vs_ml_algorithm(args.toy_example, plot=True)
         custom_vs_exhaustive(args.toy_example, plot=True)
         exhaustive_prototypes(args.toy_example, plot=True)

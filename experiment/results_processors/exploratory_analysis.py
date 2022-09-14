@@ -12,7 +12,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .empirical_evaluation import load_results_pipelines, load_results_auto
+from .experimental_evaluation import load_results_pipelines, load_results_auto
 from utils.common import *
 
 
@@ -460,15 +460,15 @@ def run_meta_learning(toy):
 def exploratory_analysis(toy_example):
     exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, new_results_path = get_paths(toy_example)
 
-    print("EA05. Plot results")
+    print("EA05. Plot results\n")
     if not toy_example:
-        print("\n\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
+        print("\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
         print("\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n")
     prototypes_impact_analysis(exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, toy_example)
     transformation_analysis(custom_prototypes_results_path, new_results_path, plots_path)
     physical_pipelines_analysis(custom_prototypes_results_path, new_results_path, plots_path)
-    print("EA06. Extract meta-features from datasets")
+    print("EA06. Extract meta-features from datasets\n")
     meta_learning_input_preparation(new_results_path, custom_prototypes_results_path)
-    print("EA07. Perform meta-learning")
+    print("EA07. Perform meta-learning\n")
     run_meta_learning(toy_example)
-    print("EA08. Plot and check the significance of the results")
+    print("EA08. Plot and check the significance of the results\n")

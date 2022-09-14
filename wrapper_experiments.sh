@@ -4,4 +4,4 @@
 
 ./scripts/prototype_construction.sh $1
 
-./scripts/empirical_evaluation.sh $1
+./scripts/experimental_evaluation.sh $1

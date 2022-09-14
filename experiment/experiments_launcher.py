@@ -70,9 +70,11 @@ def launch_experiments(args):
     """
 
     
-    print("\t\tChecking scenarios with results...")
-    if args.experiment == "exhaustive_prototypes" and args.toy_example == False:
-        print("\n\t\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
+    print("\n\t\tChecking scenarios with results...\n")
+    if ((args.experiment == "exhaustive_prototypes" or 
+        (args.experiment == "custom_prototypes" and args.mode == "pipeline_algorithm")) and 
+        args.toy_example == False):
+        print("\t\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
         print("\t\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n")
 
     # Get scenario and result path
@@ -178,6 +180,8 @@ def launch_experiments(args):
                 datetime.timedelta(seconds=total_runtime * 2), total_runtime * 2
             )
         )
+    else:
+        print()
 
     # Run experiment one by one
     if to_run.values():
