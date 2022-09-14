@@ -69,6 +69,12 @@ def launch_experiments(args):
         args: taken from utils.common.parse_args
     """
 
+    
+    print("\t\tChecking scenarios with results...")
+    if args.experiment == "exhaustive_prototypes" and args.toy_example == False:
+        print("\n\t\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
+        print("\t\t(We do not provide the status bar because it really depends on the memory usage, please do not cancel the execution)\n")
+
     # Get scenario and result path
     if args.toy_example == True:
         scenario_path = create_directory(SCENARIO_PATH, "toy")
@@ -98,11 +104,6 @@ def launch_experiments(args):
     scenario_list = [p for p in os.listdir(scenario_path) if ".yaml" in p]
     result_list = [p for p in os.listdir(result_path) if ".json" in p]
     scenarios = {}
-
-    print("\t\tChecking scenarios with results...")
-    if args.experiment == "exhaustive_prototypes" and args.toy_example == False:
-        print("\n\t\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
-        print("\t\t(We do not provide the status bar because it really depends on the memory usage, please do not cancel the execution)\n")
 
     # Determine which one have no result files
     for scenario in scenario_list:
