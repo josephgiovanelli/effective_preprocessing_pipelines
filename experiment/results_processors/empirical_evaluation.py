@@ -598,6 +598,7 @@ def exhaustive_prototypes(toy, plot):
     else:
         results_path = os.path.join(RAW_RESULT_PATH, "paper")
         plots_path = os.path.join(ARTIFACTS_PATH, "paper")
+    results_path = os.path.join(results_path, "exhaustive_prototypes")
 
     filtered_data_sets = [
         "_".join(i)
