@@ -21,6 +21,14 @@ from utils.common import *
 
 
 def create_possible_categories(pipeline):
+    """Creates all the categories of the optimization process outcome.
+
+    Args:
+        pipeline: pair of transformation.
+
+    Returns:
+        dict: common name in the key, specific name in the value.
+    """
     first = pipeline[0][0].upper()
     second = pipeline[1][0].upper()
     first_or_second = first + "o" + second
@@ -47,7 +55,14 @@ def create_possible_categories(pipeline):
 
 
 def merge_dict(list):
-    """Merge dictionaries and keep values of common keys in list"""
+    """Merges dictionaries and keep values of common keys in list.
+
+    Args:
+        list: list of dictionaries to merge.
+
+    Returns:
+        dict: merged dictionary.
+    """
     new_dict = {}
     for key, value in list[0].items():
         new_value = []
@@ -58,6 +73,15 @@ def merge_dict(list):
 
 
 def load_results(input_path, filtered_datasets):
+    """Loads the results of the optimization process.
+
+    Args:
+        input_path: where to load the results.
+        filtered_datasets: OpenML ids of the datasets.
+
+    Returns:
+        dict: the loaded results.
+    """
     comparison = {}
     confs = [os.path.join(input_path, "conf1"), os.path.join(input_path, "conf2")]
     for path in confs:
@@ -114,44 +138,15 @@ def load_results(input_path, filtered_datasets):
     )
 
 
-def load_algorithm_results(input_path, filtered_datasets):
-    results_map = {}
-    files = [f for f in listdir(input_path) if isfile(join(input_path, f))]
-    results = [f[:-5] for f in files if f[-4:] == "json"]
-    for algorithm in algorithms:
-        for dataset in filtered_datasets:
-            acronym = "".join([a for a in algorithm if a.isupper()]).lower()
-            acronym += "_" + str(dataset)
-            if acronym in results:
-                with open(os.path.join(input_path, acronym + ".json")) as json_file:
-                    data = json.load(json_file)
-                    accuracy = data["context"]["best_config"]["score"] // 0.0001 / 100
-                    pipeline = (
-                        str(data["context"]["best_config"]["pipeline"])
-                        .replace(" ", "")
-                        .replace(",", " ")
-                    )
-                    num_iterations = data["context"]["iteration"] + 1
-                    best_iteration = data["context"]["best_config"]["iteration"] + 1
-                    baseline_score = data["context"]["baseline_score"] // 0.0001 / 100
-            else:
-                accuracy = 0
-                pipeline = ""
-                num_iterations = 0
-                best_iteration = 0
-                baseline_score = 0
-
-            results_map[acronym] = {}
-            results_map[acronym]["accuracy"] = accuracy
-            results_map[acronym]["baseline_score"] = baseline_score
-            results_map[acronym]["num_iterations"] = num_iterations
-            results_map[acronym]["best_iteration"] = best_iteration
-            results_map[acronym]["pipeline"] = pipeline
-
-    return results_map
-
-
 def save_simple_results(result_path, simple_results, filtered_datasets):
+    """Saves the results of the optimization process.
+
+    Args:
+        result_path: where to save the results.
+        simple_results: the resuts to save.
+        filtered_datasets: OpenML ids of the datasets.
+    """
+
     def values_to_string(values):
         return [str(value).replace(",", "") for value in values]
 
@@ -195,6 +190,13 @@ def save_simple_results(result_path, simple_results, filtered_datasets):
 
 
 def compose_pipeline(pipeline1, pipeline2, scheme):
+    """Creates pipelines and aprameters to check the validity and compare the steps
+
+    Args:
+        pipeline1: mask for the presence of each transformation in the first pipeline.
+        pipeline2: mask for the presence of each transformation in the second pipeline.
+        scheme: pair of transformations at hand.
+    """
     pipelines = {"pipeline1": [], "pipeline2": []}
     parameters = {"pipeline1": [], "pipeline2": []}
     for step in scheme:
@@ -222,6 +224,14 @@ def compose_pipeline(pipeline1, pipeline2, scheme):
 
 
 def have_same_steps(pipelines):
+    """Checks if the pipelines have the same steps.
+
+    Args:
+        pipelines: pipelines to check.
+
+    Returns:
+        bool: wheter they have the same steps or not.
+    """
     pipeline1_has_first = not pipelines["pipeline1"][0].__contains__("NoneType")
     pipeline1_has_second = not pipelines["pipeline1"][1].__contains__("NoneType")
     pipeline2_has_first = not pipelines["pipeline2"][0].__contains__("NoneType")
@@ -248,6 +258,17 @@ def have_same_steps(pipelines):
 
 
 def check_validity(pipelines, result, acc1, acc2):
+    """Checks the validity for a specific optimized pair of transformation on a specific dataset and ML algorithm.
+
+    Args:
+        pipelines: pair of transformations at hand.
+        result: results of the optimization.
+        acc1: accuracy of the first pipeline.
+        acc2: accuracy of the second pipeline.
+
+    Returns:
+        _type_: _description_
+    """
     if pipelines["pipeline1"] == [] and pipelines["pipeline2"] == []:
         validity, problem = False, "not_exec"
     elif pipelines["pipeline1"] == [] or pipelines["pipeline2"] == []:
@@ -277,6 +298,18 @@ def check_validity(pipelines, result, acc1, acc2):
 
 
 def compute_result(result, pipelines, categories, baseline_scores, scores):
+    """Computes the validation in Table 3 for a specific optimized pair of transformation on a specific dataset and ML algorithm.
+
+    Args:
+        result: results of the optimization process.
+        pipelines: pair of transformations at hand.
+        categories: possible categories.
+        baseline_scores: score of the baseline.
+        scores: scores of the two different order.
+
+    Returns:
+        string: final category of the case.
+    """
     if baseline_scores[0] != baseline_scores[1]:
         raise Exception("Baselines with different scores")
 
@@ -485,6 +518,15 @@ def instantiate_results(
     acronym,
     categories,
 ):
+    """Creates the data structure to host the grouped results.
+
+    Args:
+        grouped_by_dataset_result: dict that will contain the results grouped by datasets.
+        grouped_by_algorithm_results: dict that will contain the result grouped by algorithm.
+        dataset: OpenML id of the dataset.
+        acronym: acronym of the optimized algorithm.
+        categories: possible categories.
+    """
     if not (grouped_by_dataset_result.__contains__(dataset)):
         grouped_by_dataset_result[dataset] = {}
 
@@ -495,6 +537,15 @@ def instantiate_results(
 
 
 def get_winner(accuracy1, accuracy2):
+    """Determines the winner bwteen two configurations, given the accuracies.
+
+    Args:
+        accuracy1: accuracy of the first configuration.
+        accuracy2: accuracy of the second configuration.
+
+    Returns:
+        int: 1 if the first is the freater, 0 if it is a draw, 2 otherwise.
+    """
     if accuracy1 > accuracy2:
         return 1
     elif accuracy1 == accuracy2:
@@ -506,6 +557,16 @@ def get_winner(accuracy1, accuracy2):
 
 
 def rich_simple_results(simple_results, pipeline_scheme, categories):
+    """Enriches the simple results with the compose pipelines.
+
+    Args:
+        simple_results: raw results of the optimization process.
+        pipeline_scheme: pair of the transformations at hand.
+        categories: possible categories.
+
+    Returns:
+        dict: enriched results.
+    """
     for key, value in simple_results.items():
         first_configuration = value[0]
         second_configuration = value[1]
@@ -558,6 +619,16 @@ def rich_simple_results(simple_results, pipeline_scheme, categories):
 
 
 def aggregate_results(simple_results, categories):
+    """Aggregates the results by dataset and by algorithm.
+
+    Args:
+        simple_results: the raw results of the optimization process.
+        categories: possible categories.
+
+    Returns:
+        dict: aggregated results by dataset.
+        dict: aggregated results by algorithm.
+    """
     grouped_by_dataset_result = {}
     grouped_by_algorithm_results = {}
 
@@ -579,6 +650,15 @@ def aggregate_results(simple_results, categories):
 
 
 def compute_summary(grouped_by_algorithm_results, categories):
+    """Creates summary from the aggregated results by algorithm.
+
+    Args:
+        grouped_by_algorithm_results: aggregated results by algorithm.
+        categories: possible categories.
+
+    Returns:
+        dict: summary.
+    """
     summary = {}
     for _, category in categories.items():
         summary[category] = sum(
@@ -590,6 +670,13 @@ def compute_summary(grouped_by_algorithm_results, categories):
 def save_grouped_by_algorithm_results(
     result_path, grouped_by_algorithm_results, summary, no_algorithms=False
 ):
+    """Saves the results aggregated by algorithm.
+
+    Args:
+        result_path: where to save the results.
+        grouped_by_algorithm_results: results to save.
+        summary: summary of the results.
+    """
     with open(os.path.join(result_path, "summary.csv"), "w") as out:
         out.write("," + ",".join(summary.keys()) + "\n")
         if not (no_algorithms):
@@ -608,6 +695,12 @@ def save_grouped_by_algorithm_results(
 def save_details_grouped_by_dataset_result(
     result_path, details_grouped_by_dataset_result
 ):
+    """Saves the results aggregated by dataset.
+
+    Args:
+        result_path: where to save the results.
+        details_grouped_by_dataset_result: results to save.
+    """
     for element in algorithms:
         header = False
         acronym = "".join([a for a in element if a.isupper()]).lower()
@@ -632,6 +725,20 @@ def save_details_grouped_by_dataset_result(
 
 
 def extract_results(input_path, filtered_data_sets, pipeline, categories):
+    """Extracts and aggregate the optimization results.
+
+    Args:
+        input_path: where to load the results.
+        filtered_data_sets: OpenML ids of the datasets.
+        pipeline: pair of transformations at hand.
+        categories: possible categories.
+
+    Returns:
+        dict: raw results of the optimization process.
+        dict: results aggregated by algorithm.
+        dict: results aggregated by dataset.
+        dict: summary.
+    """
     # load and format the results
     simple_results = load_results(input_path, filtered_data_sets)
     simple_results = rich_simple_results(simple_results, pipeline, categories)
@@ -651,6 +758,15 @@ def extract_results(input_path, filtered_data_sets, pipeline, categories):
 
 
 def compute_summary_from_data_set_results(dataset_results, categories):
+    """Computes summary for 10x4cv
+
+    Args:
+        dataset_results: raw results.
+        categories: possible categories.
+
+    Returns:
+        dict: summary.
+    """
     summary = {
         algorithm: {category: 0 for _, category in categories.items()}
         for algorithm in ["knn", "nb", "rf"]
@@ -664,6 +780,19 @@ def compute_summary_from_data_set_results(dataset_results, categories):
 def extract_results_10x4cv(
     input_path, filtered_data_sets, pipeline, categories, folds, repeat
 ):
+    """Loads the results from the 10x4cv.
+
+    Args:
+        input_path: where to load the results.
+        filtered_data_sets: OpenML ids of the datasets.
+        pipeline: pair of transformations.
+        categories: possible categories.
+        folds: number of folds.
+        repeat: number of times to repeat the fold-cv
+
+    Returns:
+        dict: summary of the 10x4cv.
+    """
     from sklearn.model_selection import RepeatedKFold
 
     # load and format the results
@@ -671,9 +800,7 @@ def extract_results_10x4cv(
     simple_results = rich_simple_results(simple_results, pipeline, categories)
 
     # summarize the results
-    grouped_by_algorithm_results, grouped_by_data_set_result = aggregate_results(
-        simple_results, categories
-    )
+    _, grouped_by_data_set_result = aggregate_results(simple_results, categories)
 
     rkf = RepeatedKFold(n_splits=folds, n_repeats=repeat, random_state=1)
 
@@ -710,6 +837,15 @@ def save_results(
     grouped_by_algorithm_results,
     summary,
 ):
+    """Saves both raw and aggregated results.
+
+    Args:
+        result_path: where to save the results.
+        filtered_data_sets: OpenML ids of the datasets.
+        simple_results: raw results of the optimization process.
+        grouped_by_algorithm_results: aggregated results by algorithm.
+        summary: summary of the results.
+    """
     save_simple_results(result_path, simple_results, filtered_data_sets)
     save_grouped_by_algorithm_results(
         result_path, grouped_by_algorithm_results, summary
@@ -717,6 +853,12 @@ def save_results(
 
 
 def save_results_10x4cv(result_path, summaries):
+    """Saves the results of the 10x4cv.
+
+    Args:
+        result_path: where to save the results.
+        summaries: summary to save.
+    """
     for batch in range(len(summaries)):
         for set_, results in summaries[batch].items():
             with open(
@@ -731,83 +873,13 @@ def save_results_10x4cv(result_path, summaries):
                     out.write(row)
 
 
-def merge_results(pipeline_results, algorithm_results):
-    comparison = {}
-    summary = {}
-    for algorithm in algorithms:
-        acronym = "".join([a for a in algorithm if a.isupper()]).lower()
-        summary[acronym] = {"algorithm": 0, "pipeline": 0, "draw": 0}
-        comparison[acronym] = {}
-
-    for key, value in pipeline_results.items():
-        acronym = key.split("_")[0]
-        data_set = key.split("_")[1]
-        acc1 = pipeline_results[key]["conf1"]["accuracy"]
-        acc2 = pipeline_results[key]["conf2"]["accuracy"]
-        best_pipeline_result = pipeline_results[key][
-            "conf" + str(1 if acc1 > acc2 else 2)
-        ]
-
-        if (
-            algorithm_results[key]["baseline_score"]
-            != best_pipeline_result["baseline_score"]
-        ):
-            print(
-                "Different baseline scores: "
-                + str(key)
-                + " "
-                + str(algorithm_results[key]["baseline_score"])
-                + " "
-                + str(best_pipeline_result["baseline_score"])
-            )
-
-        comparison[acronym][data_set] = {
-            "algorithm": algorithm_results[key]["accuracy"],
-            "pipeline": best_pipeline_result["accuracy"],
-            "baseline": algorithm_results[key]["baseline_score"],
-            "choosen_pipeline": best_pipeline_result["pipeline"],
-        }
-        winner = (
-            "algorithm"
-            if comparison[acronym][data_set]["algorithm"]
-            > comparison[acronym][data_set]["pipeline"]
-            else (
-                "pipeline"
-                if comparison[acronym][data_set]["algorithm"]
-                < comparison[acronym][data_set]["pipeline"]
-                else "draw"
-            )
-        )
-        summary[acronym][winner] += 1
-
-    new_summary = {"algorithm": 0, "pipeline": 0, "draw": 0}
-    for algorithm, results in summary.items():
-        for category, result in summary[algorithm].items():
-            new_summary[category] += summary[algorithm][category]
-
-    summary["summary"] = new_summary
-
-    return comparison, summary
-
-
-def save_comparison(comparison, result_path):
-    def values_to_string(values):
-        return [str(value).replace(",", "") for value in values]
-
-    for algorithm in algorithms:
-        acronym = "".join([a for a in algorithm if a.isupper()]).lower()
-        if os.path.exists("{}.csv".format(acronym)):
-            os.remove("{}.csv".format(acronym))
-        with open(os.path.join(result_path, "{}.csv".format(acronym)), "w") as out:
-            keys = comparison[acronym][list(comparison[acronym].keys())[0]].keys()
-            header = ",".join(keys)
-            out.write("dataset," + header + "\n")
-            for dataset, results in comparison[acronym].items():
-                result_string = ",".join(values_to_string(results.values()))
-                out.write(dataset + "," + result_string + "\n")
-
-
 def save_summary(summary, result_path):
+    """Saves the summary of the results.
+
+    Args:
+        summary: summary to save.
+        result_path: where to save the summary.
+    """
     if os.path.exists("summary.csv"):
         os.remove("summary.csv")
     with open(os.path.join(result_path, "summary.csv"), "w") as out:
@@ -820,6 +892,15 @@ def save_summary(summary, result_path):
 
 
 def max_frequency(x):
+    """Returns the element with max frequency and its frequency in a list.
+
+    Args:
+        x: list.
+
+    Returns:
+        int: elem with max frequency.
+        counter: frequency.
+    """
     counter = 0
     num = x[0]
 
@@ -833,6 +914,14 @@ def max_frequency(x):
 
 
 def create_num_equal_elements_matrix(grouped_by_dataset_result):
+    """Creates a matrix counting the invalid results.
+
+    Args:
+        grouped_by_dataset_result: aggregated results byalgorithm
+
+    Returns:
+        dict: invalid results
+    """
     num_equal_elements_matrix = np.zeros((len(algorithms), len(algorithms)))
 
     for _, value in grouped_by_dataset_result.items():
@@ -853,6 +942,12 @@ def create_num_equal_elements_matrix(grouped_by_dataset_result):
 
 
 def save_num_equal_elements_matrix(result_path, num_equal_elements_matrix):
+    """Saves the matrix with invalid results.
+
+    Args:
+        result_path: where to save the results-
+        num_equal_elements_matrix: the matrix to save.
+    """
     with open(os.path.join(result_path, "num_equal_elements_matrix.csv"), "w") as out:
         out.write(
             "length,"
@@ -870,32 +965,15 @@ def save_num_equal_elements_matrix(result_path, num_equal_elements_matrix):
             out.write(row)
 
 
-def create_hamming_matrix(X, y):
-    def hamming_distance(s1, s2):
-        assert len(s1) == len(s2)
-        return sum(ch1 != ch2 for ch1, ch2 in zip(s1, s2))
-
-    hamming_matrix = np.zeros((len(algorithms), len(algorithms)))
-    value = np.zeros(len(algorithms))
-    value[X[0][1]] = y[0] + 1
-    for i in range(1, np.size(X, 0)):
-        if X[i][0] == X[i - 1][0]:
-            value[X[i][1]] = y[i] + 1
-        else:
-            most_frequent = int(s.mode([x for x in value if x != 0])[0])
-            weight = list(value).count(0)
-            ideal = np.zeros(len(algorithms))
-            for j in range(0, np.size(value, 0)):
-                if value[j] != 0:
-                    ideal[j] = most_frequent
-            hamming_matrix[weight][hamming_distance(value, ideal)] += 1
-
-            value = np.zeros(5)
-            value[X[i][1]] = y[i] + 1
-    return hamming_matrix
-
-
 def get_results(grouped_by_dataset_result):
+    """Gets the results aggregated by dataset in a pandas.DataFrame.
+
+    Args:
+        grouped_by_dataset_result: the aggregated results by dataset.
+
+    Returns:
+        pandas.DataFrame: dataframe of the aggregated results by dataset.
+    """
     data = []
     for dataset, value in grouped_by_dataset_result.items():
         for algorithm, result in value.items():
@@ -912,6 +990,14 @@ def get_results(grouped_by_dataset_result):
 
 
 def encode_data(data):
+    """Encodes with ordinal encoding.
+
+    Args:
+        data: data to encode.
+
+    Returns:
+        pandas.DataFrame: encoded data.
+    """
     numeric_features = data.select_dtypes(
         include=["int64", "float64", "int32", "float32"]
     ).columns
@@ -929,6 +1015,15 @@ def encode_data(data):
 
 
 def join_result_with_extended_meta_features(filtered_datasets, data):
+    """Enriches the results of the optimization process with the complete OpenML meta-fratures in resources/meta_features.
+
+    Args:
+        filtered_datasets: OpenML ids of the datasets.
+        data: results of the optimization process.
+
+    Returns:
+        pandas.DataFrame: dataframe with meta-features.
+    """
     meta = pd.read_csv(os.path.join(META_FEATURES_PATH, "extended-meta-features.csv"))
     meta = meta.loc[meta["id"].isin(filtered_datasets)]
     meta = meta.drop(columns=["name", "runs"])
@@ -940,6 +1035,15 @@ def join_result_with_extended_meta_features(filtered_datasets, data):
 
 
 def join_result_with_extracted_meta_features(data, impute):
+    """Enriches the results of the optimization process with the extractes meta-fratures in resources/meta_features.
+
+    Args:
+        data: results of the optimization process.
+        impute: wheter to impute the missing meta-features or not.
+
+    Returns:
+        pandas.DataFrame: dataframe with meta-features.
+    """
     meta = pd.read_csv(
         os.path.join(
             META_FEATURES_PATH,
@@ -955,6 +1059,15 @@ def join_result_with_extracted_meta_features(data, impute):
 
 
 def join_result_with_simple_meta_features(filtered_datasets, data):
+    """Enriches the results of the optimization process with the basic meta-fratures in resources/meta_features.
+
+    Args:
+        filtered_datasets: OpenML ids of the datasets.
+        data: results of the optimization process.
+
+    Returns:
+        pandas.DataFrame: dataframe with meta-features.
+    """
     meta = pd.read_csv(os.path.join(META_FEATURES_PATH, "simple-meta-features.csv"))
     meta = meta.loc[meta["did"].isin(filtered_datasets)]
     meta = meta.drop(columns=["version", "status", "format", "uploader", "row", "name"])
@@ -967,6 +1080,16 @@ def join_result_with_simple_meta_features(filtered_datasets, data):
 
 
 def modify_class(data, categories, option):
+    """Given the optimization results, determines if an order can decided.
+
+    Args:
+        data: results of the optimization process.
+        categories: distinct labels in the optimization process.
+        option: how to aggregate the results.
+
+    Returns:
+        pandas.DataFrame: the results with the labels changed.
+    """
     for key, value in categories.items():
         if option == "group_all":
             if key == "first_second" or key == "second_first" or key == "not_exec_once":
@@ -987,6 +1110,14 @@ def modify_class(data, categories, option):
 
 
 def create_correlation_matrix(data):
+    """Creates a correlation matrix with several frequency tests (e.g., kendall, pearson, spearman).
+
+    Args:
+        data: frequencies of the optimization process.
+
+    Returns:
+        numpy.array: array of indecies
+    """
     encoded = encode_data(data)
 
     kendall = encoded.corr(method="kendall")["class"].to_frame()
@@ -1011,10 +1142,25 @@ def create_correlation_matrix(data):
 
 
 def save_data_frame(result_path, data_frame, index):
+    """Saves a pandas.DataFrame.
+
+    Args:
+        result_path: where to save the data frame.
+        data_frame: data frame to save.
+        index: wheter to include the index or not.
+    """
     data_frame.to_csv(result_path, index=index)
 
 
 def save_correlation_matrix(result_path, name, correlation_matrix, group_no_order):
+    """Saves correlation matrix of the frequencies tests.
+
+    Args:
+        result_path: where to save the set.
+        name: file name to save.
+        correlation_matrix: matrix of correlations from the frequencies tests.
+        group_no_order: whether aggregate the result by algorithm or not.
+    """
     save_data_frame(
         os.path.join(
             result_path, name + ("_grouped" if group_no_order else "") + ".csv"
@@ -1025,6 +1171,14 @@ def save_correlation_matrix(result_path, name, correlation_matrix, group_no_orde
 
 
 def save_train_meta_learner(result_path, name, train_meta_learner, group_no_order):
+    """Saves the train set for the meta learner.
+
+    Args:
+        result_path: where to save the set.
+        name: file name to save.
+        train_meta_learner: set to save.
+        group_no_order: whether aggregate the result by algorithm or not.
+    """
     save_data_frame(
         os.path.join(
             result_path, name + ("_grouped" if group_no_order else "") + ".csv"
@@ -1035,6 +1189,16 @@ def save_train_meta_learner(result_path, name, train_meta_learner, group_no_orde
 
 
 def chi2test(observed, distribution, prob=0.95):
+    """Performs the chi square test.
+
+    Args:
+        observed: the observed frequencies.
+        distribution: frequencies of the distribution to compare with.
+        prob (optional): probability of the chi square test. Defaults to 0.95.
+
+    Returns:
+        _type_: _description_
+    """
     table = [observed, distribution]
     stat, p, dof, expected = chi2_contingency(table)
     critical = chi2.ppf(prob, dof)
@@ -1052,6 +1216,15 @@ def chi2test(observed, distribution, prob=0.95):
 
 
 def chi2tests(grouped_by_algorithm_results, summary, categories, uniform):
+    """Performs the chi square tests for the prototype construction.
+
+    Args:
+        grouped_by_algorithm_results: frequencies of the optimization process.
+        summary: summary of the optimization process.
+        categories: labels of the pair of transofrmations.
+        uniform: wheter to compare with a uniform distribution or not.
+    """
+
     def run_chi2test(observed, uniform, formatted_input):
         tot = sum(observed)
         observed.sort(reverse=True)
@@ -1141,6 +1314,13 @@ def chi2tests(grouped_by_algorithm_results, summary, categories, uniform):
 
 
 def save_chi2tests(result_path, tests):
+    """Saves the chi square test results.
+
+    Args:
+        result_path: where to save the results.
+        tests: results of the test.
+    """
+
     def saver(collection, name):
         with open(name, "w") as out:
             header = False
@@ -1160,6 +1340,12 @@ def save_chi2tests(result_path, tests):
 
 
 def experiments_summarizer(pipeline, toy):
+    """Summarizes the frequencies obtained in the optimization process.
+
+    Args:
+        pipeline: pair of transformations at hand.
+        toy: whether it is the toy example or not.
+    """
     warnings.simplefilter(action="ignore", category=FutureWarning)
     if toy:
         path = os.path.join(RAW_RESULT_PATH, "toy")
@@ -1221,6 +1407,12 @@ def experiments_summarizer(pipeline, toy):
 
 
 def experiments_summarizer_10x4cv(pipeline, toy):
+    """Summarizes the frequencies of the 10x4cv analysis.
+
+    Args:
+        pipeline: pair of transformations at hand.
+        toy: whether it is the toy example or not.
+    """
 
     # configure environment
     if toy:
@@ -1427,6 +1619,11 @@ def experiments_summarizer_10x4cv(pipeline, toy):
 
 
 def graph_maker(toy):
+    """Plots the frequencies obtained in the optimization process.
+
+    Args:
+        toy: whether it is the toy example or not.
+    """
     logging.getLogger("matplotlib.font_manager").disabled = True
     if toy:
         input_path = os.path.join(RAW_RESULT_PATH, "toy")
@@ -1560,6 +1757,11 @@ def graph_maker(toy):
 
 
 def graph_maker_10x4cv(toy):
+    """Plots the 10x4cv chart.
+
+    Args:
+        toy: whether it is the toy example or not.
+    """
     logging.getLogger("matplotlib.font_manager").disabled = True
     cv_file_name = "summary_with_mean_.csv"
     if toy:
@@ -1568,7 +1770,9 @@ def graph_maker_10x4cv(toy):
     else:
         prototype_construction_path = os.path.join(RAW_RESULT_PATH, "paper")
         plot_path = os.path.join(ARTIFACTS_PATH, "paper")
-    prototype_construction_path = os.path.join(prototype_construction_path, "prototype_construction")
+    prototype_construction_path = os.path.join(
+        prototype_construction_path, "prototype_construction"
+    )
 
     fn_path = os.path.join(prototype_construction_path, "features_normalize")
     fn_cv_path = os.path.join(fn_path, "summary", "10x4cv")
@@ -1621,6 +1825,11 @@ def graph_maker_10x4cv(toy):
 
 
 def run_p_binom_test(toy):
+    """Performs the biomial test to understand if the frequencies obtain in the experiments are significant.
+
+    Args:
+        toy: whether it is the toy example or not.
+    """
     experiment = "toy" if toy else "paper"
     subprocess.call(
         f"Rscript experiment/results_processors/p_binom_test.R {experiment}",
@@ -1631,6 +1840,11 @@ def run_p_binom_test(toy):
 
 
 def prototype_construction(toy_example):
+    """Performs the prototype construction analysis.
+
+    Args:
+        toy_example: wheter it is the toy example or not.
+    """
     print("PC02. Perform significance test over the results\n")
     experiments_summarizer(pipeline=["features", "rebalance"], toy=toy_example)
     experiments_summarizer(pipeline=["discretize", "features"], toy=toy_example)
@@ -1643,7 +1857,9 @@ def prototype_construction(toy_example):
     experiments_summarizer_10x4cv(pipeline=["features", "normalize"], toy=toy_example)
     experiments_summarizer_10x4cv(pipeline=["discretize", "rebalance"], toy=toy_example)
 
-    print("PC04. Select winning order for each pair (using results from PC02 and PC03)\n")
+    print(
+        "PC04. Select winning order for each pair (using results from PC02 and PC03)\n"
+    )
     print("PC05. Combine ordered pairs of transformations\n")
     graph_maker(toy_example)
     graph_maker_10x4cv(toy_example)
