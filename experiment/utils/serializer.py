@@ -3,6 +3,14 @@ import json
 import os
 
 def serialize_results(scenario, result_path, policy=None, pipeline=None):
+    """Serialize the results enriched with several other information from the run.
+
+    Args:
+        scenario: the input scenario.
+        result_path: where to write the results.
+        policy (optional): data structure containing the results. Defaults to None.
+        pipeline (optional): the optimized pipeline. Defaults to None.
+    """
     results = {
         'scenario': scenario,
     }

@@ -2,6 +2,7 @@ import argparse
 
 import os
 
+# Common paths
 RESOURCES_PATH = os.path.join("./", "resources")
 SCENARIO_PATH = os.path.join(RESOURCES_PATH, "scenarios")
 RAW_RESULT_PATH = os.path.join(RESOURCES_PATH, "raw_results")
@@ -12,17 +13,19 @@ DATASETS_PATH = os.path.join(RESOURCES_PATH, "datasets")
 
 algorithms = ['RandomForest', 'NaiveBayes', 'KNearestNeighbors']
 
-#benchmark_suite = openml.study.get_suite('OpenML-CC18') # obtain the benchmark suite
+# Suite OpenML-CC18
+# Benchmark_suite = openml.study.get_suite('OpenML-CC18') # obtain the benchmark suite
 benchmark_suite = [3, 6, 11, 12, 14, 15, 16, 18, 22, 23, 28, 29, 31, 32, 37, 44, 46, 50, 54, 151, 182, 188, 38, 307, 
                        300, 458, 469, 554, 1049, 1050, 1053, 1063, 1067, 1068, 1590, 4134, 1510, 1489, 1494, 1497, 1501, 
                        1480, 1485, 1486, 1487, 1468, 1475, 1462, 1464, 4534, 6332, 1461, 4538, 1478, 23381, 40499, 
                        40668, 40966, 40982, 40994, 40983, 40975, 40984, 40979, 40996, 41027, 23517, 40923, 40927, 40978, 
                        40670, 40701]
 
+# Suite AutoML
 extended_benchmark_suite = [41145, 41156, 41157, 4541, 41158, 42742, 40498, 42734, 41162, 42733, 42732, 1596, 40981, 40685, 
                         4135, 41142, 41161, 41159, 41163, 41164, 41138, 41143, 41146, 41150, 40900, 41165, 41166, 41168, 41169, 
                         41147, 1111, 1169, 41167, 41144, 1515, 1457, 181]
-
+# Suite all-classification-tasks
 large_comparison_classification_tasks = [12, 9, 7, 10, 14, 15, 6, 13, 11, 5, 2, 4, 3, 20, 49, 179, 164, 171, 182, 163, 181, 172, 
                         38, 27, 44, 28, 23, 37, 43, 41, 36, 39, 35, 62, 57, 151, 56, 60, 59, 61, 119, 137, 22, 29, 16, 24, 32, 30, 
                         26, 18, 34, 384, 387, 383, 377, 357, 375, 51, 188, 183, 185, 275, 184, 186, 255, 187, 251, 388, 397, 400, 401, 
@@ -46,9 +49,15 @@ large_comparison_classification_tasks = [12, 9, 7, 10, 14, 15, 6, 13, 11, 5, 2, 
                         963, 958, 962, 960, 959, 1045, 1053, 1044, 1050, 1049, 1054, 1046, 1055, 1048, 993, 1002, 1001, 998, 1000, 995, 999, 994, 
                         996, 997, 1101, 1066, 1071, 1069, 1068, 1067, 1075, 1073, 1120, 1121]
 
+# Dataset used to verify the impact of pre-processing
 pipeline_impact_suite = [1461]
 
 def parse_args():
+    """Parse the arguments given via CLI.
+
+    Returns:
+        dict: arguments and their values.
+    """
     parser = argparse.ArgumentParser(description="Automated Machine Learning Workflow creation and configuration")
     parser.add_argument("-p", "--pipeline", nargs="+", type=str, required=False, help="step of the pipeline to execute")
     parser.add_argument("-exp", "--experiment", nargs="?", type=str, required=False, help="type of the experiments")
@@ -58,6 +67,15 @@ def parse_args():
     return args
 
 def create_directory(result_path, directory):
+    """Create a directory in the specified path.
+
+    Args:
+        result_path: where to create a directory.
+        directory: name of the directory.
+
+    Returns:
+        os.path: the resulting path.
+    """
     result_path = os.path.join(result_path, directory)
 
     if not os.path.exists(result_path):
@@ -66,6 +84,15 @@ def create_directory(result_path, directory):
     return result_path
 
 def get_filtered_datasets(experiment, toy):
+    """Retrieve the dataset list for a certain experiment.
+
+    Args:
+        experiment: keyword of the experiment.
+        toy: whether it is the toy example or not.
+
+    Returns:
+        list: list of OpenML ids.
+    """
     if experiment == "pipeline_impact":
         return pipeline_impact_suite
     else:

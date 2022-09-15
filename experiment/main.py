@@ -8,15 +8,14 @@ import json
 
 
 def load_dataset(id, args):
-    """
-    Load a dataset from its id
+    """Load a dataset from its id.
 
     Args:
-        id: id from OpenML
-        args: taken from utils.cli.parse_args
+        id: id from OpenML.
+        args: taken from utils.cli.parse_args.
 
     Returns:
-        X, y are respectivelly the data items and the labels
+        X, y are respectivelly the data items and the labels.
     """
     # Load the data from the csv
     X, y, categorical_indicator = datasets.load_from_csv(id)
@@ -30,7 +29,7 @@ def load_dataset(id, args):
     print(f"X:\n{X}")
     print(f"y:\n{y}")
 
-    # Set all the characteristics on a singleton
+    # Set all the dataset characteristics on a singleton
     PrototypeSingleton.getInstance().setPipeline(args.pipeline)
     num_features = [i for i, x in enumerate(categorical_indicator) if x == False]
     cat_features = [i for i, x in enumerate(categorical_indicator) if x == True]
@@ -46,11 +45,10 @@ def load_dataset(id, args):
 
 
 def main(args):
-    """
-    Launch the optimization experiments according to the specified parameters.
+    """Launch the optimization experiments according to the specified parameters.
 
     Args:
-        args: taken from utils.cli.parse_args
+        args: taken from utils.cli.parse_args.
     """
 
     # Get scenario and config

@@ -13,6 +13,15 @@ from utils.common import *
 
 
 def load_results_pipelines(input_path, filtered_data_sets):
+    """Load the results about the solely prototype optimization.
+
+    Args:
+        input_path: where to load the results.
+        filtered_data_sets: ids of the datasets.
+
+    Returns:
+        dict: the results in form of key-value pairs.
+    """
     results_map = {}
     files = [f for f in listdir(input_path) if isfile(join(input_path, f))]
     results = [f[:-5] for f in files if f[-4:] == "json"]
@@ -38,6 +47,15 @@ def load_results_pipelines(input_path, filtered_data_sets):
 
 
 def load_results_auto(input_path, filtered_data_sets):
+    """Load the results about the experiment about custom prototypes.
+
+    Args:
+        input_path: where to load the results.
+        filtered_data_sets: ids of the datasets.
+
+    Returns:
+        dict: the results in form of key-value pairs.
+    """
     results_map = {}
     files = [f for f in listdir(input_path) if isfile(join(input_path, f))]
     results = [f[:-5] for f in files if f[-4:] == "json"]
@@ -70,7 +88,14 @@ def load_results_auto(input_path, filtered_data_sets):
 
 
 def declare_winners(results_map):
+    """Declare the winner between ML algorithm optimization and custom prototypes optimization.
 
+    Args:
+        results_map: dict of results.
+
+    Returns:
+        dict: the winners in form of key-value pairs.
+    """
     winners_map = {}
     for algorithm, value in results_map.items():
         winners_map[algorithm] = {}
@@ -93,7 +118,14 @@ def declare_winners(results_map):
 
 
 def get_winners_accuracy(results_map):
+    """Gets the accuracy of each winner (between ML algorithm optimization and custom prototypes optimization).
 
+    Args:
+        results_map: dict of results.
+
+    Returns:
+        dict: the enriched map of winners.
+    """
     accuracy_map = {}
     for algorithm, value in results_map.items():
         accuracy_map[algorithm] = {}
@@ -299,11 +331,7 @@ def save_comparison(results_pipelines, results_auto, result_path, plot_path, plo
         plt.clf()
 
 
-def load_custom_vs_exhaustive_results(
-    input_path, filtered_data_sets, algorithm_comparison=False
-):
-    # exceptions = ['nb_37', 'rf_1510', 'rf_1497', 'knn_1489', 'rf_1462', 'nb_46', 'knn_23517', 'rf_1063', 'nb_23517',
-    #              'rf_40701', 'nb_1501', 'rf_44', 'nb_1497', 'knn_1486', 'rf_28']
+def load_custom_vs_exhaustive_results(input_path, filtered_data_sets, algorithm_comparison=False):
     results_map = {}
     files = [f for f in listdir(input_path) if isfile(join(input_path, f))]
     results = [f[:-5] for f in files if f[-4:] == "json"]

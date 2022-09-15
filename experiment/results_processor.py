@@ -13,11 +13,10 @@ logging.getLogger("matplotlib.font_manager").disabled = True
 
 
 def process_results(args):
-    """
-    Process the results according to the given parameters
+    """Process the results according to the given parameters.
 
     Args:
-        args: taken from utils.common.parse_args
+        args: taken from utils.common.parse_args.
     """
     if args.experiment == "pipeline_impact":
         pipeline_impact(args.toy_example)

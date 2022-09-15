@@ -21,11 +21,10 @@ GLOBAL_SEED = 42
 
 
 def kill(proc_pid):
-    """
-    Kill a process given its pid.
+    """Kill a process given its process id.
 
     Args:
-        proc_pid: process id
+        proc_pid: process id.
     """
     process = psutil.Process(proc_pid)
     for proc in process.children(recursive=True):
@@ -34,16 +33,15 @@ def kill(proc_pid):
 
 
 def run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path, toy):
-    """
-    Launch a proccess that computes the experiment by running a specific command on the command line.
+    """Launch a proccess that computes the experiment by running a specific command on the CLI.
 
     Args:
-        cmd: command to run
-        current_scenario: scenario of the experiment
-        result_path: where to save the results
-        stdout_path: where to save the standard output
-        stderr_path: where to save the standard error
-        toy: wheter it is the toy example or not
+        cmd: command to run.
+        current_scenario: scenario of the experiment.
+        result_path: where to save the results.
+        stdout_path: where to save the standard output.
+        stderr_path: where to save the standard error.
+        toy: wheter it is the toy example or not.
     """
     open(stdout_path, "w")
     open(stderr_path, "w")
@@ -63,10 +61,10 @@ def run_cmd(cmd, current_scenario, result_path, stdout_path, stderr_path, toy):
 
 
 def launch_experiments(args):
-    """launch the experiments according to the given parameters.
+    """Launch the experiments according to the given parameters.
 
     Args:
-        args: taken from utils.common.parse_args
+        args: taken from utils.common.parse_args.
     """
 
     
@@ -186,7 +184,7 @@ def launch_experiments(args):
         with tqdm(total=len(to_run)) as pbar:
             for info in to_run.values():
 
-                # Common data structures
+                # Define the common data structures
                 base_scenario = info["path"].split(".yaml")[0]
                 current_scenario_path = os.path.join(scenario_path, info["path"])
                 current_scenario = scenarios_util.load(current_scenario_path)
@@ -216,7 +214,7 @@ def launch_experiments(args):
                     if args.toy_example:
                         cmd += " -toy true"
 
-                    # Set stdoout and stderr
+                    # Set stdout and stderr
                     stdout_path = os.path.join(result_path, "{}_stdout.txt".format(base_scenario))
                     stderr_path = os.path.join(result_path, "{}_stderr.txt".format(base_scenario))
 
@@ -230,7 +228,7 @@ def launch_experiments(args):
                         args.toy_example,
                     )
 
-                # Run experiments regarding the EE workflow (exhaustive experiments)
+                # Run experiments regarding the EE workflow (exhaustive prototypes + ML algorithm)
                 elif args.experiment == "exhaustive_prototypes":
 
                     # Get the exhaustive prototypes
@@ -283,7 +281,7 @@ def launch_experiments(args):
                         except Exception:
                             accuracy = 0
 
-                        # Cache the accuracy
+                        # Store the accuracy
                         data_to_write["pipelines"].append(
                             {
                                 "index": str(i),
@@ -301,7 +299,7 @@ def launch_experiments(args):
                     except:
                         print("I didn't manage to write")
 
-                # Run the experiments of the EE workflow (effective experiments)
+                # Run the experiments of the EE workflow (custom prototypes + ML algorithm)
                 elif args.experiment == "custom_prototypes":
 
                     if args.mode == "pipeline_algorithm":
@@ -310,7 +308,7 @@ def launch_experiments(args):
                         pipelines = pseudo_exhaustive_pipelines()
                         results = []
 
-                        # For each prototype
+                        # For each prototype...
                         for i in range(0, len(pipelines)):
                             pipeline = pipelines[i]
                             cmd = "python experiment/main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}".format(
@@ -355,7 +353,7 @@ def launch_experiments(args):
                                 accuracy = 0
                                 results.append(accuracy)
 
-                        # Store the best one
+                        # Store the best performance
                         try:
                             max_i = 0
                             for i in range(1, len(pipelines)):
@@ -370,7 +368,7 @@ def launch_experiments(args):
                             ) as log_out:
                                 log_out.write("trying to get the best pipeline: no available result")
 
-                        # Run the algorithm optimization after with the best pipeline
+                        # Run the algorithm optimization with the best pipeline
                         try:
                             with open(
                                 os.path.join(result_path,"{}.json".format(base_scenario + "_best_pipeline"))
@@ -409,7 +407,7 @@ def launch_experiments(args):
                             ) as log_out:
                                 log_out.write("\ntrying to run best pipeline and algorithm: could not find a pipeline")
 
-                    # Run the experiments of the EE workflow (Just HPO experiments)
+                    # Run the experiments of the EE workflow (Just ML algorithm)
                     elif args.mode == "algorithm":
                         cmd = "python experiment/main.py -s {} -c control.seed={} -p {} -r {} -m {} -np {} -exp {}".format(
                             current_scenario_path,

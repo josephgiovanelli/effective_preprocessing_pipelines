@@ -23,12 +23,11 @@ base = OrderedDict(
 
 
 def __write_scenario(path, scenario):
-    """
-    Util that writes a scneario in a given path.
+    """Util that writes a scneario in a given path.
 
     Args:
-        path: where to write
-        scenario: what to write
+        path: where to write.
+        scenario: what to write.
     """
     try:
         # print("   -> {}".format(path))
@@ -45,11 +44,10 @@ def __write_scenario(path, scenario):
 
 
 def generate_scenarios(args):
-    """
-    Creates the scenarios according to the given parameters.
+    """Creates the scenarios according to the given parameters.
 
     Args:
-        args: taken from utils.common.parse_args
+        args: taken from utils.common.parse_args.
     """
 
     # Get scenario and result path
