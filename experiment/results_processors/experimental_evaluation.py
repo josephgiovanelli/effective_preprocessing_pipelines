@@ -13,14 +13,14 @@ from utils.common import *
 
 
 def load_results_pipelines(input_path, filtered_data_sets):
-    """Load the results about the solely prototype optimization.
+    """Loads the results about the exhaustive prototypes optimization.
 
     Args:
         input_path: where to load the results.
-        filtered_data_sets: ids of the datasets.
+        filtered_data_sets: OpenML ids of the datasets.
 
     Returns:
-        dict: the results in form of key-value pairs.
+        dict: for each pair of ML algorithm and dataset, it reports the accuracy of each prototype.
     """
     results_map = {}
     files = [f for f in listdir(input_path) if isfile(join(input_path, f))]
@@ -47,14 +47,14 @@ def load_results_pipelines(input_path, filtered_data_sets):
 
 
 def load_results_auto(input_path, filtered_data_sets):
-    """Load the results about the experiment about custom prototypes.
+    """Loads the results about the custom prototypes optimization.
 
     Args:
         input_path: where to load the results.
-        filtered_data_sets: ids of the datasets.
+        filtered_data_sets: OpenML ids of the datasets.
 
     Returns:
-        dict: the results in form of key-value pairs.
+        dict: for each pair of ML algorithm and dataset, it reports the accuracy of each prototype.
     """
     results_map = {}
     files = [f for f in listdir(input_path) if isfile(join(input_path, f))]
@@ -88,13 +88,13 @@ def load_results_auto(input_path, filtered_data_sets):
 
 
 def declare_winners(results_map):
-    """Declare the winner between ML algorithm optimization and custom prototypes optimization.
+    """Declares the best prototype among the optimized ones.
 
     Args:
-        results_map: dict of results.
+        results_map: for each pair of ML algorithm and dataset, it reports the accuracy of each prototype.
 
     Returns:
-        dict: the winners in form of key-value pairs.
+        dict: for each pair of ML algorithm and dataset, it reports the best prototype.
     """
     winners_map = {}
     for algorithm, value in results_map.items():
@@ -118,13 +118,13 @@ def declare_winners(results_map):
 
 
 def get_winners_accuracy(results_map):
-    """Gets the accuracy of each winner (between ML algorithm optimization and custom prototypes optimization).
+    """Enriches the winners_map with the information of accuracy.
 
     Args:
-        results_map: dict of results.
+        results_map: for each pair of ML algorithm and dataset, it reports the best prototype.
 
     Returns:
-        dict: the enriched map of winners.
+        dict: for each pair of ML algorithm and dataset, it reports the accuracy of the best prototype.
     """
     accuracy_map = {}
     for algorithm, value in results_map.items():
@@ -150,7 +150,14 @@ def get_winners_accuracy(results_map):
 
 
 def summarize_winners(winners_map):
+    """Pivots the winners_map.
 
+    Args:
+        winners_map: for each pair of ML algorithm and dataset, it reports the accuracy of the best prototype.
+
+    Returns:
+        dict: for each protoype counts the winners.
+    """
     summary_map = {}
     for algorithm, value in winners_map.items():
         summary_map[algorithm] = {}
@@ -164,6 +171,14 @@ def summarize_winners(winners_map):
 
 
 def save_summary(summary_map, results_path, plots_path, plot):
+    """Saves and plot the summary about the exhaustive prototypes optimization.
+
+    Args:
+        summary_map: for each protoype counts the winners.
+        results_path: where to save the results.
+        plots_path: where to save the plot.
+        plot: wheter to plot or not.
+    """
     if os.path.exists("summary.csv"):
         os.remove("summary.csv")
     total = {}
@@ -254,13 +269,17 @@ def save_summary(summary_map, results_path, plots_path, plot):
 
 
 def save_comparison(results_pipelines, results_auto, result_path, plot_path, plot):
+    """Saves and plot the comparison between the custom and exhaustive prototypes optimization.
+
+    Args:
+        results_pipelines: results about the exhaustive prototypes optimization.
+        results_auto: results about the custom prototypes optimization.
+        result_path: where to save the comparison.
+        plot_path: where to save the plot.
+        plot: whether to plot or not.
+    """
     if os.path.exists("comparison.csv"):
         os.remove("comparison.csv")
-    algorithm_map = {
-        "nb": "NaiveBayes",
-        "knn": "KNearestNeighbors",
-        "rf": "RandomForest",
-    }
     plot_results = {}
 
     for algorithm, value in results_pipelines.items():
@@ -331,7 +350,19 @@ def save_comparison(results_pipelines, results_auto, result_path, plot_path, plo
         plt.clf()
 
 
-def load_custom_vs_exhaustive_results(input_path, filtered_data_sets, algorithm_comparison=False):
+def load_custom_vs_ml_algorithm(
+    input_path, filtered_data_sets, algorithm_comparison=False
+):
+    """Loads the results of the comparison between the custom prototypes optimization and the solely ML algorithm optimization.
+
+    Args:
+        input_path: from where to load the results.
+        filtered_data_sets: list of the OpenML ids of the datasets.
+        algorithm_comparison (optional): wheter to aggregate by algorithm or not. Defaults to False.
+
+    Returns:
+        _type_: _description_
+    """
     results_map = {}
     files = [f for f in listdir(input_path) if isfile(join(input_path, f))]
     results = [f[:-5] for f in files if f[-4:] == "json"]
@@ -392,9 +423,20 @@ def load_custom_vs_exhaustive_results(input_path, filtered_data_sets, algorithm_
     return results_map
 
 
-def merge_custom_vs_exhaustive_results(
+def merge_custom_vs_ml_algorithm(
     auto_results, other_results, other_label, filtered_data_sets
 ):
+    """Merges the results of the custom prototypes optimization and the solely ML algorithm optimization.
+
+    Args:
+        auto_results: results of the custom prototypes optimization.
+        other_results: results of the exhaustive prototypes optimization.
+        other_label: labels of the exhaustive protoypes optimization
+        filtered_data_sets: list of the OpenML ids of the datasets.
+
+    Returns:
+        dict, dict: compariso of the optimization, summary of the comparison.
+    """
     auto_label = "pipeline_algorithm"
     comparison = {}
     summary = {}
@@ -488,7 +530,14 @@ def merge_custom_vs_exhaustive_results(
     return comparison, summary
 
 
-def save_custom_vs_exhaustive_comparison(comparison, result_path):
+def save_custom_vs_ml_algorithm_comparison(comparison, result_path):
+    """Saves comparison between the custom prototypes optimization and the solely ML algorithm optimization.
+
+    Args:
+        comparison: results of the comparison.
+        result_path: where to save the results.
+    """
+
     def values_to_string(values):
         return [str(value).replace(",", "") for value in values]
 
@@ -505,7 +554,13 @@ def save_custom_vs_exhaustive_comparison(comparison, result_path):
                 out.write(dataset + "," + result_string + "\n")
 
 
-def save_custom_vs_exhaustive_summary(summary, result_path):
+def save_custom_vs_ml_algorithm_summary(summary, result_path):
+    """Saves the summary of the comparison between the custom prototypes optimization and the solely ML algorithm optimization.
+
+    Args:
+        summary: summary to save.
+        result_path: where to save the summary.
+    """
     if os.path.exists("summary.csv"):
         os.remove("summary.csv")
     with open(os.path.join(result_path, "summary.csv"), "w") as out:
@@ -517,7 +572,13 @@ def save_custom_vs_exhaustive_summary(summary, result_path):
             out.write(algorithm + "," + result_string + "\n")
 
 
-def plot_custom_vs_exhaustive_comparison(comparison, result_path):
+def plot_custom_vs_ml_algorithm_comparison(comparison, result_path):
+    """Plots the comparison between the custom prototypes optimization and the solely ML algorithm optimization.
+
+    Args:
+        comparison: the comparison to plot.
+        result_path: where to plot.
+    """
     import matplotlib.pyplot as plt
     import numpy as np
 
@@ -552,8 +613,6 @@ def plot_custom_vs_exhaustive_comparison(comparison, result_path):
             pa_percentages.append(
                 comparison[acronym][key]["pa_percentage"] // 0.0001 / 100
             )
-        # print(a_percentages)
-        # print(pa_percentages)
 
         data = {
             "dataset": keys,
@@ -617,13 +676,22 @@ def plot_custom_vs_exhaustive_comparison(comparison, result_path):
 
 
 def exhaustive_prototypes(toy, plot):
+    """Performs the exhaustive prototypes optimization analysis.
+
+    Args:
+        toy: wheter it is the toy example or not.
+        plot: wheter to plot or not.
+    """
     if plot:
         print("EE08. Check for the existence of a universal pipeline prototype\n")
-        
-        if not toy:
-            print("\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
-            print("\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n")
 
+        if not toy:
+            print(
+                "\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes"
+            )
+            print(
+                "\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n"
+            )
 
     # configure environment
     if toy:
@@ -662,12 +730,22 @@ def exhaustive_prototypes(toy, plot):
 
 
 def custom_vs_exhaustive(toy, plot):
+    """Performs the comparison between the custom and exhaustive prototypes optimization.
+
+    Args:
+        toy: wheter it is the toy example or not.
+        plot: wheter to plot or not.
+    """
     if plot:
         print("EE06. Compare and plot the results from EE04 and EE05\n")
-        
+
         if not toy:
-            print("\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
-            print("\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n")
+            print(
+                "\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes"
+            )
+            print(
+                "\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n"
+            )
 
     # configure environment
     if toy:
@@ -699,7 +777,6 @@ def custom_vs_exhaustive(toy, plot):
             )
         )
     ]
-    # print(filtered_data_sets)
 
     results_pipelines = load_results_pipelines(
         exhaustive_prototypes_results_path, filtered_data_sets
@@ -708,21 +785,31 @@ def custom_vs_exhaustive(toy, plot):
     results_auto = load_results_auto(
         custom_prototypes_pipeline_algorithm_results_path, filtered_data_sets
     )
-    # print(results_pipelines)
-    # print(results_auto)
 
     save_comparison(results_pipelines, results_auto, new_results_path, plots_path, plot)
 
 
 def custom_vs_ml_algorithm(toy, plot):
+    """Performs the comparison between the custom prototypes and the ML algorithm optimization.
+
+    Args:
+        toy: wheter it is the toy example or not.
+        plot: wheter to plot or not.
+    """
     if plot:
         print("EE03. Compare and plot the results from EE01 and EE02\n")
     else:
-        print("EA04. Perform exploratory analysis: prototypes versus physical pipeline\n")
-        
+        print(
+            "EA04. Perform exploratory analysis: prototypes versus physical pipeline\n"
+        )
+
     if not toy:
-        print("\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
-        print("\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n")
+        print(
+            "\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes"
+        )
+        print(
+            "\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n"
+        )
 
     # configure environment
     if toy:
@@ -750,18 +837,18 @@ def custom_vs_ml_algorithm(toy, plot):
         )
     ]
 
-    auto_results = load_custom_vs_exhaustive_results(
+    auto_results = load_custom_vs_ml_algorithm(
         input_auto, filtered_data_sets, algorithm_comparison=True
     )
-    algorithm_results = load_custom_vs_exhaustive_results(
+    algorithm_results = load_custom_vs_ml_algorithm(
         input_algorithm, filtered_data_sets, algorithm_comparison=True
     )
 
-    comparison, summary = merge_custom_vs_exhaustive_results(
+    comparison, summary = merge_custom_vs_ml_algorithm(
         auto_results, algorithm_results, "algorithm", filtered_data_sets
     )
     # print(comparison)
-    save_custom_vs_exhaustive_comparison(comparison, results_path)
-    save_custom_vs_exhaustive_summary(summary, results_path)
+    save_custom_vs_ml_algorithm_comparison(comparison, results_path)
+    save_custom_vs_ml_algorithm_summary(summary, results_path)
     if plot:
-        plot_custom_vs_exhaustive_comparison(comparison, plots_path)
+        plot_custom_vs_ml_algorithm_comparison(comparison, plots_path)
