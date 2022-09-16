@@ -17,12 +17,27 @@ from utils.common import *
 
 
 def diff(first, second):
+    """Performs the differences between two lists.
+
+    Args:
+        first: first list.
+        second: second list.
+
+    Returns:
+        list: difference of the two lists.
+    """
     second = set(second)
     return [item for item in first if item not in second]
 
 
 def transformation_analysis(custom_prototypes_results_path, new_results_path, plots_path):
+    """Performs the analysis about transformations.
 
+    Args:
+        custom_prototypes_results_path: where to load the data.
+        new_results_path: where to save the outcome.
+        plots_path: where to plot.
+    """
     # configure environment
     input_auto = os.path.join(custom_prototypes_results_path, "pipeline_algorithm")
     discretize_count, normalize_count = {}, {}
@@ -174,7 +189,13 @@ def transformation_analysis(custom_prototypes_results_path, new_results_path, pl
 
 
 def physical_pipelines_analysis(custom_prototypes_results_path, new_results_path, plots_path):
+    """Performs the analysis about the physical pipelines.
 
+    Args:
+        custom_prototypes_results_path: where to load the data.
+        new_results_path: where to save the outcome.
+        plots_path: where to plot.
+    """
     # configure environment
     input_auto = os.path.join(custom_prototypes_results_path, "pipeline_algorithm")
     results_map = pd.DataFrame()
@@ -298,6 +319,14 @@ def physical_pipelines_analysis(custom_prototypes_results_path, new_results_path
 
 
 def prototypes_impact_analysis(exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, toy):
+    """Performs the analysis about the impact of the prototypes.
+
+    Args:
+        exhaustive_prototypes_results_path: where to load the data about the exhaustive prototypes optimization.
+        custom_prototypes_results_path: where to load the data about the custom prototypes optimization.
+        plots_path: where to plot.
+        toy: whether it is the toy example or not
+    """
     filtered_data_sets = ['_'.join(i) for i in list(itertools.product(
         ["knn", "nb", "rf"], [str(integer) for integer in get_filtered_datasets("exploratory_analysis", toy)]))]
 
@@ -346,6 +375,17 @@ def prototypes_impact_analysis(exhaustive_prototypes_results_path, custom_protot
 
 
 def get_paths(toy):
+    """Gets all the paths for the exploratory analysis.
+
+    Args:
+        toy: whether it is the toy example or not.
+
+    Returns:
+        string: path to the exhaustive prototypes optimization results.
+        string: path to the custom prototypes optimization results.
+        string: where to plot.
+        string: where to save the outcome.
+    """
     if toy:
         results_path = os.path.join(RAW_RESULT_PATH, "toy")
         plots_path = os.path.join(ARTIFACTS_PATH, "toy")
@@ -359,6 +399,12 @@ def get_paths(toy):
 
 
 def meta_learning_input_preparation(results_path, custom_prototypes_results_path):
+    """Prepares the input for the meta-learning process.
+
+    Args:
+        results_path: where to save the outcome.
+        custom_prototypes_results_path: path to the custom prototypes optimization results.
+    """
     custom_prototypes_pipeline_algorithm_results_path = os.path.join(
         custom_prototypes_results_path, "pipeline_algorithm")
     custom_vs_ml_algorithm_summary_results_path = os.path.join(
@@ -448,6 +494,11 @@ def meta_learning_input_preparation(results_path, custom_prototypes_results_path
 
 
 def run_meta_learning(toy):
+    """Performs meta-learning.
+
+    Args:
+        toy: whether it is the toy example or not.
+    """
     
     experiment = "toy" if toy else "paper"
     subprocess.call(
@@ -458,6 +509,11 @@ def run_meta_learning(toy):
 
 
 def exploratory_analysis(toy_example):
+    """Performs the whole exploratory analysis.
+
+    Args:
+        toy: whether it is the toy example or not.
+    """
     exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, new_results_path = get_paths(toy_example)
 
     print("EA05. Plot results\n")
