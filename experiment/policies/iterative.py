@@ -8,6 +8,8 @@ from hyperopt import tpe, fmin, Trials
 
 
 class Iterative(Policy):
+    """Policy of optimization that performs the optimization of data pre-processing and ML algorithm iteratively.
+    """
 
     def run(self, X, y):
         super(Iterative, self).run(X, y)

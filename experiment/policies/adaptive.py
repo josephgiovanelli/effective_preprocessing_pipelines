@@ -10,6 +10,8 @@ from hyperopt import tpe, fmin, Trials
 
 
 class Adaptive(Policy):
+    """Policy of optimization that performs the optimization of data pre-processing and ML algorithm adaptively.
+    """
 
     def __init__(self, config):
         super(Adaptive, self).__init__(config)

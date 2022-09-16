@@ -23,6 +23,8 @@ import numpy as np
 
 
 class PrototypeSingleton:
+    """Singleton used to control the data pre-processing transformations during the optimization.
+    """
     __instance = None
 
     POOL = {
@@ -59,19 +61,26 @@ class PrototypeSingleton:
 
     @staticmethod
     def getInstance():
-        """Static access method."""
+        """Static access method.
+        """
         if PrototypeSingleton.__instance == None:
             PrototypeSingleton()
         return PrototypeSingleton.__instance
 
     def __init__(self):
-        """Virtually private constructor."""
+        """Virtually private constructor.
+        """
         if PrototypeSingleton.__instance != None:
             raise Exception("This class is a singleton!")
         else:
             PrototypeSingleton.__instance = self
 
     def setPipeline(self, params):
+        """Sets the pipeline to optimize.
+
+        Args:
+            params: list of steps.
+        """
         for param in params:
             self.parts.append(param)
 
@@ -81,21 +90,37 @@ class PrototypeSingleton:
         self.DOMAIN_SPACE = generate_domain_space(self.PROTOTYPE)
 
     def setFeatures(self, num_features, cat_features):
+        """Sets the indices of the numerical and categorical features.
+
+        Args:
+            num_features: indicies of the numerical features.
+            cat_features: indicies of the categorical features.
+        """
         self.original_numerical_features = num_features
         self.current_numerical_features = num_features
         self.original_categorical_features = cat_features
         self.current_categorical_features = cat_features
 
     def set_X_y(self, X, y):
+        """Sets the dataset at hand.
+
+        Args:
+            X: data items.
+            y: labels.
+        """
         self.X = X
         self.y = y
 
     def resetFeatures(self):
+        """Resets the indicies of numerical and categorical features.
+        """
         self.current_numerical_features = self.original_numerical_features
         self.current_categorical_features = []
         self.current_categorical_features.extend(self.original_categorical_features)
 
     def applyColumnTransformer(self):
+        """Applies the column transformer to transform numerical and categorical features differently.
+        """
         len_numerical_features = len(self.current_numerical_features)
         len_categorical_features = len(self.current_categorical_features)
         self.current_numerical_features = list(range(0, len_numerical_features))
@@ -107,10 +132,14 @@ class PrototypeSingleton:
         )
 
     def applyDiscretization(self):
+        """Applies Discretization to numerical features.
+        """
         self.current_categorical_features.extend(self.current_numerical_features)
         self.current_numerical_features = []
 
     def applyOneHotEncoding(self):
+        """Applies One Hot Encoding to categorical features.
+        """
         new_categorical_features = 0
         for i in self.original_categorical_features:
             new_categorical_features += len(np.unique(self.X[:, i]))
@@ -129,13 +158,31 @@ class PrototypeSingleton:
         )
 
     def getFeatures(self):
+        """Gets the indicies of numerical and categorical features.
+
+        Returns:
+            list: indicies of the numerical features.
+            list: indicies of the categorical features.
+        """
         return self.current_numerical_features, self.current_categorical_features
 
     def getDomainSpace(self):
+        """Gets the whole search space optimized.
+        """
         return self.DOMAIN_SPACE
 
     def getPrototype(self):
+        """Gets the prototype to optimize.
+
+        Returns:
+            list: prorotype.
+        """
         return self.PROTOTYPE
 
     def getParts(self):
+        """Gets the list of steps to optimize.
+
+        Returns:
+            list: list of steps.
+        """
         return self.parts

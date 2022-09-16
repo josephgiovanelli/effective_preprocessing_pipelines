@@ -4,6 +4,15 @@ from .adaptive import Adaptive
 from .joint import Joint
 
 def initiate(name, config):
+    """Initiates a policy.
+
+    Args:
+        name: name of the policy (i.e., iterative, split, adaptive, joint).
+        config: extra config. 
+
+    Returns:
+        object: the instance of the class policy.
+    """
     policies = {
         'iterative': Iterative,
         'split': Split,

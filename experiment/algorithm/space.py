@@ -91,6 +91,14 @@ parameter_grid = {
 
 
 def get_domain_space(algorithm_name):
+    """generates the domain space of a specific algorithm.
+
+    Args:
+        algorithm_name: algorithm name
+
+    Returns:
+        dict: the domain space.
+    """
     if algorithm_name in parameter_grid.keys():
         return generate_domain_space(parameter_grid.get(algorithm_name))
     else:

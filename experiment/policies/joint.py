@@ -8,6 +8,8 @@ from hyperopt import tpe, fmin, Trials
 import hyperopt.pyll.stochastic
 
 class Joint(Policy):
+    """Policy of optimization that performs the optimization of data pre-processing and ML algorithm jointly.
+    """
 
     def run(self, X, y):
         super(Joint, self).run(X, y)

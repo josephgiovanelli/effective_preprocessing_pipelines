@@ -1,3 +1,5 @@
+"""Search space of each operator.
+"""
 
 def params_SimpleImputer():
     return {

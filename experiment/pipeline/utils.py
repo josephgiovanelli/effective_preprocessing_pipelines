@@ -8,6 +8,15 @@ from sklearn.pipeline import FeatureUnion
 from .space import *
 
 def expand_params(operation, operator):
+    """Expands the parameter of a certain operation.
+
+    Args:
+        operation: operation at hand (e.g., Normalization)
+        operator: operator at hand (e.g., StdScaler)
+
+    Returns:
+        dict: key are the name of parameters, values are the domains.
+    """
     try:
         params = globals()['params_{}'.format(type(operator).__name__)]()
         expanded_params = {}
@@ -19,6 +28,14 @@ def expand_params(operation, operator):
 
 
 def generate_grid(prototype):
+    """Generates the search space of a prototype. (Legacy)
+
+    Args:
+        prototype: list of operations.
+
+    Returns:
+        list: the search space, cartesian product of the search space of each operation.
+    """
     final_grid = []
     elements = [zip([k] * len(o), o) for k,o in prototype.items()]
     for element in itertools.product(*elements):
@@ -34,6 +51,14 @@ def generate_grid(prototype):
 
 
 def pretty_config(conf):
+    """Prints the config in a pretty way.
+
+    Args:
+        conf: config to print.
+
+    Returns:
+        string: what to print.
+    """
     print_conf = {}
     for k,v in conf.items():
         if '__' in k:
@@ -49,12 +74,25 @@ def pretty_config(conf):
 
 
 def pretty_print_grid(grid):
+    """Prints a grid in a pretty way.
+
+    Args:
+        grid: grid to print.
+    """
     for conf in grid:
         print_conf = pretty_config(conf)
         print(print_conf)
 
 
 def generate_domain_space(prototype):
+    """Generates the search space of a prototype.
+
+    Args:
+        prototype: list of operations.
+
+    Returns:
+        list: the search space, cartesian product of the search space of each operation.
+    """
     domain_space = {}
     for operation, operators in prototype.items():
         operators_space = []

@@ -13,6 +13,21 @@ from pipeline.prototype import pipeline_conf_to_full_pipeline, get_baseline
 
 
 def objective(pipeline_config, algo_config, algorithm, X, y, context, config, step):
+    """Function that is executed in the optimization process (to maximize).
+
+    Args:
+        pipeline_config: prototype to optimize.
+        algo_config: algorithm to optimize.
+        algorithm: legacy.
+        X: data items.
+        y: labels.
+        context: data structure to save the progresses.
+        config: extra information.
+        step: either algorithm or pipeline.
+
+    Returns:
+        dict: summary of the optimization
+    """
     pipeline_hash = hashlib.sha1(json.dumps(pipeline_config, sort_keys=True).encode()).hexdigest()
     algorithm_hash = hashlib.sha1(json.dumps(algo_config, sort_keys=True).encode()).hexdigest()
     item_hash = {
@@ -105,16 +120,69 @@ def objective(pipeline_config, algo_config, algorithm, X, y, context, config, st
     return item
 
 def objective_pipeline(pipeline_config, current_algo_config, algorithm, X, y, context, config):
+    """Performs the optimization on the data pre-processing pipeline.
+
+    Args:
+        pipeline_config: prototype to optimize.
+        algo_config: algorithm to optimize.
+        algorithm: legacy.
+        X: data items.
+        y: labels.
+        context: data structure to save the progresses.
+        config: extra information.
+
+    Returns:
+        dict: summary of the optimization
+    """
     return objective(pipeline_config, current_algo_config, algorithm, X, y, context, config, step='pipeline')
 
 def objective_algo(algo_config, current_pipeline_config, algorithm, X, y, context, config):
+    """Performs the optimization on the data pre-processing pipeline.
+
+    Args:
+        pipeline_config: prototype to optimize.
+        algo_config: algorithm to optimize.
+        algorithm: legacy.
+        X: data items.
+        y: labels.
+        context: data structure to save the progresses.
+        config: extra information.
+
+    Returns:
+        dict: summary of the optimization
+    """
     return objective(current_pipeline_config, algo_config, algorithm, X, y, context, config, step='algorithm')
 
 def objective_joint(wconfig, algorithm, X, y, context, config):
+    """Performs the optimization of the data pre-processing pipeline and the ML algorithm jointly.
+
+    Args:
+        wconfig: joint configuration of pipeline and algorithm.
+        algorithm: legacy
+        X: data items.
+        y: labels.
+        context: data structure to save the progresses.
+        config: extra information.
+
+    Returns:
+        _type_: _description_
+    """
     return objective(wconfig['pipeline'], wconfig['algorithm'], algorithm, X, y, context, config, step='joint')
 
 
 def get_baseline_score(algorithm, X, y, seed):
+    """Computes the baseline (no optimization at all).
+
+    Args:
+        algorithm: used algorithm.
+        X: data items.
+        y: labels.
+        seed: seed for reproducibility.
+
+    Returns:
+        float: mean of the accuracies among the folds.
+        float: std of the accuracies among the folds.
+    """
     pipeline, _ = pipeline_conf_to_full_pipeline(
         get_baseline(), 
         ALGORITHM_SPACE.algorithms.get(algorithm), 

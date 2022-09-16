@@ -9,6 +9,8 @@ import numpy as np
 
 
 class Split(Policy):
+    """Policy of optimization that performs the optimization subsequentially, specifically: data pre-processing and ML algorithm.
+    """
 
     def run(self, X, y):
         super(Split, self).run(X, y)
@@ -29,7 +31,15 @@ class Split(Policy):
                 self._optimize_algorithm(X, y, current_pipeline_configuration, trials_algo)
 
     def _get_budget(self, phase):
-    
+        """Gets the busget according to the phase at hand
+
+        Args:
+            phase: either pipeline or algorithm
+
+        Returns:
+            int: max evaluations
+            int: max time budget
+        """
         if phase == 'algorithm':
             budget = self.config['time'] - self.config['step_pipeline']
         else:
@@ -47,6 +57,17 @@ class Split(Policy):
             
 
     def _optimize_algorithm(self, X, y, current_pipeline_configuration, trials_algo):
+        """Performs the optimization on the ML algorithm at hand.
+
+        Args:
+            X: data items.
+            y: labels.
+            current_pipeline_configuration: best pipeline configuration.
+            trials_algo: data structure for data saving.
+
+        Returns:
+            dict: best algorithm configuration.
+        """
         print('## Algorithm')
         obj_algo = functools.partial(objective_algo,
                 current_pipeline_config=current_pipeline_configuration,
@@ -73,6 +94,17 @@ class Split(Policy):
         return current_algo_configuration
 
     def _optimize_pipeline(self, X, y, current_algo_configuration, trials_pipelines):
+        """Performs the optimization on the prototype at hand.
+
+        Args:
+            X: data items.
+            y: labels.
+            current_algo_configuration: best algorithm configuration.
+            trials_algo: data structure for data saving.
+
+        Returns:
+            dict: best pipeline configuration.
+        """
         print('## Data Pipeline')
         obj_pl = functools.partial(objective_pipeline,
                 current_algo_config=current_algo_configuration,
