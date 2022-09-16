@@ -13,6 +13,15 @@ from os.path import isfile, join
 
 
 def load_results(input_path, filtered_datasets):
+    """Loads the results for the experiment about data pre-processing impact.
+
+    Args:
+        input_path: where to load the results.
+        filtered_datasets: OpenML ids of the datasets.
+
+    Returns:
+        dict: the loaded results.
+    """
     result = {}
     files = [f for f in listdir(input_path) if isfile(join(input_path, f))]
     results = [f[:-5] for f in files if f[-4:] == 'json']
@@ -43,6 +52,14 @@ def load_results(input_path, filtered_datasets):
 
 
 def find_pipeline_iterations(history):
+    """Finds the number of iterations in which data pre-processing was addressed.
+
+    Args:
+        history: the whole history of iterations.
+
+    Returns:
+        int: iteration number.
+    """
     for iteration in history:
         if iteration['step'] == 'algorithm':
             pass
@@ -51,6 +68,15 @@ def find_pipeline_iterations(history):
 
 
 def perform_algorithm_pipeline_analysis(results, toy):
+    """Summarizes the results of the optimization process and performs the analysis about the data pre-processing impact.
+
+    Args:
+        results: results of the optimization process.
+        toy : whether it is the toy example or not.
+
+    Returns:
+        dict: the outcome to plot.
+    """
     pipelines_iterations, algorithm_iterations = [], []
 
     for result in results:
@@ -86,6 +112,16 @@ def perform_algorithm_pipeline_analysis(results, toy):
 
 
 def perform_analysis(results, scores, toy):
+    """Performs the analysis about the data pre-processing impact.
+
+    Args:
+        results: results of the optimization process.
+        scores: max scores of the data pre-processing and ML algorithm phases.
+        toy : whether it is the toy example or not.
+
+    Returns:
+        dict: the outcome to plot.
+    """
     scores_to_kpi = {}
     outcome = {}
 
@@ -119,6 +155,13 @@ def perform_analysis(results, scores, toy):
 
 
 def save_analysis(analysis, result_path, toy):
+    """Saves the outcome of the data pre-processing impact analysis.
+
+    Args:
+        analysis: outcome of the analysis.
+        result_path: where to save the outcome.
+        toy : whether it is the toy example or not.
+    """
 
     max_iteration = 10 if toy else 100
 
@@ -166,7 +209,11 @@ def save_analysis(analysis, result_path, toy):
 
 
 def pipeline_impact(toy):
+    """Performs the analysis about the data pre-processing impact.
 
+    Args:
+        toy : whether it is the toy example or not.
+    """
     logging.getLogger('matplotlib.font_manager').disabled = True
     if toy:
         path = os.path.join(RAW_RESULT_PATH, "toy")
