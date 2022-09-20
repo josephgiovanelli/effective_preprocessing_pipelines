@@ -687,10 +687,10 @@ def exhaustive_prototypes(toy, plot):
 
         if not toy:
             print(
-                "\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes"
+                "\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes (up to 20mins)"
             )
             print(
-                "\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n"
+                "\tWe do not provide the status bar because it depends on the memory usage, do not cancel the execution\n"
             )
 
     # configure environment
@@ -741,10 +741,10 @@ def custom_vs_exhaustive(toy, plot):
 
         if not toy:
             print(
-                "\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes"
+                "\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes (up to 20mins)"
             )
             print(
-                "\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n"
+                "\tWe do not provide the status bar because it depends on the memory usage, do not cancel the execution\n"
             )
 
     # configure environment
@@ -805,10 +805,10 @@ def custom_vs_ml_algorithm(toy, plot):
 
     if not toy:
         print(
-            "\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes"
+            "\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes (up to 20mins)"
         )
         print(
-            "\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n"
+            "\tWe do not provide the status bar because it depends on the memory usage, do not cancel the execution\n"
         )
 
     # configure environment

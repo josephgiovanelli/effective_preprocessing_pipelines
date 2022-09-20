@@ -72,8 +72,8 @@ def launch_experiments(args):
     if ((args.experiment == "exhaustive_prototypes" or 
         (args.experiment == "custom_prototypes" and args.mode == "pipeline_algorithm")) and 
         args.toy_example == False):
-        print("\t\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes")
-        print("\t\t(We do not provide the status bar because it depends on the memory usage, do not cancel the execution)\n")
+        print("\t\tWarning: Given the huge amount of data to check, depending on your laptop, this operation might take several minutes (up to 20mins) (up to 20mins)")
+        print("\t\tWe do not provide the status bar because it depends on the memory usage, do not cancel the execution\n")
 
     # Get scenario and result path
     if args.toy_example == True:

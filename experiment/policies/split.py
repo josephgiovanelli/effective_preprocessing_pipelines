@@ -31,7 +31,7 @@ class Split(Policy):
                 self._optimize_algorithm(X, y, current_pipeline_configuration, trials_algo)
 
     def _get_budget(self, phase):
-        """Gets the busget according to the phase at hand
+        """Gets the budget according to the phase at hand
 
         Args:
             phase: either pipeline or algorithm
