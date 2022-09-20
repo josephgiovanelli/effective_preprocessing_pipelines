@@ -250,10 +250,10 @@ def save_summary(summary_map, results_path, plots_path, plot):
             color="violet",
         )
 
-        plt.xlabel("Prototype ID", labelpad=10.0)
+        plt.xlabel("Prototype ID", labelpad=20.0)
         plt.ylabel(
             "Percentage of cases for which a prototype\nachieved the best performance",
-            labelpad=10.0,
+            labelpad=20.0,
         )
         plt.yticks(
             ticks=np.linspace(0, 20, 11),
@@ -261,8 +261,10 @@ def save_summary(summary_map, results_path, plots_path, plot):
         )
         # plt.title('Comparison of the goodness of the prototypes')
         plt.legend()
+        # plt.subplots_adjust(left=5, bottom=5, right=5, top=5, wspace=0, hspace=0)
         fig = plt.gcf()
-        fig.set_size_inches(12, 6)
+        fig.set_size_inches(15, 6)
+        fig.tight_layout()
         fig.savefig(os.path.join(plots_path, "Figure12.pdf"))
 
         plt.clf()
@@ -342,9 +344,10 @@ def save_comparison(results_pipelines, results_auto, result_path, plot_path, plo
             plt.ylim(0.0, 1.25)
         # plt.title('Evaluation of the prototype building through the proposed precedence')
         # plt.tight_layout()
-        plt.tight_layout(pad=0.2)
+        # plt.subplots_adjust(left=5, bottom=5, right=5, top=5, wspace=0, hspace=0)
+        plt.tight_layout(pad=4)
         fig = plt.gcf()
-        fig.set_size_inches(10, 5)
+        fig.set_size_inches(15, 6)
         fig.savefig(os.path.join(plot_path, "Figure13.pdf"))
 
         plt.clf()
