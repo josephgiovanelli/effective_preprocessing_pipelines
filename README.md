@@ -1,9 +1,11 @@
 # Reproducible experiments for generating pre-processing pipelines for AutoETL
 
 This is the repository for the companion reproducible paper of [1].
+To implement the optimization process, we departed from the code provided in [2] (GitHub repository: [https://github.com/aquemy/DPSO_experiments](https://github.com/aquemy/DPSO_experiments)).
 
-[1] J. Giovanelli, B. Bilalli, A. Abelló, Data pre-processing pipeline generation for AutoETL, Inf. Syst. (2021) 101957. http://dx.doi.org/10.1016/j.is.2021.101957 
+[1] J. Giovanelli, B. Bilalli, A. Abelló, "Data pre-processing pipeline generation for AutoETL", Inf. Syst. (2021) 101957. http://dx.doi.org/10.1016/j.is.2021.101957
 
+[2] A. Quemy, "Data Pipeline Selection and Optimization." DOLAP. 2019. http://ceur-ws.org/Vol-2324/Paper19-AQuemy.pdf
 # Requirements
 
 In order to reproduce the experiments in any operating systems, Docker is required: [https://www.docker.com/](https://www.docker.com/).
@@ -128,18 +130,20 @@ Afterwards, the workflows illustrated in the paper are run.
 ***Expected output:***
 
 ```
-### PROTOTYPE CONSTRUCTION ###
+### EXPLORATORY ANALYSIS (EA) ###
 
 Creating scenarios...
-	Done.
-Running experiments...
-	Features Rebalance
-		num invalid scenarios: 0
-		num scenarios with results: 0
-		num scenarios to run: 30
-			estimated time: 0:05:00 (300s)
-Running scenario knn_11.yaml0<?, ?it/s]
-:   0%|          | 0/300 [00:00<?, ?it/s]
+        Done.
+
+EA01. SMBO on fixed pre-processing prototypes and ML algorithms
+
+                Checking scenarios with results...
+
+                num invalid scenarios: 0
+                num scenarios with results: 0
+                num scenarios to run: 3
+                        estimated time: 0:01:00 (60s)
+:   0%|          | 0/3 [00:00<?, ?it/s]
 ```
 
 # Possible issues
