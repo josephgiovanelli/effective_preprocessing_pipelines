@@ -374,7 +374,7 @@ def prototypes_impact_analysis(exhaustive_prototypes_results_path, custom_protot
     fig.savefig(os.path.join(plots_path, "Figure7.pdf"))
 
 
-def get_paths(toy):
+def get_paths(toy, cache):
     """Gets all the paths for the exploratory analysis.
 
     Args:
@@ -389,9 +389,12 @@ def get_paths(toy):
     if toy:
         results_path = os.path.join(RAW_RESULT_PATH, "toy")
         plots_path = os.path.join(ARTIFACTS_PATH, "toy")
-    else:
+    elif cache:
         results_path = os.path.join(RAW_RESULT_PATH, "paper")
         plots_path = os.path.join(ARTIFACTS_PATH, "paper")
+    else:
+        results_path = os.path.join(RAW_RESULT_PATH, "paper_new")
+        plots_path = os.path.join(ARTIFACTS_PATH, "paper_new")
     custom_prototypes_results_path = os.path.join(results_path, "custom_prototypes")
     exhaustive_prototypes_results_path = os.path.join(results_path, "exhaustive_prototypes")
     new_results_path = create_directory(results_path, "exploratory_analysis")
@@ -493,14 +496,14 @@ def meta_learning_input_preparation(results_path, custom_prototypes_results_path
         results_path, 'meta_learning_input' + '.csv'), index=False)
 
 
-def run_meta_learning(toy):
+def run_meta_learning(toy, cache):
     """Performs meta-learning.
 
     Args:
         toy: whether it is the toy example or not.
     """
     
-    experiment = "toy" if toy else "paper"
+    experiment = "toy" if toy else ("paper" if cache else "paper_new")
     subprocess.call(
         f"Rscript experiment/results_processors/meta_learner.R {experiment}", 
         shell=True, 
@@ -508,13 +511,13 @@ def run_meta_learning(toy):
         stderr=subprocess.DEVNULL)
 
 
-def exploratory_analysis(toy_example):
+def exploratory_analysis(toy_example, cache):
     """Performs the whole exploratory analysis.
 
     Args:
         toy: whether it is the toy example or not.
     """
-    exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, new_results_path = get_paths(toy_example)
+    exhaustive_prototypes_results_path, custom_prototypes_results_path, plots_path, new_results_path = get_paths(toy_example, cache)
 
     print("EA05. Plot results\n")
     if not toy_example:
@@ -526,5 +529,5 @@ def exploratory_analysis(toy_example):
     print("EA06. Extract meta-features from datasets\n")
     meta_learning_input_preparation(new_results_path, custom_prototypes_results_path)
     print("EA07. Perform meta-learning\n")
-    run_meta_learning(toy_example)
+    run_meta_learning(toy_example, cache)
     print("EA08. Plot and check the significance of the results\n")

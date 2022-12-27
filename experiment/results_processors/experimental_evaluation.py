@@ -678,7 +678,7 @@ def plot_custom_vs_ml_algorithm_comparison(comparison, result_path):
     plt.clf()
 
 
-def exhaustive_prototypes(toy, plot):
+def exhaustive_prototypes(toy, cache, plot):
     """Performs the exhaustive prototypes optimization analysis.
 
     Args:
@@ -700,9 +700,12 @@ def exhaustive_prototypes(toy, plot):
     if toy:
         results_path = os.path.join(RAW_RESULT_PATH, "toy")
         plots_path = os.path.join(ARTIFACTS_PATH, "toy")
-    else:
+    elif cache == True:
         results_path = os.path.join(RAW_RESULT_PATH, "paper")
         plots_path = os.path.join(ARTIFACTS_PATH, "paper")
+    else:
+        results_path = os.path.join(RAW_RESULT_PATH, "paper_new")
+        plots_path = os.path.join(ARTIFACTS_PATH, "paper_new")
     results_path = os.path.join(results_path, "exhaustive_prototypes")
 
     filtered_data_sets = [
@@ -732,7 +735,7 @@ def exhaustive_prototypes(toy, plot):
     save_summary(summary, results_path, plots_path, plot)
 
 
-def custom_vs_exhaustive(toy, plot):
+def custom_vs_exhaustive(toy, cache, plot):
     """Performs the comparison between the custom and exhaustive prototypes optimization.
 
     Args:
@@ -754,9 +757,12 @@ def custom_vs_exhaustive(toy, plot):
     if toy:
         results_path = os.path.join(RAW_RESULT_PATH, "toy")
         plots_path = os.path.join(ARTIFACTS_PATH, "toy")
-    else:
+    elif cache:
         results_path = os.path.join(RAW_RESULT_PATH, "paper")
         plots_path = os.path.join(ARTIFACTS_PATH, "paper")
+    else:
+        results_path = os.path.join(RAW_RESULT_PATH, "paper_new")
+        plots_path = os.path.join(ARTIFACTS_PATH, "paper_new")
 
     custom_prototypes_results_path = os.path.join(results_path, "custom_prototypes")
     custom_prototypes_pipeline_algorithm_results_path = os.path.join(
@@ -792,7 +798,7 @@ def custom_vs_exhaustive(toy, plot):
     save_comparison(results_pipelines, results_auto, new_results_path, plots_path, plot)
 
 
-def custom_vs_ml_algorithm(toy, plot):
+def custom_vs_ml_algorithm(toy, cache, plot):
     """Performs the comparison between the custom prototypes and the ML algorithm optimization.
 
     Args:
@@ -818,9 +824,12 @@ def custom_vs_ml_algorithm(toy, plot):
     if toy:
         results_path = os.path.join(RAW_RESULT_PATH, "toy")
         plots_path = os.path.join(ARTIFACTS_PATH, "toy")
-    else:
+    elif cache:
         results_path = os.path.join(RAW_RESULT_PATH, "paper")
         plots_path = os.path.join(ARTIFACTS_PATH, "paper")
+    else:
+        results_path = os.path.join(RAW_RESULT_PATH, "paper_new")
+        plots_path = os.path.join(ARTIFACTS_PATH, "paper_new")
     results_path = os.path.join(results_path, "custom_prototypes")
     input_auto = os.path.join(results_path, "pipeline_algorithm")
     input_algorithm = os.path.join(results_path, "algorithm")

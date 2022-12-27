@@ -53,8 +53,10 @@ def generate_scenarios(args):
     # Get scenario and result path
     if args.toy_example == True:
         scenario_path = create_directory(SCENARIO_PATH, "toy")
-    else:
+    elif args.cache == True:
         scenario_path = create_directory(SCENARIO_PATH, "paper")
+    else:
+        scenario_path = create_directory(SCENARIO_PATH, "paper_new")
     scenario_path = create_directory(scenario_path, args.experiment)
 
     # Get scenarios according to the experiment at hand

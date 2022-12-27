@@ -79,9 +79,12 @@ def launch_experiments(args):
     if args.toy_example == True:
         scenario_path = create_directory(SCENARIO_PATH, "toy")
         result_path = create_directory(RAW_RESULT_PATH, "toy")
-    else:
+    elif args.cache == True:
         scenario_path = create_directory(SCENARIO_PATH, "paper")
         result_path = create_directory(RAW_RESULT_PATH, "paper")
+    else:
+        scenario_path = create_directory(SCENARIO_PATH, "paper_new")
+        result_path = create_directory(RAW_RESULT_PATH, "paper_new")
 
     scenario_path = create_directory(scenario_path, args.experiment)
     result_path = create_directory(result_path, args.experiment)

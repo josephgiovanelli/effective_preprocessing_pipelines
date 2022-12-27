@@ -19,18 +19,18 @@ def process_results(args):
         args: taken from utils.common.parse_args.
     """
     if args.experiment == "pipeline_impact":
-        pipeline_impact(args.toy_example)
+        pipeline_impact(args.toy_example, args.cache)
     elif args.experiment == "prototype_construction":
-        prototype_construction(args.toy_example)
+        prototype_construction(args.toy_example, args.cache)
     elif args.experiment == "experimental_evaluation":
-        custom_vs_ml_algorithm(args.toy_example, plot=True)
-        custom_vs_exhaustive(args.toy_example, plot=True)
-        exhaustive_prototypes(args.toy_example, plot=True)
+        custom_vs_ml_algorithm(args.toy_example, args.cache, plot=True)
+        custom_vs_exhaustive(args.toy_example, args.cache, plot=True)
+        exhaustive_prototypes(args.toy_example, args.cache, plot=True)
     elif args.experiment == "exploratory_analysis":
-        custom_vs_ml_algorithm(args.toy_example, plot=False)
-        custom_vs_exhaustive(args.toy_example, plot=False)
-        exhaustive_prototypes(args.toy_example, plot=False)
-        exploratory_analysis(args.toy_example)
+        custom_vs_ml_algorithm(args.toy_example, args.cache, plot=False)
+        custom_vs_exhaustive(args.toy_example, args.cache, plot=False)
+        exhaustive_prototypes(args.toy_example, args.cache, plot=False)
+        exploratory_analysis(args.toy_example, args.cache)
 
 
 if __name__ == "__main__":

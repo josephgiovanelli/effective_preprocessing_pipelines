@@ -1339,7 +1339,7 @@ def save_chi2tests(result_path, tests):
             saver(value, os.path.join(result_path, key + ".csv"))
 
 
-def experiments_summarizer(pipeline, toy):
+def experiments_summarizer(pipeline, toy, cache):
     """Summarizes the frequencies obtained in the optimization process.
 
     Args:
@@ -1349,8 +1349,10 @@ def experiments_summarizer(pipeline, toy):
     warnings.simplefilter(action="ignore", category=FutureWarning)
     if toy:
         path = os.path.join(RAW_RESULT_PATH, "toy")
-    else:
+    elif cache:
         path = os.path.join(RAW_RESULT_PATH, "paper")
+    else:
+        path = os.path.join(RAW_RESULT_PATH, "paper_new")
     input_path = os.path.join(path, "prototype_construction", "_".join(pipeline))
     result_path = create_directory(input_path, "summary")
     categories = create_possible_categories(pipeline)
@@ -1406,7 +1408,7 @@ def experiments_summarizer(pipeline, toy):
         )
 
 
-def experiments_summarizer_10x4cv(pipeline, toy):
+def experiments_summarizer_10x4cv(pipeline, toy, cache):
     """Summarizes the frequencies of the 10x4cv analysis.
 
     Args:
@@ -1417,8 +1419,10 @@ def experiments_summarizer_10x4cv(pipeline, toy):
     # configure environment
     if toy:
         path = os.path.join(RAW_RESULT_PATH, "toy")
-    else:
+    elif cache:
         path = os.path.join(RAW_RESULT_PATH, "paper")
+    else:
+        path = os.path.join(RAW_RESULT_PATH, "paper_new")
     input_path = os.path.join(path, "prototype_construction", "_".join(pipeline))
     result_path = create_directory(input_path, "summary")
     result_path = create_directory(result_path, "10x4cv")
@@ -1618,7 +1622,7 @@ def experiments_summarizer_10x4cv(pipeline, toy):
     )
 
 
-def graph_maker(toy):
+def graph_maker(toy, cache):
     """Plots the frequencies obtained in the optimization process.
 
     Args:
@@ -1628,9 +1632,12 @@ def graph_maker(toy):
     if toy:
         input_path = os.path.join(RAW_RESULT_PATH, "toy")
         result_path = os.path.join(ARTIFACTS_PATH, "toy")
-    else:
+    elif cache:
         input_path = os.path.join(RAW_RESULT_PATH, "paper")
         result_path = os.path.join(ARTIFACTS_PATH, "paper")
+    else:
+        input_path = os.path.join(RAW_RESULT_PATH, "paper_new")
+        result_path = os.path.join(ARTIFACTS_PATH, "paper_new")
     input_path = os.path.join(input_path, "prototype_construction")
 
     data = {}
@@ -1756,7 +1763,7 @@ def graph_maker(toy):
     )
 
 
-def graph_maker_10x4cv(toy):
+def graph_maker_10x4cv(toy, cache):
     """Plots the 10x4cv chart.
 
     Args:
@@ -1767,9 +1774,12 @@ def graph_maker_10x4cv(toy):
     if toy:
         prototype_construction_path = os.path.join(RAW_RESULT_PATH, "toy")
         plot_path = os.path.join(ARTIFACTS_PATH, "toy")
-    else:
+    elif cache:
         prototype_construction_path = os.path.join(RAW_RESULT_PATH, "paper")
         plot_path = os.path.join(ARTIFACTS_PATH, "paper")
+    else:
+        prototype_construction_path = os.path.join(RAW_RESULT_PATH, "paper_new")
+        plot_path = os.path.join(ARTIFACTS_PATH, "paper_new")
     prototype_construction_path = os.path.join(
         prototype_construction_path, "prototype_construction"
     )
@@ -1824,13 +1834,13 @@ def graph_maker_10x4cv(toy):
     fig.savefig(os.path.join(plot_path, "Figure5.pdf"))
 
 
-def run_p_binom_test(toy):
+def run_p_binom_test(toy, cache):
     """Performs the biomial test to understand if the frequencies obtain in the experiments are significant.
 
     Args:
         toy: whether it is the toy example or not.
     """
-    experiment = "toy" if toy else "paper"
+    experiment = "toy" if toy else ("paper" if cache else "paper_new")
     subprocess.call(
         f"Rscript experiment/results_processors/p_binom_test.R {experiment}",
         shell=True,
@@ -1839,28 +1849,28 @@ def run_p_binom_test(toy):
     )
 
 
-def prototype_construction(toy_example):
+def prototype_construction(toy_example, cache):
     """Performs the prototype construction analysis.
 
     Args:
         toy_example: wheter it is the toy example or not.
     """
     print("PC02. Perform significance test over the results\n")
-    experiments_summarizer(pipeline=["features", "rebalance"], toy=toy_example)
-    experiments_summarizer(pipeline=["discretize", "features"], toy=toy_example)
-    experiments_summarizer(pipeline=["features", "normalize"], toy=toy_example)
-    experiments_summarizer(pipeline=["discretize", "rebalance"], toy=toy_example)
+    experiments_summarizer(pipeline=["features", "rebalance"], toy=toy_example, cache=cache)
+    experiments_summarizer(pipeline=["discretize", "features"], toy=toy_example, cache=cache)
+    experiments_summarizer(pipeline=["features", "normalize"], toy=toy_example, cache=cache)
+    experiments_summarizer(pipeline=["discretize", "rebalance"], toy=toy_example, cache=cache)
 
     print("PC03. Validate results with 10x4 CV\n")
-    experiments_summarizer_10x4cv(pipeline=["features", "rebalance"], toy=toy_example)
-    experiments_summarizer_10x4cv(pipeline=["discretize", "features"], toy=toy_example)
-    experiments_summarizer_10x4cv(pipeline=["features", "normalize"], toy=toy_example)
-    experiments_summarizer_10x4cv(pipeline=["discretize", "rebalance"], toy=toy_example)
+    experiments_summarizer_10x4cv(pipeline=["features", "rebalance"], toy=toy_example, cache=cache)
+    experiments_summarizer_10x4cv(pipeline=["discretize", "features"], toy=toy_example, cache=cache)
+    experiments_summarizer_10x4cv(pipeline=["features", "normalize"], toy=toy_example, cache=cache)
+    experiments_summarizer_10x4cv(pipeline=["discretize", "rebalance"], toy=toy_example, cache=cache)
 
     print(
         "PC04. Select winning order for each pair (using results from PC02 and PC03)\n"
     )
     print("PC05. Combine ordered pairs of transformations\n")
-    graph_maker(toy_example)
-    graph_maker_10x4cv(toy_example)
-    run_p_binom_test(toy_example)
+    graph_maker(toy_example, cache)
+    graph_maker_10x4cv(toy_example, cache)
+    run_p_binom_test(toy_example, cache)

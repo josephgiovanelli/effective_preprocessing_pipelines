@@ -208,7 +208,7 @@ def save_analysis(analysis, result_path, toy):
     fig.savefig(os.path.join(result_path, 'Figure2.pdf'))
 
 
-def pipeline_impact(toy):
+def pipeline_impact(toy, cache):
     """Performs the analysis about the data pre-processing impact.
 
     Args:
@@ -218,9 +218,12 @@ def pipeline_impact(toy):
     if toy:
         path = os.path.join(RAW_RESULT_PATH, "toy")
         result_path = create_directory(ARTIFACTS_PATH, 'toy')
-    else:
+    elif cache:
         path = os.path.join(RAW_RESULT_PATH, "paper")
         result_path = create_directory(ARTIFACTS_PATH, 'paper')
+    else:
+        path = os.path.join(RAW_RESULT_PATH, "paper_new")
+        result_path = create_directory(ARTIFACTS_PATH, "paper_new")
     input_path = os.path.join(path, "pipeline_impact")
     filtered_data_sets = get_filtered_datasets(experiment='pipeline_impact', toy=toy)
 
