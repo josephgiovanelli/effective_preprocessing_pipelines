@@ -8,9 +8,8 @@ RUN apt-get update && \
 RUN Rscript -e 'install.packages("party")'
 RUN Rscript -e 'install.packages("caret")'
 
-RUN cd home && mkdir effective_preprocessing_pipelines
-WORKDIR /home/effective_preprocessing_pipelines
-VOLUME /home/effective_preprocessing_pipelines
+RUN cd home && mkdir dump
+WORKDIR /home/dump
 COPY experiment experiment
 COPY resources resources
 COPY scripts scripts
@@ -18,7 +17,7 @@ COPY requirements.txt .
 RUN wget -c https://dataverse.harvard.edu/api/access/datafile/6855929
 RUN unzip 6855929
 RUN rm -rf 6855929
-RUN mv raw_results /home/effective_preprocessing_pipelines/resources/raw_results
+RUN mv raw_results /home/dump/resources/raw_results
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -29,4 +28,6 @@ RUN python -m pip install --upgrade pip
 RUN python -m pip install -r requirements.txt
 
 RUN chmod 777 scripts/*
-ENTRYPOINT ["./scripts/wrapper_experiments.sh"]
+RUN cd home && mkdir autoprep
+WORKDIR /home/autoprep
+ENTRYPOINT ["sh /home/dump/scripts/wrapper_experiments.sh"]
