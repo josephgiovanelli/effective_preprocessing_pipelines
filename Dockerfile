@@ -9,8 +9,8 @@ RUN Rscript -e 'install.packages("party")'
 RUN Rscript -e 'install.packages("caret")'
 
 RUN cd home && mkdir effective_preprocessing_pipelines
-VOLUME /home/effective_preprocessing_pipelines
 WORKDIR /home/effective_preprocessing_pipelines
+VOLUME /home/effective_preprocessing_pipelines
 COPY experiment experiment
 COPY resources resources
 COPY scripts scripts
