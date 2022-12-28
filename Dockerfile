@@ -28,6 +28,6 @@ RUN python -m pip install --upgrade pip
 RUN python -m pip install -r requirements.txt
 
 RUN chmod 777 scripts/*
-RUN cd home && mkdir autoprep
+RUN mkdir /home/autoprep
 WORKDIR /home/autoprep
 ENTRYPOINT ["sh /home/dump/scripts/wrapper_experiments.sh"]
