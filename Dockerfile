@@ -9,6 +9,7 @@ RUN Rscript -e 'install.packages("party")'
 RUN Rscript -e 'install.packages("caret")'
 
 RUN cd home && mkdir effective_preprocessing_pipelines
+VOLUME /home/effective_preprocessing_pipelines
 WORKDIR /home/effective_preprocessing_pipelines
 COPY experiment experiment
 COPY resources resources
@@ -28,5 +29,4 @@ RUN python -m pip install --upgrade pip
 RUN python -m pip install -r requirements.txt
 
 RUN chmod 777 scripts/*
-VOLUME /home/effective_preprocessing_pipelines
 ENTRYPOINT ["./scripts/wrapper_experiments.sh"]
