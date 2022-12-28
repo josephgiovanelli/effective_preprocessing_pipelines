@@ -14,9 +14,9 @@ COPY experiment experiment
 COPY resources resources
 COPY scripts scripts
 COPY requirements.txt .
-RUN wget -c https://dataverse.harvard.edu/api/access/datafile/6855923
-RUN unzip 6855923
-RUN rm -rf 6855923
+RUN wget -c https://dataverse.harvard.edu/api/access/datafile/6855929
+RUN unzip 6855929
+RUN rm -rf 6855929
 RUN mv raw_results /home/effective_preprcessing_pipelines/resources/raw_results
 
 # Keeps Python from generating .pyc files in the container
