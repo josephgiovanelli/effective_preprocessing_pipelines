@@ -4,14 +4,14 @@ args = commandArgs(trailingOnly=TRUE)
 library("caret")
 library("party") 
 
-setwd("/home")
+setwd("/home/autoprep")
 # Read the experiments results
 # The columns are: DatasetID, meta-features_1, ..., meta-features_n, algorithm, transformation_1, ..., transformation_n
 # - dataset ID: the Id of the dataset
 # - meta-features_1, ..., meta-features_n: the value of the dataset meta-features
 # - algorithm: the used mining algorithm (NB, KNN, RF)
 # - transformation_1, ..., transformation_n: the operator (chosen by SMBO) for each of the transformations in the prototype
-union <- read.csv(paste("/home/autoprep/resources/raw_results/", args[1],"/exploratory_analysis/meta_learning_input.csv", sep = ""), header = TRUE)
+union <- read.csv(paste("./resources/raw_results/", args[1],"/exploratory_analysis/meta_learning_input.csv", sep = ""), header = TRUE)
 # Drop the dataset IDs
 union <- union[,-1]
 
@@ -30,7 +30,7 @@ ctreeFitFeatures <- train(features ~ .,
                           method = "ctree2", 
                           na.action = na.pass, 
                           trControl = trainControl(method = "cv"))
-pdf(paste(c("/home/autoprep/resources/artifacts/", args[1],"/Figure10.pdf"), collapse = ""), width = 15, height = 6)
+pdf(paste(c("./resources/artifacts/", args[1],"/Figure10.pdf"), collapse = ""), width = 15, height = 6)
 plot(ctreeFitFeatures$finalModel)
 dev.off()
 
@@ -39,6 +39,6 @@ ctreeFitRebalance <- train(rebalance ~ .,
                            method = "ctree2", 
                            na.action = na.pass, 
                            trControl = trainControl(method = "cv"))
-pdf(paste(c("/home/autoprep/resources/artifacts/", args[1],"/Figure11.pdf"), collapse = ""), width = 15, height = 6)
+pdf(paste(c("./resources/artifacts/", args[1],"/Figure11.pdf"), collapse = ""), width = 15, height = 6)
 plot(ctreeFitRebalance$finalModel)
 dev.off()
